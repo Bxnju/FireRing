@@ -1,5 +1,6 @@
 package com.benchopo.firering.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,11 +27,11 @@ fun CreateRoomScreen(
     val loading by gameViewModel.loading.collectAsState()
 
     // Navigate to lobby when room is created
-    LaunchedEffect(roomCode) {
-        roomCode?.let {
-            navController.navigate(Routes.LOBBY.replace("{roomCode}", it)) { popUpTo(Routes.HOME) }
-        }
-    }
+//    LaunchedEffect(roomCode) {
+//        roomCode?.let {
+//            navController.navigate(Routes.LOBBY.replace("{roomCode}", it)) { popUpTo(Routes.HOME) }
+//        }
+//    }
 
     Scaffold(
             topBar = {
@@ -64,8 +65,16 @@ fun CreateRoomScreen(
 
             Button(
                     onClick = {
-                        if (playerName.isNotBlank()) {
-                            gameViewModel.createRoom(playerName)
+
+                        try {
+                            if (playerName.isNotBlank()) {
+                                gameViewModel.createRoom(playerName)
+                            }
+                        }catch (e: Exception){
+                            Log.e("CreateRoomScreen", "Error creating room: ${e.message}")
+                        }finally {
+                            roomCode?.let {
+                                navController.navigate(Routes.LOBBY.replace("{roomCode}", it)) { popUpTo(Routes.HOME) } }
                         }
                     },
                     enabled = !loading && playerName.isNotBlank(),
