@@ -22,10 +22,16 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
         ) {
                 // Title
+                Text(
+                        "FireRing",
+                        style = MaterialTheme.typography.headlineLarge,
+                        textAlign = TextAlign.Center
+                )
+
                 Row {
                         Text(
-                                "Ring of Fire ",
-                                style = MaterialTheme.typography.headlineLarge,
+                                "The RoF game ",
+                                style = MaterialTheme.typography.headlineMedium,
                                 textAlign = TextAlign.Center
                         )
 
@@ -35,6 +41,11 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
                                 modifier = Modifier.size(48.dp)
                         )
                 }
+
+                Image(painter = painterResource(id = R.drawable.ic_logo),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(200.dp)
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
