@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "161861031986",
-    "firebase_url": "https://fire-ring-59d8a-default-rtdb.firebaseio.com",
-    "project_id": "fire-ring-59d8a",
-    "storage_bucket": "fire-ring-59d8a.firebasestorage.app"
+    "project_number": "787041682100",
+    "project_id": "fireringapp",
+    "storage_bucket": "fireringapp.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:161861031986:android:5e37ff38a1bc007eb6442b",
+        "mobilesdk_app_id": "1:787041682100:android:662a9466dc34b158440de1",
         "android_client_info": {
           "package_name": "com.benchopo.firering"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyByGavreLAyB3hBGvOoTVv5wz9CiCnD3L4"
+          "current_key": "AIzaSyAF9Y-rhYTq-OEkh_eZAj4TL_McM5-TS0U"
         }
       ],
       "services": {

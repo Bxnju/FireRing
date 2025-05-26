@@ -1,0 +1,342 @@
+{
+  "rooms": {
+    "ABC123": {
+      "info": {
+        "roomCode": "ABC123",
+        "hostId": "user1",
+        "gameState": "WAITING",
+        "kingsCupCount": 0,
+        "gameMode": "NORMAL",
+        "createdAt": 1716741123456
+      },
+      "players": {
+        "user1": {
+          "id": "user1",
+          "name": "Player One",
+          "isHost": true,
+          "isGuest": false,
+          "selectedDrinkId": "beer",
+          "drinkCount": 0,
+          "mateIds": [],
+          "isConnected": true,
+          "lastActiveTimestamp": 1716741123456,
+          "turnIndex": 0
+        },
+        "guest1": {
+          "id": "guest1",
+          "name": "Guest Player",
+          "isHost": false,
+          "isGuest": true,
+          "selectedDrinkId": "soda",
+          "drinkCount": 0,
+          "mateIds": [],
+          "isConnected": true,
+          "lastActiveTimestamp": 1716741123456,
+          "turnIndex": 1
+        }
+      },
+      "turnOrder": ["user1", "guest1"],
+      "activeRules": {
+        "no_names": {
+          "id": "no_names",
+          "title": "No Names",
+          "description": "Players cannot say each other's names. Violators drink.",
+          "createdByPlayerId": "user1",
+          "createdAt": 1716741123456,
+          "expiresAfterPlayerId": "user1",
+          "ruleType": "CUSTOM"
+        }
+      },
+      "activeGame": {
+        "miniGameId": "rockPaperScissors",
+        "startedByPlayerId": "user1",
+        "startedAt": 1716741123456,
+        "state": "COMPLETED",
+        "loserIds": ["guest1"],
+        "completedAt": 1716741124500
+      },
+      "drinks": {
+        "beer": {
+          "id": "beer",
+          "name": "Beer",
+          "alcoholContent": 4.5,
+          "emoji": "🍺",
+          "isCustom": false
+        },
+        "soda": {
+          "id": "soda",
+          "name": "Soda",
+          "alcoholContent": 0.0,
+          "emoji": "🥤",
+          "isCustom": false
+        }
+      },
+      "settings": {
+        "allowGuestPlayers": true,
+        "maxPlayers": 10,
+        "enableCustomRules": true,
+        "autoAdvanceTurns": true,
+        "kingsCupAmount": 4,
+        "breakRingEnabled": true,
+        "breakRingThreshold": 0.33
+      }
+    }
+  },
+  "users": {
+    "user1": {
+      "profile": {
+        "userId": "user1",
+        "displayName": "Player One",
+        "pinHash": "1234",
+        "lastLogin": 1716741123456
+      },
+      "savedRules": {
+        "rule_ace": true,
+        "rule_king": true
+      },
+      "customRules": {
+        "custom_rule1": {
+          "id": "custom_rule1",
+          "title": "Dance Move",
+          "description": "Player must perform a dance move or drink",
+          "popularity": 5
+        }
+      }
+    }
+  },
+  "rules": {
+    "default": {
+      "rule_ace": {
+        "id": "rule_ace",
+        "cardValue": "A",
+        "title": "All Drink",
+        "description": "All players drink.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      },
+      "rule_2": {
+        "id": "rule_2",
+        "cardValue": "2",
+        "title": "Choose",
+        "description": "The player who drew the card chooses who will drink.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      },
+      "rule_3": {
+        "id": "rule_3",
+        "cardValue": "3",
+        "title": "Me",
+        "description": "The player who drew the card drinks.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      },
+      "rule_4": {
+        "id": "rule_4",
+        "cardValue": "4",
+        "title": "Hoes",
+        "description": "All girls playing drink.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      },
+      "rule_5": {
+        "id": "rule_5",
+        "cardValue": "5",
+        "title": "Thumbs",
+        "description": "All players must put their thumbs together on the table, the last player to do so drinks.",
+        "ruleType": "PHYSICAL",
+        "isDefault": true
+      },
+      "rule_6": {
+        "id": "rule_6",
+        "cardValue": "6",
+        "title": "Dicks",
+        "description": "All men playing drink.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      },
+      "rule_7": {
+        "id": "rule_7",
+        "cardValue": "7",
+        "title": "Heaven",
+        "description": "All players must rise both hands and the last one to do so has to drink.",
+        "ruleType": "PHYSICAL",
+        "isDefault": true
+      },
+      "rule_8": {
+        "id": "rule_8",
+        "cardValue": "8",
+        "title": "Mate",
+        "description": "The player who drew the card chooses another player who will be their mate. Whenever one drinks, both drink. Mates can be chained.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      },
+      "rule_9": {
+        "id": "rule_9",
+        "cardValue": "9",
+        "title": "Rhyme",
+        "description": "The player who drew the card says any word, and in order the players must rhyme with that word. The first player on staying silent or not rhyming drinks.",
+        "ruleType": "MINIGAME",
+        "isDefault": true
+      },
+      "rule_10": {
+        "id": "rule_10",
+        "cardValue": "10",
+        "title": "Game",
+        "description": "A game is played. The losers drink.",
+        "ruleType": "MINIGAME",
+        "isDefault": true
+      },
+      "rule_jack": {
+        "id": "rule_jack",
+        "cardValue": "J",
+        "title": "Rule",
+        "description": "The player who drew the card chooses a rule. All players must follow it until the drawer's turn comes again.",
+        "ruleType": "CUSTOM",
+        "isDefault": true
+      },
+      "rule_queen": {
+        "id": "rule_queen",
+        "cardValue": "Q",
+        "title": "Cultura Chupistica",
+        "description": "The drawer says a category. Taking turns all players must say words fitting that category until one repeats or freezes. The loser drinks.",
+        "ruleType": "MINIGAME",
+        "isDefault": true
+      },
+      "rule_king": {
+        "id": "rule_king",
+        "cardValue": "K",
+        "title": "King's Cup",
+        "description": "The drawer must fill a shot of its drink and pour it on the King's Cup. The 4th time the 'K' comes out, the drawer fills the last shot and drinks the Kings Cup.",
+        "ruleType": "STANDARD",
+        "isDefault": true
+      }
+    }
+  },
+  "miniGames": {
+    "rockPaperScissors": {
+      "id": "rockPaperScissors",
+      "name": "Rock Paper Scissors",
+      "description": "Classic hand game. Losers drink.",
+      "isCustom": false
+    },
+    "truthOrDare": {
+      "id": "truthOrDare",
+      "name": "Truth or Dare",
+      "description": "Choose truth or dare. Failing either means you drink.",
+      "isCustom": false
+    },
+    "neverHaveIEver": {
+      "id": "neverHaveIEver",
+      "name": "Never Have I Ever",
+      "description": "Say something you've never done. Those who have done it drink.",
+      "isCustom": false
+    }
+  },
+  "customRuleTemplates": {
+    "no_names": {
+      "id": "no_names",
+      "title": "No Names",
+      "description": "Players cannot say each other's names. Violators drink.",
+      "popularity": 87
+    },
+    "no_phones": {
+      "id": "no_phones",
+      "title": "No Phones",
+      "description": "Players cannot use their phones. Violators drink.",
+      "popularity": 65
+    },
+    "no_pointing": {
+      "id": "no_pointing",
+      "title": "No Pointing",
+      "description": "Players cannot point at anything. Violators drink.",
+      "popularity": 42
+    }
+  },
+  "drinks": {
+    "default": {
+      "beer": {
+        "id": "beer",
+        "name": "Beer",
+        "alcoholContent": 4.5,
+        "emoji": "🍺",
+        "isCustom": false
+      },
+      "wine": {
+        "id": "wine",
+        "name": "Wine",
+        "alcoholContent": 12.0,
+        "emoji": "🍷",
+        "isCustom": false
+      },
+      "whiskey": {
+        "id": "whiskey",
+        "name": "Whiskey",
+        "alcoholContent": 40.0,
+        "emoji": "🥃",
+        "isCustom": false
+      },
+      "vodka": {
+        "id": "vodka",
+        "name": "Vodka",
+        "alcoholContent": 40.0,
+        "emoji": "🥂",
+        "isCustom": false
+      },
+      "tequila": {
+        "id": "tequila",
+        "name": "Tequila",
+        "alcoholContent": 38.0,
+        "emoji": "🥃",
+        "isCustom": false
+      },
+      "rum": {
+        "id": "rum",
+        "name": "Rum",
+        "alcoholContent": 40.0,
+        "emoji": "🥃",
+        "isCustom": false
+      },
+      "soda": {
+        "id": "soda",
+        "name": "Soda",
+        "alcoholContent": 0.0,
+        "emoji": "🥤",
+        "isCustom": false
+      },
+      "water": {
+        "id": "water",
+        "name": "Water",
+        "alcoholContent": 0.0,
+        "emoji": "💧",
+        "isCustom": false
+      }
+    }
+  },
+  "gameModes": {
+    "normal": {
+      "id": "normal",
+      "name": "Normal",
+      "description": "Standard Ring of Fire rules."
+    },
+    "camionero": {
+      "id": "camionero",
+      "name": "Camionero",
+      "description": "Truck driver mode - higher alcohol content and more challenging rules."
+    },
+    "despechado": {
+      "id": "despechado",
+      "name": "Despechado",
+      "description": "Heartbroken mode - sad songs and drinking to forget."
+    },
+    "media_copas": {
+      "id": "media_copas",
+      "name": "Media Copas",
+      "description": "Half-drunk mode - lighter drinking with more social rules."
+    },
+    "calenturientos": {
+      "id": "calenturientos",
+      "name": "Calenturientos",
+      "description": "Hot mode - spicy and daring rules."
+    }
+  }
+}

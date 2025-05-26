@@ -5,63 +5,56 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.benchopo.firering.viewmodel.GameViewModel
+import com.benchopo.firering.navigation.Routes
 
 @Composable
-fun HomeScreen(navController: NavController, gameViewModel: GameViewModel = viewModel()) {
-    var playerName by remember { mutableStateOf("") }
-
-    val roomCode by gameViewModel.roomCode.collectAsState()
-    val loading by gameViewModel.loading.collectAsState()
-
+fun HomeScreen(navController: NavController) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Welcome to FireRing 🔥", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = playerName,
-            onValueChange = { playerName = it },
-            label = { Text("Enter your name") }
+        // Title
+        Text(
+                "Ring of Fire 🔥",
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
+        Text(
+                "The drinking card game",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        // Create Room Button
         Button(
-            onClick = {
-                if (playerName.isNotBlank()) {
-                    gameViewModel.createRoom(playerName)
-                }
-            },
-            enabled = !loading && playerName.isNotBlank()
-        ) {
-            Text("Create Room")
-        }
+                onClick = { navController.navigate(Routes.CREATE_ROOM) },
+                modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
+        ) { Text("Create a Room", style = MaterialTheme.typography.titleMedium) }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
-            // Aquí podrías implementar luego la lógica para unirse a sala
-        }) {
-            Text("Join Room")
-        }
+        // Join Room Button
+        Button(
+                onClick = { navController.navigate(Routes.JOIN_ROOM) },
+                modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
+        ) { Text("Join a Room", style = MaterialTheme.typography.titleMedium) }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
-        if (loading) {
-            CircularProgressIndicator()
-        }
-
-        roomCode?.let {
-            Text("Room code: $it", style = MaterialTheme.typography.bodyLarge)
-        }
+        // Version info or other details can go here
+        Text(
+                "Version 0.1",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
