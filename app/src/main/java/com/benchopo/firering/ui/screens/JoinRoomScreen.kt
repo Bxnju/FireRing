@@ -8,14 +8,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.benchopo.firering.navigation.Routes
 import com.benchopo.firering.viewmodel.GameViewModel
+import com.benchopo.firering.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JoinRoomScreen(navController: NavController, gameViewModel: GameViewModel = viewModel()) {
+fun JoinRoomScreen(
+        navController: NavController,
+        userViewModel: UserViewModel,
+        gameViewModel: GameViewModel
+) {
     var playerName by remember { mutableStateOf("") }
     var roomCode by remember { mutableStateOf("") }
 

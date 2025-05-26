@@ -9,52 +9,55 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.benchopo.firering.navigation.Routes
+import com.benchopo.firering.viewmodel.GameViewModel
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Title
-        Text(
-                "Ring of Fire 🔥",
-                style = MaterialTheme.typography.headlineLarge,
-                textAlign = TextAlign.Center
-        )
+fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
+        LaunchedEffect(Unit) { gameViewModel.clearGameData() }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+                modifier = Modifier.fillMaxSize().padding(24.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+                // Title
+                Text(
+                        "Ring of Fire 🔥",
+                        style = MaterialTheme.typography.headlineLarge,
+                        textAlign = TextAlign.Center
+                )
 
-        Text(
-                "The drinking card game",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
-        )
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(48.dp))
+                Text(
+                        "The drinking card game",
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                )
 
-        // Create Room Button
-        Button(
-                onClick = { navController.navigate(Routes.CREATE_ROOM) },
-                modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
-        ) { Text("Create a Room", style = MaterialTheme.typography.titleMedium) }
+                Spacer(modifier = Modifier.height(48.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+                // Create Room Button
+                Button(
+                        onClick = { navController.navigate(Routes.CREATE_ROOM) },
+                        modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
+                ) { Text("Create a Room", style = MaterialTheme.typography.titleMedium) }
 
-        // Join Room Button
-        Button(
-                onClick = { navController.navigate(Routes.JOIN_ROOM) },
-                modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
-        ) { Text("Join a Room", style = MaterialTheme.typography.titleMedium) }
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(48.dp))
+                // Join Room Button
+                Button(
+                        onClick = { navController.navigate(Routes.JOIN_ROOM) },
+                        modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
+                ) { Text("Join a Room", style = MaterialTheme.typography.titleMedium) }
 
-        // Version info or other details can go here
-        Text(
-                "Version 0.1",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
+                Spacer(modifier = Modifier.height(48.dp))
+
+                // Version info or other details can go here
+                Text(
+                        "Version 0.1",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+        }
 }

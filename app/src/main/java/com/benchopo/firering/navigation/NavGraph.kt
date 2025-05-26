@@ -7,6 +7,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.benchopo.firering.ui.screens.*
+import com.benchopo.firering.viewmodel.ConnectionViewModel
+import com.benchopo.firering.viewmodel.GameViewModel
+import com.benchopo.firering.viewmodel.UserViewModel
 
 object Routes {
     const val HOME = "home"
@@ -17,25 +20,47 @@ object Routes {
 }
 
 @Composable
-fun NavGraph() {
+fun NavGraph(
+        userViewModel: UserViewModel,
+        gameViewModel: GameViewModel,
+        connectionViewModel: ConnectionViewModel
+) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Routes.HOME) {
-        composable(Routes.HOME) { HomeScreen(navController) }
-        composable(Routes.CREATE_ROOM) { CreateRoomScreen(navController) }
-        composable(Routes.JOIN_ROOM) { JoinRoomScreen(navController) }
+        // Fix: Pass gameViewModel to HomeScreen
+        composable(Routes.HOME) { HomeScreen(navController, gameViewModel) }
+
+        composable(Routes.CREATE_ROOM) {
+            CreateRoomScreen(navController, userViewModel, gameViewModel)
+        }
+
+        composable(Routes.JOIN_ROOM) { JoinRoomScreen(navController, userViewModel, gameViewModel) }
+
         composable(
                 Routes.LOBBY,
                 arguments = listOf(navArgument("roomCode") { type = NavType.StringType })
         ) { backStackEntry ->
             val roomCode = backStackEntry.arguments?.getString("roomCode") ?: ""
-            LobbyScreen(navController, roomCode)
+            LobbyScreen(
+                    navController = navController,
+                    roomCode = roomCode,
+                    userViewModel = userViewModel,
+                    gameViewModel = gameViewModel,
+                    connectionViewModel = connectionViewModel
+            )
         }
+
         composable(
                 Routes.GAME,
                 arguments = listOf(navArgument("roomCode") { type = NavType.StringType })
         ) { backStackEntry ->
             val roomCode = backStackEntry.arguments?.getString("roomCode") ?: ""
-            GameScreen(navController, roomCode)
+            GameScreen(
+                    navController = navController,
+                    roomCode = roomCode,
+                    userViewModel = userViewModel,
+                    gameViewModel = gameViewModel
+            )
         }
     }
 }

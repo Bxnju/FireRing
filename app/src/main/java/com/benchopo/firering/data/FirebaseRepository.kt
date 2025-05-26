@@ -1,5 +1,6 @@
 package com.benchopo.firering.data
 
+import android.util.Log
 import com.benchopo.firering.model.*
 import com.google.firebase.database.*
 import java.util.*
@@ -13,10 +14,10 @@ class FirebaseRepository {
     private val db = FirebaseDatabase.getInstance().reference
 
     // Room Operations
-    suspend fun createGameRoom(hostPlayerName: String): String {
+    suspend fun createGameRoom(hostPlayerName: String, userId: String): String {
         val roomCode = generateRoomCode()
         val deck = generateDeck()
-        val hostPlayerId = hostPlayerName + UUID.randomUUID().toString()
+        val hostPlayerId = userId // Use the provided userId instead of generating one
         val player =
                 Player(id = hostPlayerId, name = hostPlayerName, isHost = true, isGuest = false)
 
@@ -75,15 +76,16 @@ class FirebaseRepository {
 
         // Create new player
         val playerId = playerName + UUID.randomUUID().toString()
-        val player = Player(
-            id = playerId,
-            name = playerName,
-            isHost = false,
-            isGuest = true,
-            isConnected = true,
-            // Use current timestamp instead of ServerValue.TIMESTAMP here
-            lastActiveTimestamp = System.currentTimeMillis()
-        )
+        val player =
+                Player(
+                        id = playerId,
+                        name = playerName,
+                        isHost = false,
+                        isGuest = true,
+                        isConnected = true,
+                        // Use current timestamp instead of ServerValue.TIMESTAMP here
+                        lastActiveTimestamp = System.currentTimeMillis()
+                )
 
         // Add player to room
         val roomRef = db.child("rooms").child(roomCode)
@@ -372,60 +374,98 @@ class FirebaseRepository {
 
     suspend fun setPlayerOnlineStatus(roomCode: String, playerId: String, isOnline: Boolean) {
         val playerRef = db.child("rooms").child(roomCode).child("players").child(playerId)
-        val updates = hashMapOf<String, Any>(
-            "isConnected" to isOnline,
-            // Use the ServerValue.TIMESTAMP as a raw map value
-            "lastActiveTimestamp" to ServerValue.TIMESTAMP
-        )
+        val updates =
+                hashMapOf<String, Any>(
+                        "isConnected" to isOnline,
+                        // Use the ServerValue.TIMESTAMP as a raw map value
+                        "lastActiveTimestamp" to ServerValue.TIMESTAMP
+                )
         playerRef.updateChildren(updates).await()
     }
 
     // Add this method to leave a room
 
     suspend fun leaveRoom(roomCode: String, playerId: String) {
-        val roomRef = db.child("rooms").child(roomCode)
+        try {
+            Log.d("FirebaseRepository", "Removing player $playerId from room $roomCode")
+            val roomRef = db.child("rooms").child(roomCode)
 
-        // Get current players and turn order
-        val turnOrderRef = roomRef.child("turnOrder")
-        val turnOrderSnapshot = turnOrderRef.get().await()
-        val turnOrder =
-                turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }.toMutableList()
+            // First check if room and player exist
+            val roomSnapshot = roomRef.get().await()
+            if (!roomSnapshot.exists()) {
+                Log.w("FirebaseRepository", "Room $roomCode doesn't exist")
+                return
+            }
 
-        // Remove player from turn order
-        turnOrder.remove(playerId)
-        if (turnOrder.isNotEmpty()) {
-            turnOrderRef.setValue(turnOrder).await()
+            val playerSnapshot = roomRef.child("players").child(playerId).get().await()
+            if (!playerSnapshot.exists()) {
+                Log.w("FirebaseRepository", "Player $playerId doesn't exist in room $roomCode")
+                return
+            }
+
+            // 1. Remove from turn order first
+            val turnOrderRef = roomRef.child("turnOrder")
+            val turnOrderSnapshot = turnOrderRef.get().await()
+            val turnOrder =
+                    turnOrderSnapshot
+                            .children
+                            .map { it.getValue(String::class.java)!! }
+                            .toMutableList()
+
+            Log.d("FirebaseRepository", "Current turn order: $turnOrder")
+            turnOrder.remove(playerId)
+            Log.d("FirebaseRepository", "New turn order after removal: $turnOrder")
+
+            // 2. Handle current player transition if needed
+            val currentPlayerIdRef = roomRef.child("currentPlayerId")
+            val currentPlayerIdSnapshot = currentPlayerIdRef.get().await()
+            val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java)
+
+            // 3. Handle host transition if needed
+            val infoRef = roomRef.child("info")
+            val hostIdSnapshot = infoRef.child("hostId").get().await()
+            val hostId = hostIdSnapshot.getValue(String::class.java)
+
+            // 4. Create a batch update
+            val updates = mutableMapOf<String, Any?>()
+
+            // Update turn order
+            if (turnOrder.isNotEmpty()) {
+                updates["turnOrder"] = turnOrder
+            }
+
+            // If this was the current player, advance to next
+            if (currentPlayerId == playerId && turnOrder.isNotEmpty()) {
+                updates["currentPlayerId"] = turnOrder[0]
+            }
+
+            // If this was the host, assign a new host
+            if (hostId == playerId && turnOrder.isNotEmpty()) {
+                val newHostId = turnOrder[0]
+                updates["info/hostId"] = newHostId
+                updates["players/$newHostId/isHost"] = true
+            }
+
+            // If no players left, mark game as finished
+            if (turnOrder.isEmpty()) {
+                updates["info/gameState"] = GameState.FINISHED.name
+            }
+
+            // Remove player entry
+            updates["players/$playerId"] = null
+
+            // Execute all updates in a single batch
+            roomRef.updateChildren(updates).await()
+            Log.d("FirebaseRepository", "Successfully removed player $playerId from room $roomCode")
+        } catch (e: Exception) {
+            Log.e("FirebaseRepository", "Error removing player: ${e.message}", e)
+            throw e
         }
+    }
 
-        // Check if this player was the current player
-        val currentPlayerIdRef = roomRef.child("currentPlayerId")
-        val currentPlayerIdSnapshot = currentPlayerIdRef.get().await()
-        val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java)
-
-        // If this was the current player, advance to next
-        if (currentPlayerId == playerId && turnOrder.isNotEmpty()) {
-            val nextPlayerId = turnOrder[0]
-            currentPlayerIdRef.setValue(nextPlayerId).await()
-        }
-
-        // Remove player from players list
-        roomRef.child("players").child(playerId).removeValue().await()
-
-        // If this was the host, assign a new host if possible
-        val infoRef = roomRef.child("info")
-        val hostIdSnapshot = infoRef.child("hostId").get().await()
-        val hostId = hostIdSnapshot.getValue(String::class.java)
-
-        if (hostId == playerId && turnOrder.isNotEmpty()) {
-            // Assign new host
-            val newHostId = turnOrder[0]
-            infoRef.child("hostId").setValue(newHostId).await()
-            roomRef.child("players").child(newHostId).child("isHost").setValue(true).await()
-        }
-
-        // If no players left, mark game as finished
-        if (turnOrder.isEmpty()) {
-            infoRef.child("gameState").setValue(GameState.FINISHED.name).await()
-        }
+    // Add this method to FirebaseRepository.kt
+    suspend fun getRoomHostId(roomCode: String): String? {
+        val roomSnapshot = db.child("rooms").child(roomCode).child("info").get().await()
+        return roomSnapshot.child("hostId").getValue(String::class.java)
     }
 }

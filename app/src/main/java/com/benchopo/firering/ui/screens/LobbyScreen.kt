@@ -13,19 +13,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.benchopo.firering.model.GameState
 import com.benchopo.firering.navigation.Routes
+import com.benchopo.firering.viewmodel.ConnectionViewModel
 import com.benchopo.firering.viewmodel.GameViewModel
-import kotlinx.coroutines.launch
+import com.benchopo.firering.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LobbyScreen(
-        navController: NavController,
         roomCode: String,
-        gameViewModel: GameViewModel = viewModel()
+        navController: NavController,
+        userViewModel: UserViewModel,
+        gameViewModel: GameViewModel,
+        connectionViewModel: ConnectionViewModel
 ) {
     val scope = rememberCoroutineScope()
 
@@ -34,17 +36,26 @@ fun LobbyScreen(
     val loading by gameViewModel.loading.collectAsState()
     val playerId by gameViewModel.playerId.collectAsState()
 
-    // Check if we're the host
-    val isHost = gameRoom?.hostId == playerId
+    // Update how we check if the player is host
+    val currentPlayerId = gameViewModel.playerId.collectAsState().value
+
+    // Check if current player is host by checking the isHost flag directly from player object
+    val isHost =
+            remember(gameRoom, currentPlayerId) {
+                gameRoom?.players?.get(currentPlayerId)?.isHost == true
+            }
 
     // Track players
     val players = gameRoom?.players?.values?.toList() ?: emptyList()
 
     // Debug output
-    LaunchedEffect(gameRoom) {
+    LaunchedEffect(gameRoom, currentPlayerId, players) {
         Log.d("LobbyScreen", "Room data updated: ${gameRoom?.roomCode}")
         Log.d("LobbyScreen", "Players: ${players.map { it.name }}")
-        Log.d("LobbyScreen", "Is host: $isHost (playerId=$playerId, hostId=${gameRoom?.hostId})")
+        Log.d(
+                "LobbyScreen",
+                "Is host: $isHost (playerId=$currentPlayerId, hostId=${gameRoom?.hostId})"
+        )
     }
 
     // Ensure we get room updates
@@ -70,6 +81,35 @@ fun LobbyScreen(
 
     // Handle back press
     BackHandler { showLeaveDialog = true }
+
+    // Debug logs to help diagnose host status
+    LaunchedEffect(gameRoom, currentPlayerId) {
+        Log.d("LobbyScreen", "Current player ID: $currentPlayerId")
+        Log.d("LobbyScreen", "Host ID from room: ${gameRoom?.hostId}")
+        Log.d("LobbyScreen", "Room players: ${gameRoom?.players?.keys}")
+        Log.d(
+                "LobbyScreen",
+                "Current player is host: ${gameRoom?.players?.get(currentPlayerId)?.isHost == true}"
+        )
+    }
+
+    // Ensure room is loaded and player ID is set correctly
+    LaunchedEffect(roomCode, gameViewModel.playerId.value) {
+        Log.d(
+                "LobbyScreen",
+                "Ensuring room loaded: $roomCode with player: ${gameViewModel.playerId.value}"
+        )
+        gameViewModel.ensureRoomLoaded(roomCode)
+
+        // If we know the room code but not the player ID, try to retrieve it
+        if (gameViewModel.playerId.value == null) {
+            val hostId = gameViewModel.gameRoom.value?.hostId
+            if (hostId != null) {
+                Log.d("LobbyScreen", "Setting player ID to host: $hostId")
+                gameViewModel.setPlayerId(hostId) // Use the public method instead
+            }
+        }
+    }
 
     Scaffold(
             topBar = {
@@ -194,9 +234,9 @@ fun LobbyScreen(
                             Button(
                                     onClick = {
                                         Log.d("LobbyScreen", "Confirming leave game")
-                                        scope.launch {
-                                            gameViewModel.leaveRoom()
-                                            Log.d("LobbyScreen", "Left game, navigating to home")
+                                        gameViewModel.leaveRoom {
+                                            // This is now called after leave completes
+                                            Log.d("LobbyScreen", "Navigating to home")
                                             navController.navigate(Routes.HOME) {
                                                 popUpTo(Routes.HOME) { inclusive = true }
                                             }

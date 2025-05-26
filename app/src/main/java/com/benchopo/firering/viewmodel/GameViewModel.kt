@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benchopo.firering.data.FirebaseRepository
 import com.benchopo.firering.model.*
+import java.util.UUID
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class GameViewModel : ViewModel() {
-
+class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val repository = FirebaseRepository()
 
     private val _loading = MutableStateFlow(false)
@@ -38,20 +38,25 @@ class GameViewModel : ViewModel() {
         _loading.value = true
         viewModelScope.launch {
             try {
-                val code = repository.createGameRoom(hostPlayerName)
-                _roomCode.value = code
+                val userId = UUID.randomUUID().toString() // Cleaner ID generation
+                val code = repository.createGameRoom(hostPlayerName, userId)
 
-                // Start listening for room updates
-                repository.getRoom(code).collect { room ->
-                    if (room != null) {
-                        _gameRoom.value = room
-                        // Find host player (current user)
-                        _playerId.value = room.hostId
-                        _currentPlayer.value = room.players[room.hostId]
-                    }
-                }
+                userViewModel.setUserInfo(userId, hostPlayerName)
+                _roomCode.value = code
+                Log.d("GameViewModel", "Room created with code: $code")
+
+                // Get the hostId immediately after creation
+                val hostId = repository.getRoomHostId(code)
+
+                // Set both values immediately
+                _playerId.value = hostId
+
+                Log.d("GameViewModel", "Player ID set to: $hostId")
+
+                // Now start listening for room updates
+                loadRoom(code)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("GameViewModel", "Failed to create room", e)
                 _error.value = "Failed to create room: ${e.message}"
             } finally {
                 _loading.value = false
@@ -256,28 +261,31 @@ class GameViewModel : ViewModel() {
 
     // Add a method to leave the room
 
-    fun leaveRoom() {
-        val roomCode = _roomCode.value ?: return
-        val playerId = _playerId.value ?: return
+    fun leaveRoom(onComplete: () -> Unit = {}) {
+        val roomCode = _roomCode.value
+        val playerId = _playerId.value
 
-        Log.d("GameViewModel", "Leaving room: $roomCode, player: $playerId")
+        if (roomCode == null || playerId == null) {
+            Log.e("GameViewModel", "Cannot leave room - roomCode=$roomCode, playerId=$playerId")
+            onComplete() // Still allow navigation even if we can't properly leave
+            return
+        }
+
         _loading.value = true
         viewModelScope.launch {
             try {
-                // Make sure we're calling this correctly
                 repository.leaveRoom(roomCode, playerId)
                 Log.d("GameViewModel", "Successfully left room")
-                // Clear all game state
+            } catch (e: Exception) {
+                Log.e("GameViewModel", "Error leaving room", e)
+            } finally {
+                // Always clear state and complete
                 _roomCode.value = null
                 _playerId.value = null
                 _gameRoom.value = null
                 _currentPlayer.value = null
-                _drawnCard.value = null
-            } catch (e: Exception) {
-                Log.e("GameViewModel", "Failed to leave room", e)
-                _error.value = "Failed to leave room: ${e.message}"
-            } finally {
                 _loading.value = false
+                onComplete()
             }
         }
     }
@@ -298,9 +306,7 @@ class GameViewModel : ViewModel() {
                         _gameRoom.value = room
 
                         // Update current player if we have playerId
-                        _playerId.value?.let { pid ->
-                            _currentPlayer.value = room.players[pid]
-                        }
+                        _playerId.value?.let { pid -> _currentPlayer.value = room.players[pid] }
                     }
                 }
             } catch (e: Exception) {
@@ -308,5 +314,61 @@ class GameViewModel : ViewModel() {
                 _error.value = "Failed to load room: ${e.message}"
             }
         }
+    }
+
+    // Ensure room is loaded
+    fun ensureRoomLoaded(roomCode: String) {
+        Log.d("GameViewModel", "Ensuring room is loaded: $roomCode")
+
+        if (_roomCode.value != roomCode) {
+            _roomCode.value = roomCode
+
+            // Clear and reload if room code changed
+            _gameRoom.value = null
+        }
+
+        if (_gameRoom.value == null) {
+            viewModelScope.launch {
+                try {
+                    Log.d("GameViewModel", "Starting to collect room data")
+                    repository.getRoom(roomCode).collect { room ->
+                        if (room != null) {
+                            Log.d(
+                                    "GameViewModel",
+                                    "Room data received: ${room.roomCode}, players: ${room.players.size}"
+                            )
+                            _gameRoom.value = room
+
+                            // Update current player if possible
+                            _playerId.value?.let { pid ->
+                                val player = room.players[pid]
+                                Log.d("GameViewModel", "Current player update: $player")
+                                _currentPlayer.value = player
+                            }
+                        } else {
+                            Log.w("GameViewModel", "Received null room data")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("GameViewModel", "Error loading room", e)
+                    _error.value = "Failed to load room: ${e.message}"
+                }
+            }
+        }
+    }
+
+    // Clear game data
+    fun clearGameData() {
+        _roomCode.value = null
+        _playerId.value = null
+        _gameRoom.value = null
+        _currentPlayer.value = null
+        _drawnCard.value = null
+        _error.value = null
+    }
+
+    // Add this public method to set player ID
+    fun setPlayerId(id: String?) {
+        _playerId.value = id
     }
 }
