@@ -1,10 +1,13 @@
 package com.benchopo.firering.ui.screens
 
+import androidx.compose.foundation.Image
+import com.benchopo.firering.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -18,11 +21,21 @@ fun HomeScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Title
-        Text(
-                "Ring of Fire 🔥",
+        Row {
+            Text(
+                "Ring of Fire ",
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
-        )
+            )
+
+            Image(
+                painter = painterResource(id = R.drawable.ic_beer),
+                contentDescription = "Beer Icon",
+                modifier = Modifier.size(48.dp)
+            )
+
+        }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
