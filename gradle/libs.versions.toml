@@ -30,6 +30,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 navigation-compose = "androidx.navigation:navigation-compose:2.7.7"
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 
+splashscreen = { group = "androidx.core", name = "core-splashscreen", version = "1.0.1" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
