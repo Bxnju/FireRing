@@ -63,7 +63,7 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
         Image(
             painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = "Logo",
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(350.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
