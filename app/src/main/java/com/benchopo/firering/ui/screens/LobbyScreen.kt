@@ -137,7 +137,7 @@ fun LobbyScreen(
 
     fun copyToClipboard(code: String) {
         clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(code))
-        Toast.makeText(context, "Código copiado al portapapeles", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Código copiado al portapapeles ", Toast.LENGTH_SHORT).show()
     }
 
     Scaffold(

@@ -69,13 +69,17 @@ fun CreateRoomScreen(
                     modifier = Modifier.size(100.dp)
             )
 
-            Row {
-                Text("Create Room ", style = MaterialTheme.typography.displayMedium)
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Create Room ", style = MaterialTheme.typography.headlineLarge)
 
                 Image(
                         painter = painterResource(id = R.drawable.ic_beer_bottle),
                         contentDescription = "Beer Icon",
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(46.dp)
                 )
             }
 
