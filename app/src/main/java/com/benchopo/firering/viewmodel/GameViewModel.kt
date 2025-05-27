@@ -45,13 +45,10 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 _roomCode.value = code
                 Log.d("GameViewModel", "Room created with code: $code")
 
-                // Get the hostId immediately after creation
-                val hostId = repository.getRoomHostId(code)
-
                 // Set both values immediately
-                _playerId.value = hostId
+                _playerId.value = userId
 
-                Log.d("GameViewModel", "Player ID set to: $hostId")
+                Log.d("GameViewModel", "Player ID set to: $userId")
 
                 // Now start listening for room updates
                 loadRoom(code)
