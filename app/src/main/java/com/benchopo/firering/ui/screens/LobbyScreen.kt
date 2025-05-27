@@ -1,5 +1,6 @@
 package com.benchopo.firering.ui.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,7 @@ import com.benchopo.firering.viewmodel.ConnectionViewModel
 import com.benchopo.firering.viewmodel.GameViewModel
 import com.benchopo.firering.viewmodel.UserViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LobbyScreen(
@@ -40,10 +42,9 @@ fun LobbyScreen(
     val currentPlayerId = gameViewModel.playerId.collectAsState().value
 
     // Check if current player is host by checking the isHost flag directly from player object
-    val isHost =
-            remember(gameRoom, currentPlayerId) {
-                gameRoom?.players?.get(currentPlayerId)?.isHost == true
-            }
+    val isHost = remember(gameRoom, currentPlayerId) {
+        currentPlayerId == gameRoom?.hostId
+    }
 
     // Track players
     val players = gameRoom?.players?.values?.toList() ?: emptyList()

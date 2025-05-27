@@ -468,4 +468,92 @@ class FirebaseRepository {
         val roomSnapshot = db.child("rooms").child(roomCode).child("info").get().await()
         return roomSnapshot.child("hostId").getValue(String::class.java)
     }
+
+    suspend fun getRoomOnce(roomCode: String): GameRoom? {
+        val roomSnapshot = db.child("rooms").child(roomCode).get().await()
+        if (!roomSnapshot.exists()) {
+            return null
+        }
+
+        // Parse the snapshot into a GameRoom object (reuse your existing parsing logic)
+        // This is a one-time fetch, not a continuous flow
+
+        return parseRoomSnapshot(roomSnapshot)
+    }
+
+    // Helper method to parse a DataSnapshot into a GameRoom
+    private fun parseRoomSnapshot(snapshot: DataSnapshot): GameRoom? {
+        if (!snapshot.exists()) {
+            return null
+        }
+
+        try {
+            // Extract room info
+            val infoSnapshot = snapshot.child("info")
+            val roomCode = infoSnapshot.child("roomCode").getValue(String::class.java) ?: ""
+            val hostId = infoSnapshot.child("hostId").getValue(String::class.java) ?: ""
+            val gameStateStr =
+                    infoSnapshot.child("gameState").getValue(String::class.java)
+                            ?: GameState.WAITING.name
+            val gameState = GameState.valueOf(gameStateStr)
+            val kingsCupCount =
+                    infoSnapshot.child("kingsCupCount").getValue(Long::class.java)?.toInt() ?: 0
+            val gameModeStr =
+                    infoSnapshot.child("gameMode").getValue(String::class.java)
+                            ?: GameMode.NORMAL.name
+            val gameMode = GameMode.valueOf(gameModeStr)
+            val createdAt =
+                    infoSnapshot.child("createdAt").getValue(Long::class.java)
+                            ?: System.currentTimeMillis()
+
+            // Extract players
+            val playersMap = mutableMapOf<String, Player>()
+            snapshot.child("players").children.forEach { playerSnapshot ->
+                val player = playerSnapshot.getValue(Player::class.java)
+                if (player != null) {
+                    playersMap[player.id] = player
+                }
+            }
+
+            // Extract cards
+            val allCards = mutableListOf<Card>()
+            snapshot.child("cards").children.forEach { cardSnapshot ->
+                val card = cardSnapshot.getValue(Card::class.java)
+                if (card != null) {
+                    allCards.add(card)
+                }
+            }
+            val drawnCards = allCards.filter { it.isDrawn }
+            val deck = allCards.filter { !it.isDrawn }
+
+            // Extract turn order
+            val turnOrder =
+                    snapshot.child("turnOrder").children.mapNotNull {
+                        it.getValue(String::class.java)
+                    }
+
+            // Extract current card and player
+            val currentCardId = snapshot.child("currentCardId").getValue(String::class.java)
+            val currentPlayerId = snapshot.child("currentPlayerId").getValue(String::class.java)
+
+            // Build GameRoom object
+            return GameRoom(
+                    roomCode = roomCode,
+                    hostId = hostId,
+                    players = playersMap,
+                    deck = deck,
+                    drawnCards = drawnCards,
+                    currentCardId = currentCardId,
+                    currentPlayerId = currentPlayerId,
+                    gameState = gameState,
+                    turnOrder = turnOrder,
+                    kingsCupCount = kingsCupCount,
+                    gameMode = gameMode,
+                    createdAt = createdAt
+            )
+        } catch (e: Exception) {
+            Log.e("FirebaseRepository", "Error parsing room snapshot", e)
+            return null
+        }
+    }
 }

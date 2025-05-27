@@ -26,11 +26,11 @@ fun CreateRoomScreen(
     val loading by gameViewModel.loading.collectAsState()
 
     // Navigate to lobby when room is created
-    LaunchedEffect(roomCode) {
-        roomCode?.let {
-            navController.navigate(Routes.LOBBY.replace("{roomCode}", it)) { popUpTo(Routes.HOME) }
-        }
-    }
+    // LaunchedEffect(roomCode) {
+    //     roomCode?.let {
+    //         navController.navigate(Routes.LOBBY.replace("{roomCode}", it)) { popUpTo(Routes.HOME) }
+    //     }
+    // }
 
     Scaffold(
             topBar = {
@@ -65,7 +65,14 @@ fun CreateRoomScreen(
             Button(
                     onClick = {
                         if (playerName.isNotBlank()) {
-                            gameViewModel.createRoom(playerName)
+                            gameViewModel.createRoom(playerName) {
+                                // This will only run after room creation is complete
+                                roomCode?.let { code ->
+                                    navController.navigate(
+                                            Routes.LOBBY.replace("{roomCode}", code)
+                                    ) { popUpTo(Routes.HOME) }
+                                }
+                            }
                         }
                     },
                     enabled = !loading && playerName.isNotBlank(),

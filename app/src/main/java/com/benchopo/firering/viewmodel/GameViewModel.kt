@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.benchopo.firering.data.FirebaseRepository
 import com.benchopo.firering.model.*
 import java.util.UUID
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -33,25 +34,43 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val _drawnCard = MutableStateFlow<Card?>(null)
     val drawnCard: StateFlow<Card?> = _drawnCard
 
+    private var activeRoomJob: Job? = null
+
     // Called when creating a new room
-    fun createRoom(hostPlayerName: String) {
+    fun createRoom(hostPlayerName: String, onComplete: () -> Unit = {}) {
         _loading.value = true
         viewModelScope.launch {
             try {
-                val userId = UUID.randomUUID().toString() // Cleaner ID generation
+                // 1. Generate player ID
+                val userId = UUID.randomUUID().toString()
+
+                // 2. Create the room in Firebase
                 val code = repository.createGameRoom(hostPlayerName, userId)
 
-                userViewModel.setUserInfo(userId, hostPlayerName)
-                _roomCode.value = code
-                Log.d("GameViewModel", "Room created with code: $code")
-
-                // Set both values immediately
+                // 3. Set local state
                 _playerId.value = userId
+                _roomCode.value = code
+                userViewModel.setUserInfo(userId, hostPlayerName)
 
-                Log.d("GameViewModel", "Player ID set to: $userId")
+                // 4. Get initial room data once (not as a continuous flow)
+                val initialRoom = repository.getRoomOnce(code)
+                if (initialRoom != null) {
+                    _gameRoom.value = initialRoom
+                    _currentPlayer.value = initialRoom.players[userId]
+                }
 
-                // Now start listening for room updates
-                loadRoom(code)
+                // 5. Now we can safely navigate
+                onComplete()
+
+                // 6. Start continuous flow collection AFTER navigation
+                viewModelScope.launch {
+                    repository.getRoom(code).collect { room ->
+                        if (room != null) {
+                            _gameRoom.value = room
+                            _playerId.value?.let { pid -> _currentPlayer.value = room.players[pid] }
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Failed to create room", e)
                 _error.value = "Failed to create room: ${e.message}"
@@ -271,16 +290,17 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         _loading.value = true
         viewModelScope.launch {
             try {
+                // Cancel any active room subscriptions
+                activeRoomJob?.cancel()
+                activeRoomJob = null
+
                 repository.leaveRoom(roomCode, playerId)
                 Log.d("GameViewModel", "Successfully left room")
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Error leaving room", e)
             } finally {
                 // Always clear state and complete
-                _roomCode.value = null
-                _playerId.value = null
-                _gameRoom.value = null
-                _currentPlayer.value = null
+                clearGameData()
                 _loading.value = false
                 onComplete()
             }
@@ -294,23 +314,28 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             _roomCode.value = roomCode
         }
 
-        viewModelScope.launch {
-            try {
-                // Start collecting room updates
-                repository.getRoom(roomCode).collect { room ->
-                    Log.d("GameViewModel", "Room update: $room")
-                    if (room != null) {
-                        _gameRoom.value = room
+        // Cancel any existing room subscription
+        activeRoomJob?.cancel()
 
-                        // Update current player if we have playerId
-                        _playerId.value?.let { pid -> _currentPlayer.value = room.players[pid] }
+        activeRoomJob =
+                viewModelScope.launch {
+                    try {
+                        // Start collecting room updates
+                        repository.getRoom(roomCode).collect { room ->
+                            Log.d("GameViewModel", "Room update: $room")
+                            if (room != null) {
+                                _gameRoom.value = room
+                                // Update current player if we have playerId
+                                _playerId.value?.let { pid ->
+                                    _currentPlayer.value = room.players[pid]
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("GameViewModel", "Error loading room", e)
+                        _error.value = "Failed to load room: ${e.message}"
                     }
                 }
-            } catch (e: Exception) {
-                Log.e("GameViewModel", "Error loading room", e)
-                _error.value = "Failed to load room: ${e.message}"
-            }
-        }
     }
 
     // Ensure room is loaded
@@ -319,38 +344,42 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
         if (_roomCode.value != roomCode) {
             _roomCode.value = roomCode
-
             // Clear and reload if room code changed
             _gameRoom.value = null
         }
 
+        // Only reload if we don't have room data yet
         if (_gameRoom.value == null) {
-            viewModelScope.launch {
-                try {
-                    Log.d("GameViewModel", "Starting to collect room data")
-                    repository.getRoom(roomCode).collect { room ->
-                        if (room != null) {
-                            Log.d(
-                                    "GameViewModel",
-                                    "Room data received: ${room.roomCode}, players: ${room.players.size}"
-                            )
-                            _gameRoom.value = room
+            // Cancel any existing room subscription
+            activeRoomJob?.cancel()
 
-                            // Update current player if possible
-                            _playerId.value?.let { pid ->
-                                val player = room.players[pid]
-                                Log.d("GameViewModel", "Current player update: $player")
-                                _currentPlayer.value = player
+            activeRoomJob =
+                    viewModelScope.launch {
+                        try {
+                            Log.d("GameViewModel", "Starting to collect room data")
+                            repository.getRoom(roomCode).collect { room ->
+                                if (room != null) {
+                                    Log.d(
+                                            "GameViewModel",
+                                            "Room data received: ${room.roomCode}, players: ${room.players.size}"
+                                    )
+                                    _gameRoom.value = room
+
+                                    // Update current player if possible
+                                    _playerId.value?.let { pid ->
+                                        val player = room.players[pid]
+                                        Log.d("GameViewModel", "Current player update: $player")
+                                        _currentPlayer.value = player
+                                    }
+                                } else {
+                                    Log.w("GameViewModel", "Received null room data")
+                                }
                             }
-                        } else {
-                            Log.w("GameViewModel", "Received null room data")
+                        } catch (e: Exception) {
+                            Log.e("GameViewModel", "Error loading room", e)
+                            _error.value = "Failed to load room: ${e.message}"
                         }
                     }
-                } catch (e: Exception) {
-                    Log.e("GameViewModel", "Error loading room", e)
-                    _error.value = "Failed to load room: ${e.message}"
-                }
-            }
         }
     }
 
