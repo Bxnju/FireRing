@@ -15,8 +15,6 @@ import androidx.navigation.NavController
 import com.benchopo.firering.navigation.Routes
 import com.benchopo.firering.viewmodel.GameViewModel
 import com.benchopo.firering.viewmodel.UserViewModel
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.sp
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ButtonDefaults
@@ -123,8 +121,13 @@ fun GameScreen(
             )
         }
     ) { paddingValues ->
+        val scrollState = rememberScrollState()
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Turn indicator
@@ -228,7 +231,7 @@ fun GameScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Show the last 3 drawn cards (excluding the current one)
-                LazyRow(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -243,7 +246,7 @@ fun GameScreen(
                         taken
                     }
 
-                    items(historyCards) { historyCard ->
+                    historyCards.forEach() { historyCard ->
                         Log.d("GameScreen", "Rendering history card: ${historyCard.value} of ${historyCard.suit}")
                         Card(
                             modifier = Modifier
