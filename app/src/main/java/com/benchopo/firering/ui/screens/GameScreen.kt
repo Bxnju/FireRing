@@ -32,6 +32,7 @@ import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
 import com.benchopo.firering.ui.components.JackRuleSelector
 import com.benchopo.firering.ui.components.MiniGameSelector
+import com.benchopo.firering.ui.components.PlayerSelector
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +67,11 @@ fun GameScreen(
     val miniGames by gameViewModel.miniGames.collectAsState(emptyList())
     val selectedJackRule by gameViewModel.selectedJackRule.collectAsState()
     val selectedMiniGame by gameViewModel.selectedMiniGame.collectAsState()
+
+    // Add selected drinker state collections
+    val showPlayerSelector by gameViewModel.showPlayerSelector.collectAsState(false)
+    val selectedDrinkerId by gameViewModel.selectedDrinkerId.collectAsState()
+    val selectedDrinkerName by gameViewModel.selectedDrinkerName.collectAsState()
 
     // Determine if it's this player's turn
     val isCurrentPlayerTurn = remember(gameRoom, playerId) {
@@ -465,6 +471,68 @@ fun GameScreen(
             onDismiss = {
                 Log.d("GameScreen", "Mini Game selection cancelled")
                 gameViewModel.clearSelections()
+            }
+        )
+    }
+
+    // Add player selector dialog
+    if (showPlayerSelector && isCurrentPlayerTurn) {
+        Log.d("GameScreen", "Showing player selector")
+        PlayerSelector(
+            players = gameRoom?.players?.values?.toList() ?: emptyList(),
+            currentPlayerId = playerId ?: "",
+            onPlayerSelected = { id, name ->
+                Log.d("GameScreen", "Player selected to drink: $name (ID: $id)")
+                gameViewModel.selectPlayerToDrink(id, name)
+            },
+            onDismiss = {
+                Log.d("GameScreen", "Player selection cancelled")
+                gameViewModel.clearSelections()
+            }
+        )
+    }
+
+    // Add notification dialog for the player who was selected to drink
+    if (selectedDrinkerId != null) {
+        val isCurrentPlayerSelected = selectedDrinkerId == playerId
+        val selectorName = remember(gameRoom, selectedDrinkerName) {
+            gameRoom?.selectedDrinkerBy?.let { gameRoom?.players?.get(it)?.name } ?: "Someone"
+        }
+
+        Log.d("GameScreen", "Showing selected player notification. Current player selected: $isCurrentPlayerSelected")
+
+        AlertDialog(
+            onDismissRequest = {
+                if (isCurrentPlayerTurn) {
+                    Log.d("GameScreen", "Dismissing player selection and advancing turn")
+                    gameViewModel.clearSelections()
+                    gameViewModel.advanceTurn()
+                }
+            },
+            title = { Text(if (isCurrentPlayerSelected) "You've Been Selected!" else "$selectedDrinkerName Has Been Selected") },
+            text = {
+                if (isCurrentPlayerSelected) {
+                    Text("$selectorName has chosen you to drink. Bottoms up! 🍻")
+                } else {
+                    Text("$selectorName has chosen $selectedDrinkerName to drink.")
+                }
+            },
+            confirmButton = {
+                if (isCurrentPlayerTurn) {
+                    Button(
+                        onClick = {
+                            Log.d("GameScreen", "Player selection confirmed, advancing turn")
+                            gameViewModel.clearSelections()
+                            gameViewModel.advanceTurn()
+                        }
+                    ) {
+                        Text("Next")
+                    }
+                } else {
+                    Button(onClick = {}, enabled = false) {
+                        Text("Waiting for ${currentTurnPlayer?.name}")
+                    }
+                }
             }
         )
     }

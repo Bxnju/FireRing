@@ -57,6 +57,16 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val _showMiniGameSelector = MutableStateFlow(false)
     val showMiniGameSelector: StateFlow<Boolean> = _showMiniGameSelector
 
+    // State for player selection (Card 2)
+    private val _showPlayerSelector = MutableStateFlow(false)
+    val showPlayerSelector: StateFlow<Boolean> = _showPlayerSelector
+
+    private val _selectedDrinkerId = MutableStateFlow<String?>(null)
+    val selectedDrinkerId: StateFlow<String?> = _selectedDrinkerId
+
+    private val _selectedDrinkerName = MutableStateFlow<String?>(null)
+    val selectedDrinkerName: StateFlow<String?> = _selectedDrinkerName
+
     private var activeRoomJob: Job? = null
 
     // Called when creating a new room
@@ -216,6 +226,10 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
                 // Check for special cards
                 when (card?.value) {
+                    "2" -> {
+                        // Show player selector for choosing who drinks
+                        _showPlayerSelector.value = true
+                    }
                     "J" -> {
                         _showJackRuleSelector.value = true
                         loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL)
@@ -593,6 +607,26 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             Log.d("GameViewModel", "Mini Game was cleared, updating local state")
             _selectedMiniGame.value = null
         }
+
+        // Add to updateCurrentCardFromRoom method in GameViewModel
+
+        // Check for selected drinker by any player
+        if (gameRoom.selectedDrinkerId != null && _selectedDrinkerId.value == null) {
+            // A player was selected to drink, but we don't have it locally
+            Log.d("GameViewModel", "Player selected to drink by another player")
+
+            // Get the selected player name
+            val selectedPlayerName = gameRoom.players[gameRoom.selectedDrinkerId]?.name ?: "Unknown"
+
+            // Update local state
+            _selectedDrinkerId.value = gameRoom.selectedDrinkerId
+            _selectedDrinkerName.value = selectedPlayerName
+        } else if (gameRoom.selectedDrinkerId == null && _selectedDrinkerId.value != null) {
+            // The selected drinker was cleared in the database, clear it locally too
+            Log.d("GameViewModel", "Selected drinker was cleared, updating local state")
+            _selectedDrinkerId.value = null
+            _selectedDrinkerName.value = null
+        }
     }
 
     // Load rules and games
@@ -637,6 +671,26 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         }
     }
 
+    // Method to select a player to drink
+    fun selectPlayerToDrink(playerId: String, playerName: String) {
+        Log.d("GameViewModel", "Selecting player to drink: $playerName (ID: $playerId)")
+
+        _showPlayerSelector.value = false
+        _selectedDrinkerId.value = playerId
+        _selectedDrinkerName.value = playerName
+
+        val roomCode = _roomCode.value ?: return
+        val currentPlayerId = _playerId.value ?: return
+
+        viewModelScope.launch {
+            try {
+                repository.selectPlayerToDrink(roomCode, currentPlayerId, playerId)
+            } catch (e: Exception) {
+                _error.value = "Failed to select player: ${e.message}"
+            }
+        }
+    }
+
     // Clear selections
     fun clearSelections() {
         val roomCode = _roomCode.value ?: return
@@ -648,6 +702,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 _selectedMiniGame.value = null
                 _showJackRuleSelector.value = false
                 _showMiniGameSelector.value = false
+                _showPlayerSelector.value = false
+                _selectedDrinkerId.value = null
+                _selectedDrinkerName.value = null
 
                 // Clear in Firebase using repository
                 repository.clearSelections(roomCode)

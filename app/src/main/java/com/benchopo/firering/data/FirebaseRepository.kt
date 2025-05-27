@@ -224,6 +224,10 @@ class FirebaseRepository {
                             val currentMiniGameSelectedBy =
                                     snapshot.child("currentMiniGameSelectedBy").getValue(String::class.java)
 
+                            // Extract selected drinker info
+                            val selectedDrinkerId = snapshot.child("selectedDrinkerId").getValue(String::class.java)
+                            val selectedDrinkerBy = snapshot.child("selectedDrinkerBy").getValue(String::class.java)
+
                             // Build GameRoom object
                             val gameRoom =
                                     GameRoom(
@@ -242,7 +246,9 @@ class FirebaseRepository {
                                             currentJackRuleId = currentJackRuleId,
                                             currentJackRuleSelectedBy = currentJackRuleSelectedBy,
                                             currentMiniGameId = currentMiniGameId,
-                                            currentMiniGameSelectedBy = currentMiniGameSelectedBy
+                                            currentMiniGameSelectedBy = currentMiniGameSelectedBy,
+                                            selectedDrinkerId = selectedDrinkerId,
+                                            selectedDrinkerBy = selectedDrinkerBy
                                     )
 
                             trySend(gameRoom)
@@ -381,7 +387,10 @@ class FirebaseRepository {
             "currentJackRuleId" to null,
             "currentJackRuleSelectedBy" to null,
             "currentMiniGameId" to null,
-            "currentMiniGameSelectedBy" to null
+            "currentMiniGameSelectedBy" to null,
+            // Clear selected drinker
+            "selectedDrinkerId" to null,
+            "selectedDrinkerBy" to null
         )
 
         // Apply all updates at once
@@ -667,6 +676,10 @@ class FirebaseRepository {
             val currentMiniGameSelectedBy =
                     snapshot.child("currentMiniGameSelectedBy").getValue(String::class.java)
 
+            // Extract selected drinker info
+            val selectedDrinkerId = snapshot.child("selectedDrinkerId").getValue(String::class.java)
+            val selectedDrinkerBy = snapshot.child("selectedDrinkerBy").getValue(String::class.java)
+
             // Build GameRoom object
             return GameRoom(
                     roomCode = roomCode,
@@ -684,7 +697,9 @@ class FirebaseRepository {
                     currentJackRuleId = currentJackRuleId,
                     currentJackRuleSelectedBy = currentJackRuleSelectedBy,
                     currentMiniGameId = currentMiniGameId,
-                    currentMiniGameSelectedBy = currentMiniGameSelectedBy
+                    currentMiniGameSelectedBy = currentMiniGameSelectedBy,
+                    selectedDrinkerId = selectedDrinkerId,
+                    selectedDrinkerBy = selectedDrinkerBy
             )
         } catch (e: Exception) {
             Log.e("FirebaseRepository", "Error parsing room snapshot", e)
@@ -722,9 +737,26 @@ class FirebaseRepository {
             "currentJackRuleId" to null,
             "currentJackRuleSelectedBy" to null,
             "currentMiniGameId" to null,
-            "currentMiniGameSelectedBy" to null
+            "currentMiniGameSelectedBy" to null,
+            "selectedDrinkerId" to null,
+            "selectedDrinkerBy" to null
         )
 
         roomRef.updateChildren(updates).await()
+    }
+
+    // Method to set player who should drink
+    suspend fun selectPlayerToDrink(roomCode: String, selectingPlayerId: String, selectedPlayerId: String) {
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val updates = hashMapOf<String, Any>(
+            "selectedDrinkerId" to selectedPlayerId,
+            "selectedDrinkerBy" to selectingPlayerId
+        )
+
+        roomRef.updateChildren(updates).await()
+
+        // Increment the selected player's drink count
+        updatePlayerDrinkCount(roomCode, selectedPlayerId, 1)
     }
 }

@@ -16,5 +16,7 @@ data class GameRoom(
     val currentJackRuleId: String? = null,
     val currentJackRuleSelectedBy: String? = null,
     val currentMiniGameId: String? = null,
-    val currentMiniGameSelectedBy: String? = null
+    val currentMiniGameSelectedBy: String? = null,
+    val selectedDrinkerId: String? = null,
+    val selectedDrinkerBy: String? = null
 )
