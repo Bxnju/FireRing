@@ -54,7 +54,7 @@ fun FireRingTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = FireRingTypography,
         content = content
     )
 }
