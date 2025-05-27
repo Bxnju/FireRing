@@ -42,9 +42,15 @@ fun LobbyScreen(
     val currentPlayerId = gameViewModel.playerId.collectAsState().value
 
     // Check if current player is host by checking the isHost flag directly from player object
-    val isHost = remember(gameRoom, currentPlayerId) {
-        currentPlayerId == gameRoom?.hostId
-    }
+    val isHost =
+            remember(gameRoom, currentPlayerId) {
+                val result = currentPlayerId == gameRoom?.hostId
+                Log.d(
+                        "LobbyScreen",
+                        "isHost calculation: $result (currentPlayerId=$currentPlayerId, hostId=${gameRoom?.hostId})"
+                )
+                result
+            }
 
     // Track players
     val players = gameRoom?.players?.values?.toList() ?: emptyList()
@@ -90,8 +96,9 @@ fun LobbyScreen(
         Log.d("LobbyScreen", "Room players: ${gameRoom?.players?.keys}")
         Log.d(
                 "LobbyScreen",
-                "Current player is host: ${gameRoom?.players?.get(currentPlayerId)?.isHost == true}"
+                "Current player isHost property: ${gameRoom?.players?.get(currentPlayerId)?.isHost}"
         )
+        Log.d("LobbyScreen", "Host check by ID comparison: ${currentPlayerId == gameRoom?.hostId}")
     }
 
     // Ensure room is loaded and player ID is set correctly
@@ -109,6 +116,15 @@ fun LobbyScreen(
                 Log.d("LobbyScreen", "Setting player ID to host: $hostId")
                 gameViewModel.setPlayerId(hostId) // Use the public method instead
             }
+        }
+    }
+
+    // Add this LaunchedEffect to redirect if we end up in LobbyScreen without valid data
+    LaunchedEffect(gameRoom, currentPlayerId) {
+        // If after room loading we still don't have valid data, go back to home
+        if (gameRoom == null && currentPlayerId == null) {
+            Log.d("LobbyScreen", "No valid room data, returning to home")
+            navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } }
         }
     }
 

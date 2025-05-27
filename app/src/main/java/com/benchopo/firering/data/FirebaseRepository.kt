@@ -15,17 +15,25 @@ class FirebaseRepository {
 
     // Room Operations
     suspend fun createGameRoom(hostPlayerName: String, userId: String): String {
+        Log.d("FirebaseRepository", "Creating game room for host: $hostPlayerName with ID: $userId")
         val roomCode = generateRoomCode()
+        Log.d("FirebaseRepository", "Generated room code: $roomCode")
+
         val deck = generateDeck()
+        Log.d("FirebaseRepository", "Generated deck with ${deck.size} cards")
+
         val hostPlayerId = userId // Use the provided userId instead of generating one
         val player =
                 Player(id = hostPlayerId, name = hostPlayerName, isHost = true, isGuest = false)
+        Log.d("FirebaseRepository", "Created host player: $player")
 
         // Get default drinks
         val defaultDrinks = getDefaultDrinks()
+        Log.d("FirebaseRepository", "Added ${defaultDrinks.size} default drinks")
 
         // Create room structure
         val roomRef = db.child("rooms").child(roomCode)
+        Log.d("FirebaseRepository", "Preparing room data structure")
 
         // Create the room info
         val roomInfo =
@@ -57,20 +65,27 @@ class FirebaseRepository {
 
         // Write all data at once
         roomRef.updateChildren(updates).await()
+        Log.d("FirebaseRepository", "Room data written to database successfully")
 
         return roomCode
     }
 
     suspend fun joinRoom(roomCode: String, playerName: String): String? {
+        Log.d("FirebaseRepository", "Joining room: $roomCode with player name: $playerName")
+
         // Check if room exists
         val roomSnapshot = db.child("rooms").child(roomCode).get().await()
         if (!roomSnapshot.exists()) {
+            Log.w("FirebaseRepository", "Room $roomCode not found")
             return null
         }
 
         // Get current game state
         val gameStateSnapshot = roomSnapshot.child("info/gameState").getValue(String::class.java)
+        Log.d("FirebaseRepository", "Room game state: $gameStateSnapshot")
+
         if (gameStateSnapshot == GameState.FINISHED.name) {
+            Log.w("FirebaseRepository", "Cannot join - game is already finished")
             return null // Can't join if game has finished
         }
 
@@ -103,6 +118,7 @@ class FirebaseRepository {
         turnOrder.add(playerId)
         turnOrderRef.setValue(turnOrder).await()
 
+        Log.d("FirebaseRepository", "Player successfully joined room. ID: $playerId")
         return playerId
     }
 

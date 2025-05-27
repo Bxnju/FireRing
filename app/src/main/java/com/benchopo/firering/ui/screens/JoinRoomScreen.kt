@@ -27,13 +27,6 @@ fun JoinRoomScreen(
     val error by gameViewModel.error.collectAsState()
     val joinedRoomCode by gameViewModel.roomCode.collectAsState()
 
-    // Navigate to lobby when room is joined
-    LaunchedEffect(joinedRoomCode) {
-        joinedRoomCode?.let {
-            navController.navigate(Routes.LOBBY.replace("{roomCode}", it)) { popUpTo(Routes.HOME) }
-        }
-    }
-
     Scaffold(
             topBar = {
                 TopAppBar(
@@ -85,7 +78,14 @@ fun JoinRoomScreen(
             Button(
                     onClick = {
                         if (playerName.isNotBlank() && roomCode.isNotBlank()) {
-                            gameViewModel.joinRoom(roomCode, playerName)
+                            gameViewModel.joinRoom(roomCode, playerName) {
+                                // This will only run after room join is complete
+                                joinedRoomCode?.let { code ->
+                                    navController.navigate(
+                                            Routes.LOBBY.replace("{roomCode}", code)
+                                    ) { popUpTo(Routes.HOME) }
+                                }
+                            }
                         }
                     },
                     enabled = !loading && playerName.isNotBlank() && roomCode.length == 5,

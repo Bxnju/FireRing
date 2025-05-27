@@ -1,5 +1,6 @@
 package com.benchopo.firering.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,12 @@ import com.benchopo.firering.viewmodel.GameViewModel
 
 @Composable
 fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
+        // This LaunchedEffect will run once when HomeScreen appears
+        LaunchedEffect(Unit) {
+                Log.d("HomeScreen", "Entered HomeScreen, clearing all game data")
+                gameViewModel.clearGameData()
+        }
+
         Column(
                 modifier = Modifier.fillMaxSize().padding(24.dp),
                 verticalArrangement = Arrangement.Center,
@@ -47,7 +54,8 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
                         )
                 }
 
-                Image(painter = painterResource(id = R.drawable.ic_logo),
+                Image(
+                        painter = painterResource(id = R.drawable.ic_logo),
                         contentDescription = "Logo",
                         modifier = Modifier.size(200.dp)
                 )
@@ -65,24 +73,34 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
                 // Create Room Button
                 Button(
                         onClick = { navController.navigate(Routes.CREATE_ROOM) },
-                        modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                                .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent // Hacemos el fondo del botón transparente
-                        ),
+                        modifier = Modifier.fillMaxWidth(0.8f).height(56.dp),
+                        colors =
+                                ButtonDefaults.buttonColors(
+                                        containerColor =
+                                                Color.Transparent // Hacemos el fondo del botón
+                                        // transparente
+                                        ),
                         contentPadding = PaddingValues() // Quitamos el padding interno del botón
                 ) {
                         Box(
-                                modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                                brush = Brush.linearGradient(
-                                                        colors = listOf(Color(0xFFFF9800), Color(0xFFFF5722))
-                                                ),
-                                                shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .clip(RoundedCornerShape(12.dp)),
+                                modifier =
+                                        Modifier.fillMaxSize()
+                                                .background(
+                                                        brush =
+                                                                Brush.linearGradient(
+                                                                        colors =
+                                                                                listOf(
+                                                                                        Color(
+                                                                                                0xFFFF9800
+                                                                                        ),
+                                                                                        Color(
+                                                                                                0xFFFF5722
+                                                                                        )
+                                                                                )
+                                                                ),
+                                                        shape = RoundedCornerShape(12.dp)
+                                                )
+                                                .clip(RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                         ) {
                                 Text(
@@ -95,28 +113,32 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
-
                 // Join Room Button
                 Button(
                         onClick = { navController.navigate(Routes.JOIN_ROOM) },
-                        modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                                .height(56.dp),
-                        colors = ButtonDefaults
-                                .buttonColors(containerColor = Color.Transparent),
+                        modifier = Modifier.fillMaxWidth(0.8f).height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                         contentPadding = PaddingValues()
-                ){
+                ) {
                         Box(
-                                modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                                brush = Brush.linearGradient(
-                                                        colors = listOf(Color(0xFFFF9800), Color(0xFFFF5722))
-                                                ),
-                                                shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .clip(RoundedCornerShape(12.dp)),
+                                modifier =
+                                        Modifier.fillMaxSize()
+                                                .background(
+                                                        brush =
+                                                                Brush.linearGradient(
+                                                                        colors =
+                                                                                listOf(
+                                                                                        Color(
+                                                                                                0xFFFF9800
+                                                                                        ),
+                                                                                        Color(
+                                                                                                0xFFFF5722
+                                                                                        )
+                                                                                )
+                                                                ),
+                                                        shape = RoundedCornerShape(12.dp)
+                                                )
+                                                .clip(RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                         ) {
                                 Text(

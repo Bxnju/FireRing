@@ -38,36 +38,60 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     // Called when creating a new room
     fun createRoom(hostPlayerName: String, onComplete: () -> Unit = {}) {
+        Log.d("GameViewModel", "Creating room with host: $hostPlayerName")
         _loading.value = true
         viewModelScope.launch {
             try {
                 // 1. Generate player ID
                 val userId = UUID.randomUUID().toString()
+                Log.d("GameViewModel", "Generated user ID: $userId")
 
                 // 2. Create the room in Firebase
                 val code = repository.createGameRoom(hostPlayerName, userId)
+                Log.d("GameViewModel", "Room created successfully with code: $code")
 
                 // 3. Set local state
                 _playerId.value = userId
                 _roomCode.value = code
                 userViewModel.setUserInfo(userId, hostPlayerName)
+                Log.d("GameViewModel", "Local state updated with room code and player ID")
 
                 // 4. Get initial room data once (not as a continuous flow)
                 val initialRoom = repository.getRoomOnce(code)
                 if (initialRoom != null) {
+                    Log.d(
+                            "GameViewModel",
+                            "Initial room data loaded: ${initialRoom.players.size} players"
+                    )
                     _gameRoom.value = initialRoom
                     _currentPlayer.value = initialRoom.players[userId]
+                } else {
+                    Log.w("GameViewModel", "Initial room data is null")
                 }
 
                 // 5. Now we can safely navigate
+                Log.d("GameViewModel", "Calling completion callback")
                 onComplete()
 
                 // 6. Start continuous flow collection AFTER navigation
                 viewModelScope.launch {
+                    Log.d("GameViewModel", "Starting room data collection for code: $code")
                     repository.getRoom(code).collect { room ->
                         if (room != null) {
+                            Log.d(
+                                    "GameViewModel",
+                                    "Room update received: ${room.players.size} players"
+                            )
                             _gameRoom.value = room
-                            _playerId.value?.let { pid -> _currentPlayer.value = room.players[pid] }
+                            _playerId.value?.let { pid ->
+                                _currentPlayer.value = room.players[pid]
+                                Log.d(
+                                        "GameViewModel",
+                                        "Current player updated: ${room.players[pid]?.name}"
+                                )
+                            }
+                        } else {
+                            Log.w("GameViewModel", "Received null room in data collection")
                         }
                     }
                 }
@@ -75,35 +99,69 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 Log.e("GameViewModel", "Failed to create room", e)
                 _error.value = "Failed to create room: ${e.message}"
             } finally {
+                Log.d("GameViewModel", "Create room process completed, loading = false")
                 _loading.value = false
             }
         }
     }
 
     // Called when joining an existing room
-    fun joinRoom(roomCode: String, playerName: String) {
+    fun joinRoom(roomCode: String, playerName: String, onComplete: () -> Unit = {}) {
+        Log.d("GameViewModel", "Joining room: $roomCode with player name: $playerName")
         _loading.value = true
         viewModelScope.launch {
             try {
                 val playerId = repository.joinRoom(roomCode, playerName)
                 if (playerId != null) {
+                    Log.d("GameViewModel", "Successfully joined room. Player ID: $playerId")
                     _roomCode.value = roomCode
                     _playerId.value = playerId
 
-                    // Start listening for room updates
-                    repository.getRoom(roomCode).collect { room ->
-                        if (room != null) {
-                            _gameRoom.value = room
-                            _currentPlayer.value = room.players[playerId]
-                        }
+                    // Get initial room data synchronously before navigation
+                    val initialRoom = repository.getRoomOnce(roomCode)
+                    if (initialRoom != null) {
+                        Log.d(
+                                "GameViewModel",
+                                "Initial room data loaded: ${initialRoom.players.size} players"
+                        )
+                        _gameRoom.value = initialRoom
+                        _currentPlayer.value = initialRoom.players[playerId]
+                    } else {
+                        Log.w("GameViewModel", "Initial room data is null")
                     }
+
+                    // Call completion callback to trigger navigation
+                    onComplete()
+
+                    // Start collecting room updates after navigation
+                    activeRoomJob =
+                            viewModelScope.launch {
+                                Log.d("GameViewModel", "Starting to collect room updates")
+                                repository.getRoom(roomCode).collect { room ->
+                                    if (room != null) {
+                                        Log.d(
+                                                "GameViewModel",
+                                                "Room update received: ${room.players.size} players"
+                                        )
+                                        _gameRoom.value = room
+                                        _currentPlayer.value = room.players[playerId]
+                                    } else {
+                                        Log.w(
+                                                "GameViewModel",
+                                                "Received null room data in join flow"
+                                        )
+                                    }
+                                }
+                            }
                 } else {
+                    Log.w("GameViewModel", "Failed to join room - null player ID returned")
                     _error.value = "Room not found or game already started"
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("GameViewModel", "Exception joining room", e)
                 _error.value = "Failed to join room: ${e.message}"
             } finally {
+                Log.d("GameViewModel", "Join room process completed, loading = false")
                 _loading.value = false
             }
         }
@@ -281,6 +339,8 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         val roomCode = _roomCode.value
         val playerId = _playerId.value
 
+        Log.d("GameViewModel", "Leaving room. roomCode: $roomCode, playerId: $playerId")
+
         if (roomCode == null || playerId == null) {
             Log.e("GameViewModel", "Cannot leave room - roomCode=$roomCode, playerId=$playerId")
             onComplete() // Still allow navigation even if we can't properly leave
@@ -290,18 +350,19 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         _loading.value = true
         viewModelScope.launch {
             try {
-                // Cancel any active room subscriptions
+                Log.d("GameViewModel", "Cancelling active room subscription")
                 activeRoomJob?.cancel()
                 activeRoomJob = null
 
+                Log.d("GameViewModel", "Calling repository.leaveRoom")
                 repository.leaveRoom(roomCode, playerId)
                 Log.d("GameViewModel", "Successfully left room")
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Error leaving room", e)
             } finally {
-                // Always clear state and complete
+                Log.d("GameViewModel", "Clearing game state after leaving room")
                 clearGameData()
-                _loading.value = false
+                Log.d("GameViewModel", "Calling completion callback")
                 onComplete()
             }
         }
@@ -340,39 +401,47 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     // Ensure room is loaded
     fun ensureRoomLoaded(roomCode: String) {
-        Log.d("GameViewModel", "Ensuring room is loaded: $roomCode")
+        Log.d(
+                "GameViewModel",
+                "Ensuring room is loaded: $roomCode, current room: ${_roomCode.value}"
+        )
 
         if (_roomCode.value != roomCode) {
+            Log.d("GameViewModel", "Room code changed, updating to: $roomCode")
             _roomCode.value = roomCode
-            // Clear and reload if room code changed
             _gameRoom.value = null
         }
 
-        // Only reload if we don't have room data yet
         if (_gameRoom.value == null) {
-            // Cancel any existing room subscription
+            Log.d("GameViewModel", "Game room is null, starting new data collection")
             activeRoomJob?.cancel()
+            Log.d("GameViewModel", "Previous room job cancelled")
 
             activeRoomJob =
                     viewModelScope.launch {
                         try {
-                            Log.d("GameViewModel", "Starting to collect room data")
+                            Log.d("GameViewModel", "Starting to collect room data for: $roomCode")
                             repository.getRoom(roomCode).collect { room ->
                                 if (room != null) {
                                     Log.d(
                                             "GameViewModel",
-                                            "Room data received: ${room.roomCode}, players: ${room.players.size}"
+                                            "Room data received: ${room.roomCode}, players: ${room.players.size}, hostId: ${room.hostId}"
                                     )
                                     _gameRoom.value = room
 
-                                    // Update current player if possible
                                     _playerId.value?.let { pid ->
                                         val player = room.players[pid]
-                                        Log.d("GameViewModel", "Current player update: $player")
+                                        Log.d(
+                                                "GameViewModel",
+                                                "Current player update - ID: $pid, Player: ${player?.name}, IsHost: ${player?.isHost}"
+                                        )
                                         _currentPlayer.value = player
                                     }
                                 } else {
-                                    Log.w("GameViewModel", "Received null room data")
+                                    Log.w(
+                                            "GameViewModel",
+                                            "Received null room data in ensureRoomLoaded"
+                                    )
                                 }
                             }
                         } catch (e: Exception) {
@@ -380,17 +449,28 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                             _error.value = "Failed to load room: ${e.message}"
                         }
                     }
+        } else {
+            Log.d("GameViewModel", "Game room already loaded, skipping data collection")
         }
     }
 
     // Clear game data
     fun clearGameData() {
+        Log.d("GameViewModel", "Clearing all game data")
+
+        // Cancel any active room subscription first
+        activeRoomJob?.cancel()
+        activeRoomJob = null
+
+        // Clear all state variables
         _roomCode.value = null
         _playerId.value = null
         _gameRoom.value = null
         _currentPlayer.value = null
         _drawnCard.value = null
         _error.value = null
+
+        Log.d("GameViewModel", "Game data cleared")
     }
 
     // Add this public method to set player ID
