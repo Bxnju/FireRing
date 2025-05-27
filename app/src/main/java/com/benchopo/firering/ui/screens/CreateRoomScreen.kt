@@ -43,7 +43,20 @@ fun CreateRoomScreen(
     Scaffold(
             topBar = {
                 TopAppBar(
-                        title = { Text("FireRing") },
+                        title = {
+                            Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                            ){
+                                Text("FireRing ")
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_logo),
+                                    contentDescription = "Logo",
+                                    modifier = Modifier.size(25.dp)
+                                )
+                            }
+                                },
                         navigationIcon = {
                             IconButton(onClick = { navController.navigateUp() }) {
                                 Icon(
@@ -62,12 +75,6 @@ fun CreateRoomScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
         ) {
             Spacer(modifier = Modifier.height(35.dp))
-
-            Image(
-                    painter = painterResource(id = R.drawable.ic_logo),
-                    contentDescription = "Logo",
-                    modifier = Modifier.size(100.dp)
-            )
 
             Row(
                 Modifier.fillMaxWidth(),
