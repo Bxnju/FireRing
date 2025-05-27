@@ -132,6 +132,18 @@ fun LobbyScreen(
         }
     }
 
+    // Add or update the existing LaunchedEffect
+    LaunchedEffect(gameRoom) {
+        // If the room was deleted or has no players, navigate back to home
+        if (gameRoom == null || gameRoom?.players?.isEmpty() == true) {
+            Log.d("LobbyScreen", "Room no longer exists or has no players, returning to home")
+            gameViewModel.clearGameData()
+            navController.navigate(Routes.HOME) {
+                popUpTo(Routes.HOME) { inclusive = true }
+            }
+        }
+    }
+
     // Copy code to clipboard functionality
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current

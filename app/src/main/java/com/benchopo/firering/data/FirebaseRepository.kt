@@ -175,8 +175,32 @@ class FirebaseRepository {
                                     allCards.add(card)
                                 }
                             }
-                            val drawnCards = allCards.filter { it.isDrawn }
-                            val deck = allCards.filter { !it.isDrawn }
+
+                            // Extract drawn cards IDs for reliable filtering
+                            val drawnCardIds = mutableSetOf<String>()
+                            snapshot.child("drawnCardsList").children.forEach {
+                                drawnCardIds.add(it.key ?: "")
+                            }
+
+                            // Extract drawn cards from dedicated list (more reliable)
+                            val drawnCards = mutableListOf<Card>()
+                            snapshot.child("drawnCardsList").children.forEach { cardSnapshot ->
+                                val card = cardSnapshot.getValue(Card::class.java)
+                                if (card != null) {
+                                    drawnCards.add(card)
+                                    Log.d("FirebaseRepository", "Found drawn card: ${card.value} of ${card.suit}")
+                                }
+                            }
+
+                            // Fallback to filtering if drawnCardsList is empty
+                            if (drawnCards.isEmpty()) {
+                                drawnCards.addAll(allCards.filter { it.isDrawn })
+                                Log.d("FirebaseRepository", "Using fallback cards filter, found ${drawnCards.size} drawn cards")
+                            }
+
+                            // Use drawn card IDs set for more reliable filtering
+                            val deck = allCards.filter { !drawnCardIds.contains(it.id) && !it.isDrawn }
+                            Log.d("FirebaseRepository", "Deck contains ${deck.size} undrawn cards")
 
                             // Extract turn order
                             val turnOrder =
@@ -242,34 +266,62 @@ class FirebaseRepository {
         roomRef.child("info/gameState").setValue(GameState.PLAYING.name).await()
     }
 
+    // Update the drawCard method to ensure proper card exclusion
+
     suspend fun drawCard(roomCode: String, playerId: String): Card? {
         val roomRef = db.child("rooms").child(roomCode)
 
-        // Get undrawn cards
+        // Get undrawn cards with additional logging
         val cardsSnapshot = roomRef.child("cards").get().await()
         val undrawnCards = mutableListOf<Card>()
+        val drawnCardIds = mutableSetOf<String>()
+
+        // First, collect IDs of cards in drawnCardsList for accurate filtering
+        val drawnCardsListSnapshot = roomRef.child("drawnCardsList").get().await()
+        drawnCardsListSnapshot.children.forEach { cardSnapshot ->
+            val cardId = cardSnapshot.key
+            if (cardId != null) {
+                drawnCardIds.add(cardId)
+            }
+        }
+
+        Log.d("FirebaseRepository", "Found ${drawnCardIds.size} cards in drawnCardsList")
+
+        // Now get undrawn cards, making sure to exclude those in drawnCardsList
         cardsSnapshot.children.forEach { cardSnapshot ->
             val card = cardSnapshot.getValue(Card::class.java)
-            if (card != null && !card.isDrawn) {
+            if (card != null && !card.isDrawn && !drawnCardIds.contains(card.id)) {
                 undrawnCards.add(card)
             }
         }
 
+        Log.d("FirebaseRepository", "Found ${undrawnCards.size} undrawn cards after filtering")
+
         if (undrawnCards.isEmpty()) {
+            Log.d("FirebaseRepository", "No undrawn cards left")
             return null
         }
 
         // Get a random undrawn card
         val drawnCard = undrawnCards.random()
 
-        // Update card as drawn
-        val updates =
-                hashMapOf<String, Any>(
-                        "cards/${drawnCard.id}/isDrawn" to true,
-                        "cards/${drawnCard.id}/drawnByPlayerId" to playerId,
-                        "cards/${drawnCard.id}/drawnTimestamp" to System.currentTimeMillis(),
-                        "currentCardId" to drawnCard.id
-                )
+        // Add more detailed logging
+        Log.d("FirebaseRepository", "Drawing card: ${drawnCard.value} of ${drawnCard.suit} (${drawnCard.id})")
+        Log.d("FirebaseRepository", "Card currently drawn status: ${drawnCard.isDrawn}")
+
+        // Create a COMPLETE card object with all properties updated
+        val updatedCard = drawnCard.copy(
+            isDrawn = true,
+            drawnByPlayerId = playerId,
+            drawnTimestamp = System.currentTimeMillis()
+        )
+
+        // Update the ENTIRE card object, not just nested properties
+        val updates = hashMapOf<String, Any>(
+            // Store the entire updated card object
+            "cards/${drawnCard.id}" to updatedCard,
+            "currentCardId" to drawnCard.id
+        )
 
         // If it's a King, update kings cup count
         if (drawnCard.value == "K") {
@@ -278,13 +330,14 @@ class FirebaseRepository {
             updates["info/kingsCupCount"] = kingsCount + 1
         }
 
-        roomRef.updateChildren(updates).await()
+        // Add the card to a dedicated drawnCards collection for easier access
+        updates["drawnCardsList/${drawnCard.id}"] = updatedCard
 
-        return drawnCard.copy(
-                isDrawn = true,
-                drawnByPlayerId = playerId,
-                drawnTimestamp = System.currentTimeMillis()
-        )
+        Log.d("FirebaseRepository", "Writing updates to database")
+        roomRef.updateChildren(updates).await()
+        Log.d("FirebaseRepository", "Card successfully marked as drawn")
+
+        return updatedCard
     }
 
     suspend fun advanceTurn(roomCode: String) {
@@ -432,39 +485,42 @@ class FirebaseRepository {
             turnOrder.remove(playerId)
             Log.d("FirebaseRepository", "New turn order after removal: $turnOrder")
 
-            // 2. Handle current player transition if needed
+            // 2. Check if there will be any players left
+            val isLastPlayer = turnOrder.isEmpty()
+
+            // 3. If this is the last player, we'll delete the entire room
+            if (isLastPlayer) {
+                Log.d("FirebaseRepository", "Last player leaving room $roomCode - deleting room")
+                roomRef.removeValue().await()
+                Log.d("FirebaseRepository", "Room $roomCode deleted successfully")
+                return
+            }
+
+            // 4. Otherwise, update the room for remaining players
             val currentPlayerIdRef = roomRef.child("currentPlayerId")
             val currentPlayerIdSnapshot = currentPlayerIdRef.get().await()
             val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java)
 
-            // 3. Handle host transition if needed
             val infoRef = roomRef.child("info")
             val hostIdSnapshot = infoRef.child("hostId").get().await()
             val hostId = hostIdSnapshot.getValue(String::class.java)
 
-            // 4. Create a batch update
+            // 5. Create a batch update
             val updates = mutableMapOf<String, Any?>()
 
             // Update turn order
-            if (turnOrder.isNotEmpty()) {
-                updates["turnOrder"] = turnOrder
-            }
+            updates["turnOrder"] = turnOrder
 
             // If this was the current player, advance to next
-            if (currentPlayerId == playerId && turnOrder.isNotEmpty()) {
+            if (currentPlayerId == playerId) {
                 updates["currentPlayerId"] = turnOrder[0]
             }
 
             // If this was the host, assign a new host
-            if (hostId == playerId && turnOrder.isNotEmpty()) {
+            if (hostId == playerId) {
                 val newHostId = turnOrder[0]
                 updates["info/hostId"] = newHostId
                 updates["players/$newHostId/isHost"] = true
-            }
-
-            // If no players left, mark game as finished
-            if (turnOrder.isEmpty()) {
-                updates["info/gameState"] = GameState.FINISHED.name
             }
 
             // Remove player entry
@@ -539,8 +595,32 @@ class FirebaseRepository {
                     allCards.add(card)
                 }
             }
-            val drawnCards = allCards.filter { it.isDrawn }
-            val deck = allCards.filter { !it.isDrawn }
+
+            // Extract drawn cards IDs for reliable filtering
+            val drawnCardIds = mutableSetOf<String>()
+            snapshot.child("drawnCardsList").children.forEach {
+                drawnCardIds.add(it.key ?: "")
+            }
+
+            // Extract drawn cards from dedicated list (more reliable)
+            val drawnCards = mutableListOf<Card>()
+            snapshot.child("drawnCardsList").children.forEach { cardSnapshot ->
+                val card = cardSnapshot.getValue(Card::class.java)
+                if (card != null) {
+                    drawnCards.add(card)
+                    Log.d("FirebaseRepository", "Found drawn card: ${card.value} of ${card.suit}")
+                }
+            }
+
+            // Fallback to filtering if drawnCardsList is empty
+            if (drawnCards.isEmpty()) {
+                drawnCards.addAll(allCards.filter { it.isDrawn })
+                Log.d("FirebaseRepository", "Using fallback cards filter, found ${drawnCards.size} drawn cards")
+            }
+
+            // Use drawn card IDs set for more reliable filtering
+            val deck = allCards.filter { !drawnCardIds.contains(it.id) && !it.isDrawn }
+            Log.d("FirebaseRepository", "Deck contains ${deck.size} undrawn cards")
 
             // Extract turn order
             val turnOrder =
