@@ -249,7 +249,7 @@ fun LobbyScreen(
                                 strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Start Game")
+                        Text("Start Game", color = Color.White)
                     }
                 }
             } else {
