@@ -371,8 +371,21 @@ class FirebaseRepository {
         val nextIndex = (currentIndex + 1) % turnOrder.size
         val nextPlayerId = turnOrder[nextIndex]
 
-        // Update current player
-        roomRef.child("currentPlayerId").setValue(nextPlayerId).await()
+        // Create updates map for all changes
+        val updates = hashMapOf<String, Any?>(
+            // Update current player
+            "currentPlayerId" to nextPlayerId,
+            // Clear current card
+            "currentCardId" to null,
+            // Clear Jack Rule and Mini Game selections
+            "currentJackRuleId" to null,
+            "currentJackRuleSelectedBy" to null,
+            "currentMiniGameId" to null,
+            "currentMiniGameSelectedBy" to null
+        )
+
+        // Apply all updates at once
+        roomRef.updateChildren(updates).await()
     }
 
     suspend fun updatePlayerDrinkCount(roomCode: String, playerId: String, increment: Int = 1) {
@@ -696,6 +709,20 @@ class FirebaseRepository {
         val updates = hashMapOf<String, Any>(
             "currentMiniGameId" to gameId,
             "currentMiniGameSelectedBy" to playerId
+        )
+
+        roomRef.updateChildren(updates).await()
+    }
+
+    // Add this to FirebaseRepository.kt
+    suspend fun clearSelections(roomCode: String) {
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val updates = hashMapOf<String, Any?>(
+            "currentJackRuleId" to null,
+            "currentJackRuleSelectedBy" to null,
+            "currentMiniGameId" to null,
+            "currentMiniGameSelectedBy" to null
         )
 
         roomRef.updateChildren(updates).await()

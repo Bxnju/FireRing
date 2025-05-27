@@ -549,6 +549,50 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             Log.d("GameViewModel", "Clearing local drawn card as room has no current card")
             _drawnCard.value = null
         }
+
+        // NEW CODE: Check for Jack Rule selection by any player
+        if (gameRoom.currentJackRuleId != null && _selectedJackRule.value == null) {
+            // A Jack Rule was selected, but we don't have it locally - load it
+            Log.d("GameViewModel", "Jack Rule selected by another player, loading rule details")
+
+            // Load the jack rules if not already loaded
+            if (_jackRules.value.isEmpty()) {
+                loadRulesAndGames(gameRoom.gameMode)
+            }
+
+            // Find the selected rule in our local list
+            val rule = _jackRules.value.find { it.id == gameRoom.currentJackRuleId }
+            if (rule != null) {
+                Log.d("GameViewModel", "Found selected Jack Rule: ${rule.title}")
+                _selectedJackRule.value = rule
+            }
+        } else if (gameRoom.currentJackRuleId == null && _selectedJackRule.value != null) {
+            // The Jack Rule was cleared in the database, clear it locally too
+            Log.d("GameViewModel", "Jack Rule was cleared, updating local state")
+            _selectedJackRule.value = null
+        }
+
+        // NEW CODE: Check for Mini Game selection by any player
+        if (gameRoom.currentMiniGameId != null && _selectedMiniGame.value == null) {
+            // A Mini Game was selected, but we don't have it locally - load it
+            Log.d("GameViewModel", "Mini Game selected by another player, loading game details")
+
+            // Load the mini games if not already loaded
+            if (_miniGames.value.isEmpty()) {
+                loadRulesAndGames(gameRoom.gameMode)
+            }
+
+            // Find the selected game in our local list
+            val game = _miniGames.value.find { it.id == gameRoom.currentMiniGameId }
+            if (game != null) {
+                Log.d("GameViewModel", "Found selected Mini Game: ${game.title}")
+                _selectedMiniGame.value = game
+            }
+        } else if (gameRoom.currentMiniGameId == null && _selectedMiniGame.value != null) {
+            // The Mini Game was cleared in the database, clear it locally too
+            Log.d("GameViewModel", "Mini Game was cleared, updating local state")
+            _selectedMiniGame.value = null
+        }
     }
 
     // Load rules and games
@@ -595,9 +639,22 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     // Clear selections
     fun clearSelections() {
-        _selectedJackRule.value = null
-        _selectedMiniGame.value = null
-        _showJackRuleSelector.value = false
-        _showMiniGameSelector.value = false
+        val roomCode = _roomCode.value ?: return
+
+        viewModelScope.launch {
+            try {
+                // Clear local state
+                _selectedJackRule.value = null
+                _selectedMiniGame.value = null
+                _showJackRuleSelector.value = false
+                _showMiniGameSelector.value = false
+
+                // Clear in Firebase using repository
+                repository.clearSelections(roomCode)
+            } catch (e: Exception) {
+                Log.e("GameViewModel", "Error clearing selections: ${e.message}")
+                _error.value = "Failed to clear selections: ${e.message}"
+            }
+        }
     }
 }
