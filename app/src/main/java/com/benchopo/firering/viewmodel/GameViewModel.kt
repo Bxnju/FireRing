@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benchopo.firering.data.FirebaseRepository
+import com.benchopo.firering.data.getCardRule
 import com.benchopo.firering.model.*
 import java.util.UUID
 import kotlinx.coroutines.Job
@@ -201,17 +202,26 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 val card = repository.drawCard(roomCode, playerId)
                 _drawnCard.value = card
 
-                // Auto-advance turn if not special card requiring action
+                // For special cards, don't auto-advance turn
+                // This lets the player perform the card's action first
                 if (card != null && !isSpecialCard(card.value)) {
-                    repository.advanceTurn(roomCode)
+                    // For regular cards, we can auto-advance the turn
+                    // repository.advanceTurn(roomCode)
+                    // We'll let the player manually advance instead
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("GameViewModel", "Failed to draw card", e)
                 _error.value = "Failed to draw card: ${e.message}"
             } finally {
                 _loading.value = false
             }
         }
+    }
+
+    // To get the current card rule
+    fun getCurrentCardRule(): String {
+        val card = _drawnCard.value ?: return "Draw a card to see the rule"
+        return getCardRule(card)
     }
 
     // Called after completing card actions to advance turn

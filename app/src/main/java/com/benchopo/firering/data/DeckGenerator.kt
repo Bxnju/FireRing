@@ -36,3 +36,24 @@ fun generateDeck(): List<Card> {
     deck.shuffle()
     return deck
 }
+
+fun getCardRule(card: Card?): String {
+    if (card == null) return "Draw a card to see the rule"
+
+    return when (card.value) {
+        "A" -> "Waterfall: Everyone starts drinking. No one can stop until the person to their right stops."
+        "2" -> "You: You choose someone to drink."
+        "3" -> "Me: You drink."
+        "4" -> "Floor: Last one to touch the floor drinks."
+        "5" -> "Guys: All guys drink."
+        "6" -> "Girls: All girls drink."
+        "7" -> "Heaven: Last one to raise hand drinks."
+        "8" -> "Mate: Choose a drinking buddy who drinks when you drink."
+        "9" -> "Rhyme: Say a word; others must rhyme or drink."
+        "10" -> "Categories: Pick a category; others must answer or drink."
+        "J" -> "Never Have I Ever: Say something you haven't done. Those who have done it drink."
+        "Q" -> "Question Master: Ask questions; if someone answers (not with a question), they drink."
+        "K" -> "King's Cup: Pour some drink into the cup. The player who draws the last King drinks it all!"
+        else -> "Unknown card rule"
+    }
+}
