@@ -195,7 +195,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 // This lets the player perform the card's action first
                 if (card != null && !isSpecialCard(card.value)) {
                     // For non-special cards, auto-advance the turn after a short delay
-                    kotlinx.coroutines.delay(2500) // Give players time to see the card
+                    kotlinx.coroutines.delay(3000) // Give players time to see the card
                     repository.advanceTurn(roomCode)
                     _drawnCard.value = null // Clear drawn card after advancing
                 }
