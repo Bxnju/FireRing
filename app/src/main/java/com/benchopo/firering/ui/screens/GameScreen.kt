@@ -22,6 +22,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.text.style.TextOverflow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -256,6 +258,72 @@ fun GameScreen(
                 }
             } else {
                 Log.d("GameScreen", "No card history to show - drawnCards is empty")
+            }
+
+            // Player Drink Counter Section
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "Drink Counter",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Player list with drink counters
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val playersList = gameRoom?.players?.values?.toList() ?: emptyList()
+
+                items(playersList) { player ->
+                    Card(
+                        modifier = Modifier
+                            .width(120.dp)
+                            .padding(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            // Player name
+                            Text(
+                                player.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+
+                            // Drink count
+                            Text(
+                                "${player.drinkCount} 🍺",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+
+                            // Increment/Decrement buttons
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                // Decrement button (only enabled if count > 0)
+                                IconButton(
+                                    onClick = { gameViewModel.updateDrinks(player.id, -1) },
+                                    enabled = player.drinkCount > 0
+                                ) {
+                                    Text("-", style = MaterialTheme.typography.titleMedium)
+                                }
+
+                                // Increment button
+                                IconButton(
+                                    onClick = { gameViewModel.updateDrinks(player.id, 1) }
+                                ) {
+                                    Text("+", style = MaterialTheme.typography.titleMedium)
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
