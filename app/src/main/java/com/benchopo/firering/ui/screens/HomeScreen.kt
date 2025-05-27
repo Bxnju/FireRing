@@ -1,11 +1,16 @@
 package com.benchopo.firering.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,16 +65,67 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
                 // Create Room Button
                 Button(
                         onClick = { navController.navigate(Routes.CREATE_ROOM) },
-                        modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
-                ) { Text("Create a Room", style = MaterialTheme.typography.titleMedium) }
+                        modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent // Hacemos el fondo del botón transparente
+                        ),
+                        contentPadding = PaddingValues() // Quitamos el padding interno del botón
+                ) {
+                        Box(
+                                modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                                brush = Brush.linearGradient(
+                                                        colors = listOf(Color(0xFFFF9800), Color(0xFFFF5722))
+                                                ),
+                                                shape = RoundedCornerShape(12.dp)
+                                        )
+                                        .clip(RoundedCornerShape(12.dp)),
+                                contentAlignment = Alignment.Center
+                        ) {
+                                Text(
+                                        text = "Create a Room",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.White
+                                )
+                        }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+
 
                 // Join Room Button
                 Button(
                         onClick = { navController.navigate(Routes.JOIN_ROOM) },
-                        modifier = Modifier.fillMaxWidth(0.8f).height(56.dp)
-                ) { Text("Join a Room", style = MaterialTheme.typography.titleMedium) }
+                        modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(56.dp),
+                        colors = ButtonDefaults
+                                .buttonColors(containerColor = Color.Transparent),
+                        contentPadding = PaddingValues()
+                ){
+                        Box(
+                                modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                                brush = Brush.linearGradient(
+                                                        colors = listOf(Color(0xFFFF9800), Color(0xFFFF5722))
+                                                ),
+                                                shape = RoundedCornerShape(12.dp)
+                                        )
+                                        .clip(RoundedCornerShape(12.dp)),
+                                contentAlignment = Alignment.Center
+                        ) {
+                                Text(
+                                        text = "Join a Room",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.White
+                                )
+                        }
+                }
 
                 Spacer(modifier = Modifier.height(48.dp))
 
