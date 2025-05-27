@@ -214,6 +214,16 @@ class FirebaseRepository {
                             val currentPlayerId =
                                     snapshot.child("currentPlayerId").getValue(String::class.java)
 
+                            // Extract current Jack rule and mini-game
+                            val currentJackRuleId =
+                                    snapshot.child("currentJackRuleId").getValue(String::class.java)
+                            val currentJackRuleSelectedBy =
+                                    snapshot.child("currentJackRuleSelectedBy").getValue(String::class.java)
+                            val currentMiniGameId =
+                                    snapshot.child("currentMiniGameId").getValue(String::class.java)
+                            val currentMiniGameSelectedBy =
+                                    snapshot.child("currentMiniGameSelectedBy").getValue(String::class.java)
+
                             // Build GameRoom object
                             val gameRoom =
                                     GameRoom(
@@ -228,7 +238,11 @@ class FirebaseRepository {
                                             turnOrder = turnOrder,
                                             kingsCupCount = kingsCupCount,
                                             gameMode = gameMode,
-                                            createdAt = createdAt
+                                            createdAt = createdAt,
+                                            currentJackRuleId = currentJackRuleId,
+                                            currentJackRuleSelectedBy = currentJackRuleSelectedBy,
+                                            currentMiniGameId = currentMiniGameId,
+                                            currentMiniGameSelectedBy = currentMiniGameSelectedBy
                                     )
 
                             trySend(gameRoom)
@@ -632,6 +646,14 @@ class FirebaseRepository {
             val currentCardId = snapshot.child("currentCardId").getValue(String::class.java)
             val currentPlayerId = snapshot.child("currentPlayerId").getValue(String::class.java)
 
+            // Extract current Jack rule and mini-game
+            val currentJackRuleId = snapshot.child("currentJackRuleId").getValue(String::class.java)
+            val currentJackRuleSelectedBy =
+                    snapshot.child("currentJackRuleSelectedBy").getValue(String::class.java)
+            val currentMiniGameId = snapshot.child("currentMiniGameId").getValue(String::class.java)
+            val currentMiniGameSelectedBy =
+                    snapshot.child("currentMiniGameSelectedBy").getValue(String::class.java)
+
             // Build GameRoom object
             return GameRoom(
                     roomCode = roomCode,
@@ -645,11 +667,37 @@ class FirebaseRepository {
                     turnOrder = turnOrder,
                     kingsCupCount = kingsCupCount,
                     gameMode = gameMode,
-                    createdAt = createdAt
+                    createdAt = createdAt,
+                    currentJackRuleId = currentJackRuleId,
+                    currentJackRuleSelectedBy = currentJackRuleSelectedBy,
+                    currentMiniGameId = currentMiniGameId,
+                    currentMiniGameSelectedBy = currentMiniGameSelectedBy
             )
         } catch (e: Exception) {
             Log.e("FirebaseRepository", "Error parsing room snapshot", e)
             return null
         }
+    }
+
+    suspend fun selectJackRule(roomCode: String, playerId: String, ruleId: String) {
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val updates = hashMapOf<String, Any>(
+            "currentJackRuleId" to ruleId,
+            "currentJackRuleSelectedBy" to playerId
+        )
+
+        roomRef.updateChildren(updates).await()
+    }
+
+    suspend fun selectMiniGame(roomCode: String, playerId: String, gameId: String) {
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val updates = hashMapOf<String, Any>(
+            "currentMiniGameId" to gameId,
+            "currentMiniGameSelectedBy" to playerId
+        )
+
+        roomRef.updateChildren(updates).await()
     }
 }

@@ -28,6 +28,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import com.benchopo.firering.model.Player
+import com.benchopo.firering.ui.components.JackRuleSelector
+import com.benchopo.firering.ui.components.MiniGameSelector
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +55,14 @@ fun GameScreen(
     val playerId by gameViewModel.playerId.collectAsState()
     val drawnCard by gameViewModel.drawnCard.collectAsState()
     val loading by gameViewModel.loading.collectAsState()
+
+    // Add these state collections for Jack Rules and Mini Games
+    val showJackRuleSelector by gameViewModel.showJackRuleSelector.collectAsState(false)
+    val showMiniGameSelector by gameViewModel.showMiniGameSelector.collectAsState(false)
+    val jackRules by gameViewModel.jackRules.collectAsState(emptyList())
+    val miniGames by gameViewModel.miniGames.collectAsState(emptyList())
+    val selectedJackRule by gameViewModel.selectedJackRule.collectAsState()
+    val selectedMiniGame by gameViewModel.selectedMiniGame.collectAsState()
 
     // Determine if it's this player's turn
     val isCurrentPlayerTurn = remember(gameRoom, playerId) {
@@ -474,6 +484,104 @@ fun GameScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showLeaveDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    // Add Jack Rule selection dialog
+    if (showJackRuleSelector && isCurrentPlayerTurn) {
+        Log.d("GameScreen", "Showing Jack Rule selector with ${jackRules.size} rules")
+        JackRuleSelector(
+            rules = jackRules,
+            onRuleSelected = {
+                Log.d("GameScreen", "Jack Rule selected: ${it.title}")
+                gameViewModel.selectJackRule(it)
+            },
+            onDismiss = {
+                Log.d("GameScreen", "Jack Rule selection cancelled")
+                gameViewModel.clearSelections()
+            }
+        )
+    }
+
+    // Add Mini Game selection dialog
+    if (showMiniGameSelector && isCurrentPlayerTurn) {
+        Log.d("GameScreen", "Showing Mini Game selector with ${miniGames.size} games")
+        MiniGameSelector(
+            games = miniGames,
+            onGameSelected = {
+                Log.d("GameScreen", "Mini Game selected: ${it.title}")
+                gameViewModel.selectMiniGame(it)
+            },
+            onDismiss = {
+                Log.d("GameScreen", "Mini Game selection cancelled")
+                gameViewModel.clearSelections()
+            }
+        )
+    }
+
+    // Show selected Jack Rule to all players
+    if (selectedJackRule != null) {
+        Log.d("GameScreen", "Displaying selected Jack Rule: ${selectedJackRule?.title}")
+        AlertDialog(
+            onDismissRequest = {
+                if (isCurrentPlayerTurn) {
+                    Log.d("GameScreen", "Dismissing Jack Rule and advancing turn")
+                    gameViewModel.clearSelections()
+                    gameViewModel.advanceTurn()
+                }
+            },
+            title = { Text("Jack Rule: ${selectedJackRule?.title}") },
+            text = { Text(selectedJackRule?.description ?: "") },
+            confirmButton = {
+                if (isCurrentPlayerTurn) {
+                    Button(
+                        onClick = {
+                            Log.d("GameScreen", "Jack Rule completed, advancing turn")
+                            gameViewModel.clearSelections()
+                            gameViewModel.advanceTurn()
+                        }
+                    ) {
+                        Text("Done")
+                    }
+                } else {
+                    Button(onClick = {}, enabled = false) {
+                        Text("Waiting for ${currentTurnPlayer?.name} to finish")
+                    }
+                }
+            }
+        )
+    }
+
+    // Show selected Mini Game to all players
+    if (selectedMiniGame != null) {
+        Log.d("GameScreen", "Displaying selected Mini Game: ${selectedMiniGame?.title}")
+        AlertDialog(
+            onDismissRequest = {
+                if (isCurrentPlayerTurn) {
+                    Log.d("GameScreen", "Dismissing Mini Game and advancing turn")
+                    gameViewModel.clearSelections()
+                    gameViewModel.advanceTurn()
+                }
+            },
+            title = { Text("Mini Game: ${selectedMiniGame?.title}") },
+            text = { Text(selectedMiniGame?.description ?: "") },
+            confirmButton = {
+                if (isCurrentPlayerTurn) {
+                    Button(
+                        onClick = {
+                            Log.d("GameScreen", "Mini Game completed, advancing turn")
+                            gameViewModel.clearSelections()
+                            gameViewModel.advanceTurn()
+                        }
+                    ) {
+                        Text("Done")
+                    }
+                } else {
+                    Button(onClick = {}, enabled = false) {
+                        Text("Waiting for ${currentTurnPlayer?.name} to finish")
+                    }
+                }
             }
         )
     }

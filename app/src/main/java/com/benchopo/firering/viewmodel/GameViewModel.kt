@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benchopo.firering.data.FirebaseRepository
+import com.benchopo.firering.data.GameRulesProvider
 import com.benchopo.firering.model.*
 import java.util.UUID
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val repository = FirebaseRepository()
@@ -33,6 +35,27 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     private val _drawnCard = MutableStateFlow<Card?>(null)
     val drawnCard: StateFlow<Card?> = _drawnCard
+
+    // State for Jack Rules and Mini Games
+    private val _jackRules = MutableStateFlow<List<JackRule>>(emptyList())
+    val jackRules: StateFlow<List<JackRule>> = _jackRules
+
+    private val _miniGames = MutableStateFlow<List<MiniGame>>(emptyList())
+    val miniGames: StateFlow<List<MiniGame>> = _miniGames
+
+    // Selected rule/game
+    private val _selectedJackRule = MutableStateFlow<JackRule?>(null)
+    val selectedJackRule: StateFlow<JackRule?> = _selectedJackRule
+
+    private val _selectedMiniGame = MutableStateFlow<MiniGame?>(null)
+    val selectedMiniGame: StateFlow<MiniGame?> = _selectedMiniGame
+
+    // State for UI showing
+    private val _showJackRuleSelector = MutableStateFlow(false)
+    val showJackRuleSelector: StateFlow<Boolean> = _showJackRuleSelector
+
+    private val _showMiniGameSelector = MutableStateFlow(false)
+    val showMiniGameSelector: StateFlow<Boolean> = _showMiniGameSelector
 
     private var activeRoomJob: Job? = null
 
@@ -174,7 +197,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     }
 
     // Called when player draws a card
-    fun drawCard() {
+    open fun drawCard() {
         val roomCode = _roomCode.value ?: return
         val playerId = _playerId.value ?: return
         val room = _gameRoom.value ?: return
@@ -191,13 +214,26 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 val card = repository.drawCard(roomCode, playerId)
                 _drawnCard.value = card
 
-                // For special cards, don't auto-advance turn
-                // This lets the player perform the card's action first
-                if (card != null && !isSpecialCard(card.value)) {
-                    // For non-special cards, auto-advance the turn after a short delay
-                    kotlinx.coroutines.delay(3000) // Give players time to see the card
-                    repository.advanceTurn(roomCode)
-                    _drawnCard.value = null // Clear drawn card after advancing
+                // Check for special cards
+                when (card?.value) {
+                    "J" -> {
+                        _showJackRuleSelector.value = true
+                        loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL)
+                    }
+                    "10" -> {
+                        _showMiniGameSelector.value = true
+                        loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL)
+                    }
+                    else -> {
+                        // For non-special cards, auto-advance the turn after a short delay
+                        if (card != null && !isSpecialCard(card.value)) {
+                            viewModelScope.launch {
+                                delay(5000) // 5 seconds
+                                repository.advanceTurn(roomCode)
+                                _drawnCard.value = null
+                            }
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Failed to draw card", e)
@@ -335,34 +371,42 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     // Add a method to leave the room
 
     fun leaveRoom(onComplete: () -> Unit = {}) {
-        val roomCode = _roomCode.value
-        val playerId = _playerId.value
-
-        Log.d("GameViewModel", "Leaving room. roomCode: $roomCode, playerId: $playerId")
-
-        if (roomCode == null || playerId == null) {
-            Log.e("GameViewModel", "Cannot leave room - roomCode=$roomCode, playerId=$playerId")
-            onComplete() // Still allow navigation even if we can't properly leave
-            return
-        }
-
-        _loading.value = true
         viewModelScope.launch {
             try {
-                Log.d("GameViewModel", "Cancelling active room subscription")
-                activeRoomJob?.cancel()
-                activeRoomJob = null
+                _loading.value = true
+                val roomCode = _roomCode.value
+                val playerId = _playerId.value
 
-                Log.d("GameViewModel", "Calling repository.leaveRoom")
-                repository.leaveRoom(roomCode, playerId)
-                Log.d("GameViewModel", "Successfully left room")
-            } catch (e: Exception) {
-                Log.e("GameViewModel", "Error leaving room", e)
-            } finally {
-                Log.d("GameViewModel", "Clearing game state after leaving room")
+                if (roomCode != null && playerId != null) {
+                    // Handle special cards auto-selection
+                    if ((_showJackRuleSelector.value || _showMiniGameSelector.value) &&
+                        gameRoom.value?.currentPlayerId == playerId) {
+
+                        Log.d("GameViewModel", "Player leaving during selection, auto-selecting random rule/game")
+
+                        if (_showJackRuleSelector.value && _jackRules.value.isNotEmpty()) {
+                            val randomRule = _jackRules.value.random()
+                            selectJackRule(randomRule)
+                        }
+
+                        if (_showMiniGameSelector.value && _miniGames.value.isNotEmpty()) {
+                            val randomGame = _miniGames.value.random()
+                            selectMiniGame(randomGame)
+                        }
+
+                        advanceTurn()
+                    }
+
+                    // Use leaveRoom instead of removePlayerFromRoom
+                    repository.leaveRoom(roomCode, playerId)
+                }
+
                 clearGameData()
-                Log.d("GameViewModel", "Calling completion callback")
+                _loading.value = false
                 onComplete()
+            } catch (e: Exception) {
+                _error.value = "Failed to leave room: ${e.message}"
+                _loading.value = false
             }
         }
     }
@@ -505,5 +549,55 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             Log.d("GameViewModel", "Clearing local drawn card as room has no current card")
             _drawnCard.value = null
         }
+    }
+
+    // Load rules and games
+    private fun loadRulesAndGames(gameMode: GameMode) {
+        _jackRules.value = GameRulesProvider.getDefaultJackRules(gameMode)
+        _miniGames.value = GameRulesProvider.getDefaultMiniGames(gameMode)
+    }
+
+    // Select a Jack Rule
+    fun selectJackRule(rule: JackRule) {
+        _selectedJackRule.value = rule
+        _showJackRuleSelector.value = false
+
+        // Notify other players of the selection
+        val roomCode = _roomCode.value ?: return
+        val playerId = _playerId.value ?: return
+
+        viewModelScope.launch {
+            try {
+                repository.selectJackRule(roomCode, playerId, rule.id)
+            } catch (e: Exception) {
+                _error.value = "Failed to select rule: ${e.message}"
+            }
+        }
+    }
+
+    // Select a Mini Game
+    fun selectMiniGame(game: MiniGame) {
+        _selectedMiniGame.value = game
+        _showMiniGameSelector.value = false
+
+        // Notify other players of the selection
+        val roomCode = _roomCode.value ?: return
+        val playerId = _playerId.value ?: return
+
+        viewModelScope.launch {
+            try {
+                repository.selectMiniGame(roomCode, playerId, game.id)
+            } catch (e: Exception) {
+                _error.value = "Failed to select mini game: ${e.message}"
+            }
+        }
+    }
+
+    // Clear selections
+    fun clearSelections() {
+        _selectedJackRule.value = null
+        _selectedMiniGame.value = null
+        _showJackRuleSelector.value = false
+        _showMiniGameSelector.value = false
     }
 }

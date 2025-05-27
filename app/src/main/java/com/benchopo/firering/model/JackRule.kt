@@ -1,10 +1,10 @@
 package com.benchopo.firering.model
 
-data class MiniGame(
+data class JackRule(
     val id: String = "",
     val title: String = "",
     val description: String = "",
-    val type: MiniGameType = MiniGameType.CHALLENGE,
+    val type: RuleType = RuleType.STANDARD,
     val gameMode: GameMode = GameMode.NORMAL,
     val isCustom: Boolean = false,
     val createdByPlayerId: String? = null,
