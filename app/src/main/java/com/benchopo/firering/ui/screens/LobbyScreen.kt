@@ -2,6 +2,7 @@ package com.benchopo.firering.ui.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.navigation.NavController
 import com.benchopo.firering.model.GameState
 import com.benchopo.firering.navigation.Routes
@@ -128,6 +131,15 @@ fun LobbyScreen(
         }
     }
 
+    // Copy code to clipboard functionality
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
+
+    fun copyToClipboard(code: String) {
+        clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(code))
+        Toast.makeText(context, "Código copiado al portapapeles", Toast.LENGTH_SHORT).show()
+    }
+
     Scaffold(
             topBar = {
                 TopAppBar(
@@ -164,6 +176,9 @@ fun LobbyScreen(
                             style = MaterialTheme.typography.bodySmall,
                             textAlign = TextAlign.Center
                     )
+                    Button(onClick = { copyToClipboard(roomCode) }) {
+                        Text("Copiar Código")
+                    }
                 }
             }
 
