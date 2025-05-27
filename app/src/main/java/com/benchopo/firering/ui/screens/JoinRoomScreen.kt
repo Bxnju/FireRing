@@ -1,8 +1,11 @@
 package com.benchopo.firering.ui.screens
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,6 +34,9 @@ fun JoinRoomScreen(
     userViewModel: UserViewModel,
     gameViewModel: GameViewModel
 ) {
+    val context = LocalContext.current
+    var clickCount by remember { mutableStateOf(0) }
+
     var playerName by remember { mutableStateOf("") }
     var roomCode by remember { mutableStateOf("") }
 
@@ -93,9 +100,18 @@ fun JoinRoomScreen(
                 Text("Join Room ", style = MaterialTheme.typography.headlineLarge)
 
                 Image(
-                    painter = painterResource(id = R.drawable.ic_barrel),
+                    painter = painterResource(id = if (clickCount > 10) R.drawable.ic_beer else R.drawable.ic_barrel),
                     contentDescription = "Beer Icon",
                     modifier = Modifier.size(46.dp)
+                        .clickable (
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            clickCount++
+                            if (clickCount >= 20) {
+                                clickCount = 0
+                            }
+                        }
                 )
             }
 
