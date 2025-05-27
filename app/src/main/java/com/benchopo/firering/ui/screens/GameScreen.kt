@@ -239,78 +239,6 @@ fun GameScreen(
                 }
             }
 
-            // Card History Section
-            if (drawnCards.isNotEmpty()) {
-                Log.d("GameScreen", "Showing card history section with ${drawnCards.size} cards")
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    "Card History",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Show the last 3 drawn cards (excluding the current one)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Skip the current card if it's already drawn
-                    val historyCards = if (drawnCard != null) {
-                        val filtered = drawnCards.filter { it.id != drawnCard?.id }.take(3)
-                        Log.d("GameScreen", "History cards (excluding current): ${filtered.size} cards")
-                        filtered
-                    } else {
-                        val taken = drawnCards.take(3)
-                        Log.d("GameScreen", "History cards (no current card): ${taken.size} cards")
-                        taken
-                    }
-
-                    historyCards.forEach() { historyCard ->
-                        Log.d("GameScreen", "Rendering history card: ${historyCard.value} of ${historyCard.suit}")
-                        Card(
-                            modifier = Modifier
-                                .size(80.dp, 120.dp)
-                                .padding(4.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize().padding(8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    historyCard.value,
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                                Text(
-                                    historyCard.suit,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-
-                                // Get player who drew this card
-                                val playerName = remember(historyCard, gameRoom) {
-                                    val name = historyCard.drawnByPlayerId?.let { id ->
-                                        val playerName = gameRoom?.players?.get(id)?.name ?: "Unknown"
-                                        Log.d("GameScreen", "Card drawn by player: $id, name: $playerName")
-                                        playerName
-                                    } ?: "Unknown"
-                                    name
-                                }
-
-                                Text(
-                                    "by $playerName",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontSize = 8.sp
-                                )
-                            }
-                        }
-                    }
-                }
-            } else {
-                Log.d("GameScreen", "No card history to show - drawnCards is empty")
-            }
-
             // Player Drink Counter Section - Only current player
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -541,13 +469,8 @@ fun CardHistoryModal(
                         ) {
                             Text(
                                 "${card.value} of ${card.suit} by $playerName",
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodySmall
                             )
-                            // Optionally, show who drew the card if that info is available
-                            // For now, we'll keep it simple
-                            // card.drawnByPlayerId?.let { playerId ->
-                            //     Text("by Player $playerId", style = MaterialTheme.typography.bodySmall)
-                            // }
                         }
                     }
                 }
@@ -672,3 +595,75 @@ private fun getDrinkEmoji(drinkId: String): String {
         else -> "🥤"
     }
 }
+
+// Card History Section
+//            if (drawnCards.isNotEmpty()) {
+//                Log.d("GameScreen", "Showing card history section with ${drawnCards.size} cards")
+//                Spacer(modifier = Modifier.height(24.dp))
+//
+//                Text(
+//                    "Card History",
+//                    style = MaterialTheme.typography.titleMedium
+//                )
+//
+//                Spacer(modifier = Modifier.height(8.dp))
+//
+//                // Show the last 3 drawn cards (excluding the current one)
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                ) {
+//                    // Skip the current card if it's already drawn
+//                    val historyCards = if (drawnCard != null) {
+//                        val filtered = drawnCards.filter { it.id != drawnCard?.id }.take(3)
+//                        Log.d("GameScreen", "History cards (excluding current): ${filtered.size} cards")
+//                        filtered
+//                    } else {
+//                        val taken = drawnCards.take(3)
+//                        Log.d("GameScreen", "History cards (no current card): ${taken.size} cards")
+//                        taken
+//                    }
+//
+//                    historyCards.forEach() { historyCard ->
+//                        Log.d("GameScreen", "Rendering history card: ${historyCard.value} of ${historyCard.suit}")
+//                        Card(
+//                            modifier = Modifier
+//                                .size(80.dp, 120.dp)
+//                                .padding(4.dp)
+//                        ) {
+//                            Column(
+//                                modifier = Modifier.fillMaxSize().padding(8.dp),
+//                                horizontalAlignment = Alignment.CenterHorizontally,
+//                                verticalArrangement = Arrangement.Center
+//                            ) {
+//                                Text(
+//                                    historyCard.value,
+//                                    style = MaterialTheme.typography.titleLarge
+//                                )
+//                                Text(
+//                                    historyCard.suit,
+//                                    style = MaterialTheme.typography.bodySmall
+//                                )
+//
+//                                // Get player who drew this card
+//                                val playerName = remember(historyCard, gameRoom) {
+//                                    val name = historyCard.drawnByPlayerId?.let { id ->
+//                                        val playerName = gameRoom?.players?.get(id)?.name ?: "Unknown"
+//                                        Log.d("GameScreen", "Card drawn by player: $id, name: $playerName")
+//                                        playerName
+//                                    } ?: "Unknown"
+//                                    name
+//                                }
+//
+//                                Text(
+//                                    "by $playerName",
+//                                    style = MaterialTheme.typography.bodySmall,
+//                                    fontSize = 8.sp
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            } else {
+//                Log.d("GameScreen", "No card history to show - drawnCards is empty")
+//            }
