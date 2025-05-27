@@ -180,14 +180,14 @@ fun JoinRoomScreen(
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_cup),
-                                contentDescription = "Join Icon",
-                                modifier = Modifier.size(20.dp)
-                            )
-
+                        ) {
                             Text("Join Room", color = Color.White)
+
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_coctel),
+                                contentDescription = "Coctel Icon",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
 
                     }
