@@ -22,8 +22,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.TextButton
-import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import com.benchopo.firering.model.Player
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,12 +91,33 @@ fun GameScreen(
             TopAppBar(
                 title = { Text("Game Room: $roomCode") },
                 actions = {
-                    // Update Exit button to show dialog instead of immediately exiting
+                    // Add player info button
+                    var showPlayerInfo by remember { mutableStateOf(false) }
+
+                    IconButton(onClick = {
+                        Log.d("GameScreen", "Player info button clicked, showing sidebar")
+                        showPlayerInfo = true
+                    }) {
+                        Icon(Icons.Default.Info, contentDescription = "Player Info")
+                    }
+
+                    // Exit button
                     IconButton(onClick = {
                         Log.d("GameScreen", "Exit button pressed, showing leave dialog")
                         showLeaveDialog = true
                     }) {
                         Text("Exit")
+                    }
+
+                    // Player info drawer
+                    if (showPlayerInfo) {
+                        PlayerInfoSidebar(
+                            players = gameRoom?.players?.values?.toList() ?: emptyList(),
+                            onDismiss = {
+                                Log.d("GameScreen", "Closing player info sidebar")
+                                showPlayerInfo = false
+                            }
+                        )
                     }
                 }
             )
@@ -260,70 +287,70 @@ fun GameScreen(
                 Log.d("GameScreen", "No card history to show - drawnCards is empty")
             }
 
-            // Player Drink Counter Section
+            // Player Drink Counter Section - Only current player
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                "Drink Counter",
-                style = MaterialTheme.typography.titleMedium
-            )
+            // Find current player from the players list
+            val myPlayer = remember(gameRoom, playerId) {
+                val player = gameRoom?.players?.get(playerId)
+                Log.d("GameScreen", "Current player: ${player?.name}, drink count: ${player?.drinkCount}")
+                player
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Player list with drink counters
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                val playersList = gameRoom?.players?.values?.toList() ?: emptyList()
-
-                items(playersList) { player ->
-                    Card(
-                        modifier = Modifier
-                            .width(120.dp)
-                            .padding(4.dp)
+            if (myPlayer != null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Text(
+                            "Your Drinks",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Player name
-                            Text(
-                                player.name,
-                                style = MaterialTheme.typography.bodyMedium,
-                                maxLines = 1,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                            )
-
-                            // Drink count
-                            Text(
-                                "${player.drinkCount} 🍺",
-                                style = MaterialTheme.typography.headlineSmall
-                            )
-
-                            // Increment/Decrement buttons
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                            // Decrement button (only enabled if count > 0)
+                            FilledTonalIconButton(
+                                onClick = {
+                                    Log.d("GameScreen", "Decrementing drink count for player: ${myPlayer.id}")
+                                    gameViewModel.updateDrinks(myPlayer.id, -1)
+                                },
+                                enabled = myPlayer.drinkCount > 0
                             ) {
-                                // Decrement button (only enabled if count > 0)
-                                IconButton(
-                                    onClick = { gameViewModel.updateDrinks(player.id, -1) },
-                                    enabled = player.drinkCount > 0
-                                ) {
-                                    Text("-", style = MaterialTheme.typography.titleMedium)
-                                }
+                                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
+                            }
 
-                                // Increment button
-                                IconButton(
-                                    onClick = { gameViewModel.updateDrinks(player.id, 1) }
-                                ) {
-                                    Text("+", style = MaterialTheme.typography.titleMedium)
+                            // Drink count display
+                            Text(
+                                "${myPlayer.drinkCount} 🍺",
+                                style = MaterialTheme.typography.displaySmall
+                            )
+
+                            // Increment button
+                            FilledTonalIconButton(
+                                onClick = {
+                                    Log.d("GameScreen", "Incrementing drink count for player: ${myPlayer.id}")
+                                    gameViewModel.updateDrinks(myPlayer.id, 1)
                                 }
+                            ) {
+                                Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
                             }
                         }
                     }
                 }
+            } else {
+                Text(
+                    "Player data not available",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -446,5 +473,115 @@ fun GameScreen(
                 TextButton(onClick = { showLeaveDialog = false }) { Text("Cancel") }
             }
         )
+    }
+}
+
+@Composable
+fun PlayerInfoSidebar(
+    players: List<Player>,
+    onDismiss: () -> Unit
+) {
+    Log.d("GameScreen", "Showing player info sidebar with ${players.size} players")
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Players Info") },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                players.forEachIndexed { index, player ->
+                    Log.d("GameScreen", "Rendering player info: ${player.name}, drinks: ${player.drinkCount}")
+
+                    if (index > 0) {
+                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    ) {
+                        // Player name with online status indicator
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(
+                                        if (player.isConnected) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.error,
+                                        shape = CircleShape
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                player.name,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            if (player.isHost) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "(Host)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Drink count
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Drinks: ${player.drinkCount} 🍺",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                        // What they're drinking (if selected)
+                        player.selectedDrinkId?.let { drinkId ->
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "Drinking: ${getDrinkName(drinkId)} ${getDrinkEmoji(drinkId)}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
+}
+
+// Helper functions for drink info
+private fun getDrinkName(drinkId: String): String {
+    return when (drinkId) {
+        "beer" -> "Beer"
+        "wine" -> "Wine"
+        "whiskey" -> "Whiskey"
+        "vodka" -> "Vodka"
+        "water" -> "Water"
+        else -> "Custom Drink"
+    }
+}
+
+private fun getDrinkEmoji(drinkId: String): String {
+    return when (drinkId) {
+        "beer" -> "🍺"
+        "wine" -> "🍷"
+        "whiskey" -> "🥃"
+        "vodka" -> "🥂"
+        "water" -> "💧"
+        else -> "🥤"
     }
 }
