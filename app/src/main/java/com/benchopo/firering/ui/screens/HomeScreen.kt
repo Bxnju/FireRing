@@ -1,8 +1,11 @@
 package com.benchopo.firering.ui.screens
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -12,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -22,7 +26,17 @@ import com.benchopo.firering.viewmodel.GameViewModel
 
 @Composable
 fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
-    // This LaunchedEffect will run once when HomeScreen appears
+    val context = LocalContext.current
+    var clickCount by remember { mutableStateOf(0) }
+    var mediaPlayer: MediaPlayer? by remember { mutableStateOf(null) }
+
+    // Se limpia al salir
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayer?.release()
+        }
+    }
+
     LaunchedEffect(Unit) {
         Log.d("HomeScreen", "Entered HomeScreen, clearing all game data")
         gameViewModel.clearGameData()
@@ -35,7 +49,6 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Title
         Text(
             "FireRing",
             style = MaterialTheme.typography.displayLarge,
@@ -63,7 +76,19 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
         Image(
             painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = "Logo",
-            modifier = Modifier.size(350.dp)
+            modifier = Modifier
+                .size(350.dp)
+                .clickable (
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    clickCount++
+                    if (clickCount >= 10) {
+                        mediaPlayer = MediaPlayer.create(context, R.raw.alcohol_warning)
+                        mediaPlayer?.start()
+                        clickCount = 0
+                    }
+                }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -76,40 +101,24 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Create Room Button
         Button(
             onClick = { navController.navigate(Routes.CREATE_ROOM) },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .height(56.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor =
-                        Color.Transparent // Hacemos el fondo del botón
-                    // transparente
-                ),
-            contentPadding = PaddingValues() // Quitamos el padding interno del botón
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            contentPadding = PaddingValues()
         ) {
             Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush =
-                                Brush.linearGradient(
-                                    colors =
-                                        listOf(
-                                            Color(
-                                                0xFFFF9800
-                                            ),
-                                            Color(
-                                                0xFFFF5722
-                                            )
-                                        )
-                                ),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .clip(RoundedCornerShape(12.dp)),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFFFF9800), Color(0xFFFF5722))
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clip(RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -122,7 +131,6 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Join Room Button
         Button(
             onClick = { navController.navigate(Routes.JOIN_ROOM) },
             modifier = Modifier
@@ -132,25 +140,15 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
             contentPadding = PaddingValues()
         ) {
             Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush =
-                                Brush.linearGradient(
-                                    colors =
-                                        listOf(
-                                            Color(
-                                                0xFFFF9800
-                                            ),
-                                            Color(
-                                                0xFFFF5722
-                                            )
-                                        )
-                                ),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .clip(RoundedCornerShape(12.dp)),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFFFF9800), Color(0xFFFF5722))
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clip(RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -163,7 +161,6 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Version info or other details can go here
         Text(
             "Version 0.1",
             style = MaterialTheme.typography.bodySmall,
