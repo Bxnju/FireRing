@@ -1,5 +1,6 @@
 package com.benchopo.firering.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,6 +27,12 @@ fun JoinRoomScreen(
     val loading by gameViewModel.loading.collectAsState()
     val error by gameViewModel.error.collectAsState()
     val joinedRoomCode by gameViewModel.roomCode.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Log.d("JoinRoomScreen", "Entered JoinRoomScreen, resetting loading state")
+        gameViewModel.resetLoadingState()
+        gameViewModel.clearError()
+    }
 
     Scaffold(
             topBar = {

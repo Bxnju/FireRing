@@ -469,8 +469,13 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         _currentPlayer.value = null
         _drawnCard.value = null
         _error.value = null
+        _loading.value = false
 
         Log.d("GameViewModel", "Game data cleared")
+    }
+
+    fun resetLoadingState() {
+        _loading.value = false
     }
 
     // Add this public method to set player ID
