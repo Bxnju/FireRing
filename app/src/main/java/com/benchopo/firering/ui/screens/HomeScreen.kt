@@ -36,7 +36,7 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
                 // Title
                 Text(
                         "FireRing",
-                        style = MaterialTheme.typography.headlineLarge,
+                        style = MaterialTheme.typography.displayLarge,
                         textAlign = TextAlign.Center
                 )
 
