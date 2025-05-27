@@ -1,5 +1,6 @@
 package com.benchopo.firering.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,10 @@ import androidx.navigation.NavController
 import com.benchopo.firering.navigation.Routes
 import com.benchopo.firering.viewmodel.GameViewModel
 import com.benchopo.firering.viewmodel.UserViewModel
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.unit.sp
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,14 +45,19 @@ fun GameScreen(
         gameRoom?.currentPlayerId?.let { gameRoom?.players?.get(it) }
     }
 
+    // Get all drawn cards in order
+    val drawnCards = remember(gameRoom) {
+        val cards = gameRoom?.drawnCards?.sortedByDescending { it.drawnTimestamp ?: 0 } ?: emptyList()
+        Log.d("GameScreen", "Drawn cards from gameRoom: ${cards.size} cards")
+        cards.forEachIndexed { index, card ->
+            Log.d("GameScreen", "  Card $index: ${card.value} of ${card.suit}, drawn by: ${card.drawnByPlayerId}, timestamp: ${card.drawnTimestamp}")
+        }
+        cards
+    }
+
     // Get card rule if a card is drawn
     val cardRule = remember(drawnCard) {
-        if (drawnCard?.ruleId != null) {
-            // In a real implementation, fetch the rule text
-            "Rule for ${drawnCard?.value} of ${drawnCard?.suit}"
-        } else {
-            "Draw a card to see the rule"
-        }
+        drawnCard?.ruleDescription ?: "Draw a card to see the rule"
     }
 
     Scaffold(
@@ -158,6 +168,78 @@ fun GameScreen(
                 }
             }
 
+            // Card History Section
+            if (drawnCards.isNotEmpty()) {
+                Log.d("GameScreen", "Showing card history section with ${drawnCards.size} cards")
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    "Card History",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Show the last 3 drawn cards (excluding the current one)
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Skip the current card if it's already drawn
+                    val historyCards = if (drawnCard != null) {
+                        val filtered = drawnCards.filter { it.id != drawnCard?.id }.take(3)
+                        Log.d("GameScreen", "History cards (excluding current): ${filtered.size} cards")
+                        filtered
+                    } else {
+                        val taken = drawnCards.take(3)
+                        Log.d("GameScreen", "History cards (no current card): ${taken.size} cards")
+                        taken
+                    }
+
+                    items(historyCards) { historyCard ->
+                        Log.d("GameScreen", "Rendering history card: ${historyCard.value} of ${historyCard.suit}")
+                        Card(
+                            modifier = Modifier
+                                .size(80.dp, 120.dp)
+                                .padding(4.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize().padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    historyCard.value,
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                                Text(
+                                    historyCard.suit,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+
+                                // Get player who drew this card
+                                val playerName = remember(historyCard, gameRoom) {
+                                    val name = historyCard.drawnByPlayerId?.let { id ->
+                                        val playerName = gameRoom?.players?.get(id)?.name ?: "Unknown"
+                                        Log.d("GameScreen", "Card drawn by player: $id, name: $playerName")
+                                        playerName
+                                    } ?: "Unknown"
+                                    name
+                                }
+
+                                Text(
+                                    "by $playerName",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontSize = 8.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log.d("GameScreen", "No card history to show - drawnCards is empty")
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             // Draw card button
@@ -186,6 +268,34 @@ fun GameScreen(
                 ) {
                     Text("Next Player")
                 }
+            }
+        }
+    }
+
+    // Navigate back to home if the room is deleted or has no players
+    LaunchedEffect(gameRoom) {
+        // If the room was deleted or has no players, navigate back to home
+        if (gameRoom == null || gameRoom?.players?.isEmpty() == true) {
+            Log.d("GameScreen", "Room no longer exists or has no players, returning to home")
+            gameViewModel.clearGameData()
+            navController.navigate(Routes.HOME) {
+                popUpTo(Routes.HOME) { inclusive = true }
+            }
+        }
+    }
+
+    // Force re-fetch game room data on first load
+    LaunchedEffect(Unit) {
+        Log.d("GameScreen", "Initial load - forcing refresh of room data")
+        gameViewModel.ensureRoomLoaded(roomCode)
+    }
+
+    // Debug drawn cards data
+    LaunchedEffect(gameRoom) {
+        if (gameRoom != null) {
+            Log.d("GameScreen", "Room updated, drawn cards count: ${gameRoom?.drawnCards?.size ?: 0}")
+            gameRoom?.drawnCards?.forEach { card ->
+                Log.d("GameScreen", "Drawn card: ${card.value} of ${card.suit} by ${card.drawnByPlayerId}")
             }
         }
     }

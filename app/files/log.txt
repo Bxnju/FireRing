@@ -1,84 +1,77 @@
-------- PROCESS STARTED (16825) for package com.benchopo.firering ----------------------------
-2025-05-26 22:51:31.916 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing all game data
-2025-05-26 22:51:31.916 16825-16825 GameViewModel           com.benchopo.firering                D  Game data cleared
-2025-05-26 22:52:21.361 16825-16825 GameViewModel           com.benchopo.firering                D  Creating room with host: Porras
-2025-05-26 22:52:21.362 16825-16825 GameViewModel           com.benchopo.firering                D  Generated user ID: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:52:21.362 16825-16825 FirebaseRepository      com.benchopo.firering                D  Creating game room for host: Porras  with ID: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:52:21.365 16825-16825 FirebaseRepository      com.benchopo.firering                D  Generated room code: U5T34
-2025-05-26 22:52:21.367 16825-16825 FirebaseRepository      com.benchopo.firering                D  Generated deck with 52 cards
-2025-05-26 22:52:21.367 16825-16825 FirebaseRepository      com.benchopo.firering                D  Created host player: Player(id=1751f2b3-c875-41d0-bc05-0bb894dc7ed5, name=Porras , isHost=true, isGuest=false, selectedDrinkId=null, drinkCount=0, mateIds=[], isConnected=true, lastActiveTimestamp=1748317941367, customRuleIds=[], turnIndex=null)
-2025-05-26 22:52:21.367 16825-16825 FirebaseRepository      com.benchopo.firering                D  Added 5 default drinks
-2025-05-26 22:52:21.368 16825-16825 FirebaseRepository      com.benchopo.firering                D  Preparing room data structure
-2025-05-26 22:52:21.664 16825-16825 FirebaseRepository      com.benchopo.firering                D  Room data written to database successfully
-2025-05-26 22:52:21.664 16825-16825 GameViewModel           com.benchopo.firering                D  Room created successfully with code: U5T34
-2025-05-26 22:52:21.664 16825-16825 GameViewModel           com.benchopo.firering                D  Local state updated with room code and player ID
-2025-05-26 22:52:21.847 16825-16825 GameViewModel           com.benchopo.firering                D  Initial room data loaded: 1 players
-2025-05-26 22:52:21.847 16825-16825 GameViewModel           com.benchopo.firering                D  Calling completion callback
-2025-05-26 22:52:21.851 16825-16825 GameViewModel           com.benchopo.firering                D  Starting room data collection for code: U5T34
-2025-05-26 22:52:21.853 16825-16825 GameViewModel           com.benchopo.firering                D  Create room process completed, loading = false
-2025-05-26 22:52:21.872 16825-16825 LobbyScreen             com.benchopo.firering                D  isHost calculation: true (currentPlayerId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5, hostId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5)
-2025-05-26 22:52:22.034 16825-16825 LobbyScreen             com.benchopo.firering                D  Room data updated: U5T34
-2025-05-26 22:52:22.034 16825-16825 LobbyScreen             com.benchopo.firering                D  Players: [Porras ]
-2025-05-26 22:52:22.034 16825-16825 LobbyScreen             com.benchopo.firering                D  Is host: true (playerId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5, hostId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5)
-2025-05-26 22:52:22.034 16825-16825 LobbyScreen             com.benchopo.firering                D  Setting up room code: U5T34
-2025-05-26 22:52:22.035 16825-16825 LobbyScreen             com.benchopo.firering                D  Current player ID: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:52:22.035 16825-16825 LobbyScreen             com.benchopo.firering                D  Host ID from room: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:52:22.035 16825-16825 LobbyScreen             com.benchopo.firering                D  Room players: [1751f2b3-c875-41d0-bc05-0bb894dc7ed5]
-2025-05-26 22:52:22.035 16825-16825 LobbyScreen             com.benchopo.firering                D  Current player isHost property: false
-2025-05-26 22:52:22.035 16825-16825 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: true
-2025-05-26 22:52:22.035 16825-16825 LobbyScreen             com.benchopo.firering                D  Ensuring room loaded: U5T34 with player: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:52:22.035 16825-16825 GameViewModel           com.benchopo.firering                D  Ensuring room is loaded: U5T34, current room: U5T34
-2025-05-26 22:52:22.035 16825-16825 GameViewModel           com.benchopo.firering                D  Game room already loaded, skipping data collection
-2025-05-26 22:52:22.075 16825-16825 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
-2025-05-26 22:52:22.076 16825-16825 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
-2025-05-26 22:56:51.158 16825-16825 LobbyScreen             com.benchopo.firering                D  Confirming leave game
-2025-05-26 22:56:51.158 16825-16825 GameViewModel           com.benchopo.firering                D  Leaving room. roomCode: U5T34, playerId: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:56:51.159 16825-16825 GameViewModel           com.benchopo.firering                D  Cancelling active room subscription
-2025-05-26 22:56:51.159 16825-16825 GameViewModel           com.benchopo.firering                D  Calling repository.leaveRoom
-2025-05-26 22:56:51.159 16825-16825 FirebaseRepository      com.benchopo.firering                D  Removing player 1751f2b3-c875-41d0-bc05-0bb894dc7ed5 from room U5T34
-2025-05-26 22:56:51.189 16825-16825 FirebaseRepository      com.benchopo.firering                D  Current turn order: [1751f2b3-c875-41d0-bc05-0bb894dc7ed5]
-2025-05-26 22:56:51.189 16825-16825 FirebaseRepository      com.benchopo.firering                D  New turn order after removal: []
-2025-05-26 22:56:51.211 16825-16825 GameViewModel           com.benchopo.firering                D  Room update received: 0 players
-2025-05-26 22:56:51.211 16825-16825 GameViewModel           com.benchopo.firering                D  Current player updated: null
-2025-05-26 22:56:51.214 16825-16825 LobbyScreen             com.benchopo.firering                D  isHost calculation: true (currentPlayerId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5, hostId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5)
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Room data updated: U5T34
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Players: []
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Is host: true (playerId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5, hostId=1751f2b3-c875-41d0-bc05-0bb894dc7ed5)
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Current player ID: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Host ID from room: 1751f2b3-c875-41d0-bc05-0bb894dc7ed5
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Room players: []
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Current player isHost property: null
-2025-05-26 22:56:51.242 16825-16825 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: true
-2025-05-26 22:56:51.354 16825-16825 FirebaseRepository      com.benchopo.firering                D  Successfully removed player 1751f2b3-c875-41d0-bc05-0bb894dc7ed5 from room U5T34
-2025-05-26 22:56:51.354 16825-16825 GameViewModel           com.benchopo.firering                D  Successfully left room
-2025-05-26 22:56:51.354 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing game state after leaving room
-2025-05-26 22:56:51.354 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing all game data
-2025-05-26 22:56:51.354 16825-16825 GameViewModel           com.benchopo.firering                D  Game data cleared
-2025-05-26 22:56:51.354 16825-16825 GameViewModel           com.benchopo.firering                D  Calling completion callback
-2025-05-26 22:56:51.354 16825-16825 LobbyScreen             com.benchopo.firering                D  Navigating to home
-2025-05-26 22:56:51.369 16825-16825 LobbyScreen             com.benchopo.firering                D  isHost calculation: true (currentPlayerId=null, hostId=null)
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Room data updated: null
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Players: []
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Is host: true (playerId=null, hostId=null)
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Current player ID: null
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Host ID from room: null
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Room players: null
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Current player isHost property: null
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: true
-2025-05-26 22:56:51.516 16825-16825 LobbyScreen             com.benchopo.firering                D  Ensuring room loaded: U5T34 with player: null
-2025-05-26 22:56:51.517 16825-16825 GameViewModel           com.benchopo.firering                D  Ensuring room is loaded: U5T34, current room: null
-2025-05-26 22:56:51.517 16825-16825 GameViewModel           com.benchopo.firering                D  Room code changed, updating to: U5T34
-2025-05-26 22:56:51.517 16825-16825 GameViewModel           com.benchopo.firering                D  Game room is null, starting new data collection
-2025-05-26 22:56:51.517 16825-16825 GameViewModel           com.benchopo.firering                D  Previous room job cancelled
-2025-05-26 22:56:51.517 16825-16825 GameViewModel           com.benchopo.firering                D  Starting to collect room data for: U5T34
-2025-05-26 22:56:51.518 16825-16825 LobbyScreen             com.benchopo.firering                D  No valid room data, returning to home
-2025-05-26 22:56:51.522 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing all game data
-2025-05-26 22:56:51.524 16825-16825 GameViewModel           com.benchopo.firering                E  Error loading room
-                                                                                                    kotlinx.coroutines.JobCancellationException: StandaloneCoroutine was cancelled; job=StandaloneCoroutine{Cancelling}@25f11b5
-2025-05-26 22:56:51.525 16825-16825 GameViewModel           com.benchopo.firering                D  Game data cleared
-2025-05-26 22:56:51.641 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing all game data
-2025-05-26 22:56:51.641 16825-16825 GameViewModel           com.benchopo.firering                D  Game data cleared
-2025-05-26 22:58:30.420 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing all game data
-2025-05-26 22:58:30.420 16825-16825 GameViewModel           com.benchopo.firering                D  Game data cleared
-2025-05-26 22:58:36.637 16825-16825 GameViewModel           com.benchopo.firering                D  Clearing all game data
-2025-05-26 22:58:36.637 16825-16825 GameViewModel           com.benchopo.firering                D  Game data cleared
+--------- beginning of main
+--------- beginning of system
+2025-05-27 03:22:28.695 26312-26312 CreateRoomScreen        com.benchopo.firering                D  Entered CreateRoomScreen, resetting loading state
+2025-05-27 03:22:42.986 26312-26312 GameViewModel           com.benchopo.firering                D  Creating room with host: Porras
+2025-05-27 03:22:42.987 26312-26312 GameViewModel           com.benchopo.firering                D  Generated user ID: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:42.987 26312-26312 FirebaseRepository      com.benchopo.firering                D  Creating game room for host: Porras  with ID: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:42.990 26312-26312 FirebaseRepository      com.benchopo.firering                D  Generated room code: 9V1NX
+2025-05-27 03:22:42.993 26312-26312 FirebaseRepository      com.benchopo.firering                D  Generated deck with 52 cards
+2025-05-27 03:22:42.994 26312-26312 FirebaseRepository      com.benchopo.firering                D  Created host player: Player(id=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, name=Porras , isHost=true, isGuest=false, selectedDrinkId=null, drinkCount=0, mateIds=[], isConnected=true, lastActiveTimestamp=1748334162994, customRuleIds=[], turnIndex=null)
+2025-05-27 03:22:42.994 26312-26312 FirebaseRepository      com.benchopo.firering                D  Added 5 default drinks
+2025-05-27 03:22:42.994 26312-26312 FirebaseRepository      com.benchopo.firering                D  Preparing room data structure
+2025-05-27 03:22:43.308 26312-26312 FirebaseRepository      com.benchopo.firering                D  Room data written to database successfully
+2025-05-27 03:22:43.308 26312-26312 GameViewModel           com.benchopo.firering                D  Room created successfully with code: 9V1NX
+2025-05-27 03:22:43.308 26312-26312 GameViewModel           com.benchopo.firering                D  Local state updated with room code and player ID
+2025-05-27 03:22:43.499 26312-26312 GameViewModel           com.benchopo.firering                D  Initial room data loaded: 1 players
+2025-05-27 03:22:43.499 26312-26312 GameViewModel           com.benchopo.firering                D  Calling completion callback
+2025-05-27 03:22:43.503 26312-26312 GameViewModel           com.benchopo.firering                D  Starting room data collection for code: 9V1NX
+2025-05-27 03:22:43.505 26312-26312 GameViewModel           com.benchopo.firering                D  Create room process completed, loading = false
+2025-05-27 03:22:43.523 26312-26312 LobbyScreen             com.benchopo.firering                D  isHost calculation: true (currentPlayerId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, hostId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9)
+2025-05-27 03:22:43.693 26312-26312 LobbyScreen             com.benchopo.firering                D  Room data updated: 9V1NX
+2025-05-27 03:22:43.693 26312-26312 LobbyScreen             com.benchopo.firering                D  Players: [Porras ]
+2025-05-27 03:22:43.693 26312-26312 LobbyScreen             com.benchopo.firering                D  Is host: true (playerId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, hostId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9)
+2025-05-27 03:22:43.693 26312-26312 LobbyScreen             com.benchopo.firering                D  Setting up room code: 9V1NX
+2025-05-27 03:22:43.694 26312-26312 LobbyScreen             com.benchopo.firering                D  Current player ID: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:43.694 26312-26312 LobbyScreen             com.benchopo.firering                D  Host ID from room: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:43.694 26312-26312 LobbyScreen             com.benchopo.firering                D  Room players: [c7534a52-b1d1-4f06-8950-2e8b3cd718c9]
+2025-05-27 03:22:43.694 26312-26312 LobbyScreen             com.benchopo.firering                D  Current player isHost property: true
+2025-05-27 03:22:43.694 26312-26312 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: true
+2025-05-27 03:22:43.694 26312-26312 LobbyScreen             com.benchopo.firering                D  Ensuring room loaded: 9V1NX with player: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:43.694 26312-26312 GameViewModel           com.benchopo.firering                D  Ensuring room is loaded: 9V1NX, current room: 9V1NX
+2025-05-27 03:22:43.694 26312-26312 GameViewModel           com.benchopo.firering                D  Game room already loaded, skipping data collection
+2025-05-27 03:22:43.733 26312-26312 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-27 03:22:43.733 26312-26312 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
+2025-05-27 03:22:46.952 26312-26312 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-27 03:22:46.953 26312-26312 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
+2025-05-27 03:22:46.957 26312-26312 LobbyScreen             com.benchopo.firering                D  isHost calculation: true (currentPlayerId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, hostId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9)
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Room data updated: 9V1NX
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Players: [Porras ]
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Is host: true (playerId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, hostId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9)
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Current player ID: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Host ID from room: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Room players: [c7534a52-b1d1-4f06-8950-2e8b3cd718c9]
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Current player isHost property: true
+2025-05-27 03:22:46.972 26312-26312 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: true
+2025-05-27 03:22:47.232 26312-26312 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-27 03:22:47.233 26312-26312 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
+2025-05-27 03:22:47.237 26312-26312 LobbyScreen             com.benchopo.firering                D  isHost calculation: true (currentPlayerId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, hostId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9)
+2025-05-27 03:22:47.250 26312-26312 LobbyScreen             com.benchopo.firering                D  Room data updated: 9V1NX
+2025-05-27 03:22:47.250 26312-26312 LobbyScreen             com.benchopo.firering                D  Players: [Porras ]
+2025-05-27 03:22:47.250 26312-26312 LobbyScreen             com.benchopo.firering                D  Is host: true (playerId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9, hostId=c7534a52-b1d1-4f06-8950-2e8b3cd718c9)
+2025-05-27 03:22:47.253 26312-26312 LobbyScreen             com.benchopo.firering                D  Current player ID: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:47.254 26312-26312 LobbyScreen             com.benchopo.firering                D  Host ID from room: c7534a52-b1d1-4f06-8950-2e8b3cd718c9
+2025-05-27 03:22:47.254 26312-26312 LobbyScreen             com.benchopo.firering                D  Room players: [c7534a52-b1d1-4f06-8950-2e8b3cd718c9]
+2025-05-27 03:22:47.254 26312-26312 LobbyScreen             com.benchopo.firering                D  Current player isHost property: true
+2025-05-27 03:22:47.254 26312-26312 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: true
+2025-05-27 03:22:47.271 26312-26312 GameScreen              com.benchopo.firering                D  Drawn cards from gameRoom: 0 cards
+2025-05-27 03:22:47.320 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:22:47.403 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:22:57.877 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:22:57.918 26312-26312 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-27 03:22:57.919 26312-26312 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
+2025-05-27 03:22:57.923 26312-26312 GameScreen              com.benchopo.firering                D  Drawn cards from gameRoom: 0 cards
+2025-05-27 03:22:57.926 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:22:58.085 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:19.222 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:19.271 26312-26312 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-27 03:23:19.272 26312-26312 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
+2025-05-27 03:23:19.278 26312-26312 GameScreen              com.benchopo.firering                D  Drawn cards from gameRoom: 0 cards
+2025-05-27 03:23:19.282 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:19.437 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:22.140 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:33.703 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:33.747 26312-26312 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-27 03:23:33.747 26312-26312 GameViewModel           com.benchopo.firering                D  Current player updated: Porras
+2025-05-27 03:23:33.751 26312-26312 GameScreen              com.benchopo.firering                D  Drawn cards from gameRoom: 0 cards
+2025-05-27 03:23:33.754 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
+2025-05-27 03:23:33.911 26312-26312 GameScreen              com.benchopo.firering                D  No card history to show - drawnCards is empty
