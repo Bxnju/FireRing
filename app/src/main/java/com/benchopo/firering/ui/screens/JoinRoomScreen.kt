@@ -100,7 +100,7 @@ fun JoinRoomScreen(
                 Text("Join Room ", style = MaterialTheme.typography.headlineLarge)
 
                 Image(
-                    painter = painterResource(id = if (clickCount > 10) R.drawable.ic_beer else R.drawable.ic_barrel),
+                    painter = painterResource(id = if (clickCount > 5) R.drawable.ic_beer else R.drawable.ic_barrel),
                     contentDescription = "Beer Icon",
                     modifier = Modifier.size(46.dp)
                         .clickable (
@@ -108,7 +108,7 @@ fun JoinRoomScreen(
                             interactionSource = remember { MutableInteractionSource() }
                         ) {
                             clickCount++
-                            if (clickCount >= 20) {
+                            if (clickCount >= 10) {
                                 clickCount = 0
                             }
                         }
