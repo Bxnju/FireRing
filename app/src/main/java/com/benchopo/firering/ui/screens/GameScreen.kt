@@ -27,6 +27,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Notifications
+import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
 
 
@@ -40,6 +42,7 @@ fun GameScreen(
 ) {
     // Add exit dialog state
     var showLeaveDialog by remember { mutableStateOf(false) }
+    var showCardHistoryModal by remember { mutableStateOf(false) }
 
     // Handle system back button
     BackHandler {
@@ -99,6 +102,13 @@ fun GameScreen(
                         Icon(Icons.Default.Info, contentDescription = "Player Info")
                     }
 
+                    // Card History button
+                    IconButton(onClick = {
+                        showCardHistoryModal = true
+                    }) {
+                        Icon(Icons.Default.Notifications, contentDescription = "Card History")
+                    }
+
                     // Exit button
                     IconButton(onClick = {
                         Log.d("GameScreen", "Exit button pressed, showing leave dialog")
@@ -115,6 +125,17 @@ fun GameScreen(
                                 Log.d("GameScreen", "Closing player info sidebar")
                                 showPlayerInfo = false
                             }
+                        )
+                    }
+
+                    // Card History Modal
+                    if (showCardHistoryModal) {
+                        CardHistoryModal(
+                            drawnCards = drawnCards,
+                            onDismiss = {
+                                showCardHistoryModal = false
+                            },
+                            gameRoom,
                         )
                     }
                 }
@@ -135,7 +156,7 @@ fun GameScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -206,7 +227,7 @@ fun GameScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "Current Rule",
+                        "What this card means...",
                         style = MaterialTheme.typography.titleSmall
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -478,6 +499,69 @@ fun GameScreen(
         )
     }
 }
+
+@Composable
+fun CardHistoryModal(
+    drawnCards: List<com.benchopo.firering.model.Card>,
+    onDismiss: () -> Unit,
+    gameRoom: GameRoom?
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Card History") },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                if (drawnCards.isEmpty()) {
+                    Text("No cards have been drawn yet.")
+                } else {
+                    drawnCards.forEachIndexed { index, card ->
+                        if (index > 0) {
+                            Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        }
+
+                        // Get player who drew this card
+                        val playerName = remember(card, gameRoom) {
+                            val name = card.drawnByPlayerId?.let { id ->
+                                val playerName = gameRoom?.players?.get(id)?.name ?: "Unknown"
+                                Log.d("GameScreen", "Card drawn by player: $id, name: $playerName")
+                                playerName
+                            } ?: "Unknown"
+                            name
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                "${card.value} of ${card.suit} by $playerName",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            // Optionally, show who drew the card if that info is available
+                            // For now, we'll keep it simple
+                            // card.drawnByPlayerId?.let { playerId ->
+                            //     Text("by Player $playerId", style = MaterialTheme.typography.bodySmall)
+                            // }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
+}
+
+
 
 @Composable
 fun PlayerInfoSidebar(
