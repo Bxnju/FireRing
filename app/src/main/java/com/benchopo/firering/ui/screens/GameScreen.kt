@@ -18,6 +18,10 @@ import com.benchopo.firering.viewmodel.UserViewModel
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.TextButton
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +32,15 @@ fun GameScreen(
         gameViewModel: GameViewModel,
         userViewModel: UserViewModel,
 ) {
+    // Add exit dialog state
+    var showLeaveDialog by remember { mutableStateOf(false) }
+
+    // Handle system back button
+    BackHandler {
+        Log.d("GameScreen", "Back button pressed, showing leave dialog")
+        showLeaveDialog = true
+    }
+
     // Collect game state
     val gameRoom by gameViewModel.gameRoom.collectAsState()
     val currentPlayer by gameViewModel.currentPlayer.collectAsState()
@@ -60,16 +73,21 @@ fun GameScreen(
         drawnCard?.ruleDescription ?: "Draw a card to see the rule"
     }
 
+    // Check if deck is empty
+    val isGameOver = remember(gameRoom) {
+        (gameRoom?.deck?.isEmpty() == true)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Game Room: $roomCode") },
                 actions = {
-                    IconButton(onClick = { gameViewModel.leaveRoom {
-                        navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.HOME) { inclusive = true }
-                        }
-                    }}) {
+                    // Update Exit button to show dialog instead of immediately exiting
+                    IconButton(onClick = {
+                        Log.d("GameScreen", "Exit button pressed, showing leave dialog")
+                        showLeaveDialog = true
+                    }) {
                         Text("Exit")
                     }
                 }
@@ -246,7 +264,7 @@ fun GameScreen(
             Button(
                 onClick = { gameViewModel.drawCard() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = isCurrentPlayerTurn && !loading
+                enabled = isCurrentPlayerTurn && !loading && !isGameOver // Add !isGameOver condition
             ) {
                 if (loading) {
                     CircularProgressIndicator(
@@ -255,7 +273,7 @@ fun GameScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text("Draw Card")
+                    Text(if (isGameOver) "Game Over" else "Draw Card")
                 }
             }
 
@@ -267,6 +285,42 @@ fun GameScreen(
                     modifier = Modifier.fillMaxWidth().height(56.dp)
                 ) {
                     Text("Next Player")
+                }
+            }
+
+            // Show game over banner if all cards are drawn
+            if (isGameOver) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Game Complete!",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "All cards have been drawn",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+
+                        // Optional: Add button to return to lobby or start new game
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(
+                            onClick = { showLeaveDialog = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text("End Game")
+                        }
+                    }
                 }
             }
         }
@@ -298,5 +352,31 @@ fun GameScreen(
                 Log.d("GameScreen", "Drawn card: ${card.value} of ${card.suit} by ${card.drawnByPlayerId}")
             }
         }
+    }
+
+    // Add the leave confirmation dialog
+    if (showLeaveDialog) {
+        AlertDialog(
+            onDismissRequest = { showLeaveDialog = false },
+            title = { Text("Leave Game") },
+            text = { Text("Are you sure you want to leave this game?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        Log.d("GameScreen", "Confirming leave game")
+                        gameViewModel.leaveRoom {
+                            // This is called after leave completes
+                            Log.d("GameScreen", "Navigating to home")
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.HOME) { inclusive = true }
+                            }
+                        }
+                    }
+                ) { Text("Leave", color = androidx.compose.ui.graphics.Color.White) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLeaveDialog = false }) { Text("Cancel") }
+            }
+        )
     }
 }
