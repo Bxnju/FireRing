@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
@@ -166,18 +167,21 @@ fun LobbyScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("Room Code", style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                             roomCode,
                             style = MaterialTheme.typography.headlineMedium,
                             textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                             "Share this code with your friends",
                             style = MaterialTheme.typography.bodySmall,
                             textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.height(10.dp))
                     Button(onClick = { copyToClipboard(roomCode) }) {
-                        Text("Copiar Código")
+                        Text("Copy code", color = Color.White)
                     }
                 }
             }
@@ -274,7 +278,7 @@ fun LobbyScreen(
                                             }
                                         }
                                     }
-                            ) { Text("Leave") }
+                            ) { Text("Leave", color = Color.White) }
                         },
                         dismissButton = {
                             TextButton(onClick = { showLeaveDialog = false }) { Text("Cancel") }
