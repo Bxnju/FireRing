@@ -78,18 +78,13 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     Log.d("GameViewModel", "Starting room data collection for code: $code")
                     repository.getRoom(code).collect { room ->
                         if (room != null) {
-                            Log.d(
-                                    "GameViewModel",
-                                    "Room update received: ${room.players.size} players"
-                            )
+                            Log.d("GameViewModel", "Room update received: ${room.players.size} players")
                             _gameRoom.value = room
                             _playerId.value?.let { pid ->
                                 _currentPlayer.value = room.players[pid]
-                                Log.d(
-                                        "GameViewModel",
-                                        "Current player updated: ${room.players[pid]?.name}"
-                                )
+                                Log.d("GameViewModel", "Current player updated: ${room.players[pid]?.name}")
                             }
+                            updateCurrentCardFromRoom(room) // Add this line
                         } else {
                             Log.w("GameViewModel", "Received null room in data collection")
                         }
@@ -139,17 +134,12 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                                 Log.d("GameViewModel", "Starting to collect room updates")
                                 repository.getRoom(roomCode).collect { room ->
                                     if (room != null) {
-                                        Log.d(
-                                                "GameViewModel",
-                                                "Room update received: ${room.players.size} players"
-                                        )
+                                        Log.d("GameViewModel", "Room update received: ${room.players.size} players")
                                         _gameRoom.value = room
                                         _currentPlayer.value = room.players[playerId]
+                                        updateCurrentCardFromRoom(room) // Add this line
                                     } else {
-                                        Log.w(
-                                                "GameViewModel",
-                                                "Received null room data in join flow"
-                                        )
+                                        Log.w("GameViewModel", "Received null room data in join flow")
                                     }
                                 }
                             }
@@ -399,6 +389,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                                 _playerId.value?.let { pid ->
                                     _currentPlayer.value = room.players[pid]
                                 }
+                                updateCurrentCardFromRoom(room) // Add this line
                             }
                         }
                     } catch (e: Exception) {
@@ -490,5 +481,29 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     // Add this public method to set player ID
     fun setPlayerId(id: String?) {
         _playerId.value = id
+    }
+
+    // Add this function to synchronize the current card for all players
+    private fun updateCurrentCardFromRoom(gameRoom: GameRoom) {
+        // If there's a current card ID but our local drawnCard doesn't match it,
+        // find the card in the game room's drawn cards
+        val currentCardId = gameRoom.currentCardId
+        if (currentCardId != null && (_drawnCard.value == null || _drawnCard.value?.id != currentCardId)) {
+            Log.d("GameViewModel", "Updating current card to match room's currentCardId: $currentCardId")
+
+            // Find the card in the drawn cards list
+            val currentCard = gameRoom.drawnCards.find { it.id == currentCardId }
+
+            if (currentCard != null) {
+                Log.d("GameViewModel", "Found current card: ${currentCard.value} of ${currentCard.suit}")
+                _drawnCard.value = currentCard
+            } else {
+                Log.d("GameViewModel", "Could not find card with ID: $currentCardId in drawn cards")
+            }
+        } else if (currentCardId == null && _drawnCard.value != null) {
+            // If there's no current card in the room but we have one locally, clear it
+            Log.d("GameViewModel", "Clearing local drawn card as room has no current card")
+            _drawnCard.value = null
+        }
     }
 }
