@@ -1,6 +1,7 @@
 package com.benchopo.firering.ui.screens
 
 import android.util.Log
+import com.benchopo.firering.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import com.benchopo.firering.viewmodel.GameViewModel
 import com.benchopo.firering.viewmodel.UserViewModel
 import androidx.compose.ui.unit.sp
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.TextButton
@@ -28,6 +30,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.ui.res.painterResource
 import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
 import com.benchopo.firering.ui.components.JackRuleSelector
@@ -37,14 +40,16 @@ import com.benchopo.firering.ui.components.MiniGameSelector
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
-        navController: NavController,
-        roomCode: String,
-        gameViewModel: GameViewModel,
-        userViewModel: UserViewModel,
+    navController: NavController,
+    roomCode: String,
+    gameViewModel: GameViewModel,
+    userViewModel: UserViewModel,
 ) {
     // Add exit dialog state
     var showLeaveDialog by remember { mutableStateOf(false) }
     var showCardHistoryModal by remember { mutableStateOf(false) }
+    var showDrinkAlert by remember { mutableStateOf(false) }
+    var lastDrinkMilestone by remember { mutableStateOf(-1) }
 
     // Handle system back button
     BackHandler {
@@ -79,10 +84,14 @@ fun GameScreen(
 
     // Get all drawn cards in order
     val drawnCards = remember(gameRoom) {
-        val cards = gameRoom?.drawnCards?.sortedByDescending { it.drawnTimestamp ?: 0 } ?: emptyList()
+        val cards =
+            gameRoom?.drawnCards?.sortedByDescending { it.drawnTimestamp ?: 0 } ?: emptyList()
         Log.d("GameScreen", "Drawn cards from gameRoom: ${cards.size} cards")
         cards.forEachIndexed { index, card ->
-            Log.d("GameScreen", "  Card $index: ${card.value} of ${card.suit}, drawn by: ${card.drawnByPlayerId}, timestamp: ${card.drawnTimestamp}")
+            Log.d(
+                "GameScreen",
+                "  Card $index: ${card.value} of ${card.suit}, drawn by: ${card.drawnByPlayerId}, timestamp: ${card.drawnTimestamp}"
+            )
         }
         cards
     }
@@ -148,6 +157,22 @@ fun GameScreen(
                             gameRoom,
                         )
                     }
+
+                    if (currentPlayer?.drinkCount?.rem(5) == 0
+                        && currentPlayer?.drinkCount != 0
+                        && currentPlayer?.drinkCount != lastDrinkMilestone
+                    ) {
+                        showDrinkAlert = true
+                        lastDrinkMilestone = currentPlayer!!.drinkCount
+                    }
+
+                    if (showDrinkAlert) {
+                        DrinksAlert(
+                            onDismiss = {
+                                showDrinkAlert = false
+                            })
+                    }
+
                 }
             )
         }
@@ -163,10 +188,14 @@ fun GameScreen(
         ) {
             // Turn indicator
             Card(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -211,7 +240,9 @@ fun GameScreen(
                             .padding(8.dp)
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -231,7 +262,11 @@ fun GameScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Current rule display
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -255,13 +290,18 @@ fun GameScreen(
             // Find current player from the players list
             val myPlayer = remember(gameRoom, playerId) {
                 val player = gameRoom?.players?.get(playerId)
-                Log.d("GameScreen", "Current player: ${player?.name}, drink count: ${player?.drinkCount}")
+                Log.d(
+                    "GameScreen",
+                    "Current player: ${player?.name}, drink count: ${player?.drinkCount}"
+                )
                 player
             }
 
             if (myPlayer != null) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -281,12 +321,18 @@ fun GameScreen(
                             // Decrement button (only enabled if count > 0)
                             FilledTonalIconButton(
                                 onClick = {
-                                    Log.d("GameScreen", "Decrementing drink count for player: ${myPlayer.id}")
+                                    Log.d(
+                                        "GameScreen",
+                                        "Decrementing drink count for player: ${myPlayer.id}"
+                                    )
                                     gameViewModel.updateDrinks(myPlayer.id, -1)
                                 },
                                 enabled = myPlayer.drinkCount > 0
                             ) {
-                                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "Decrease"
+                                )
                             }
 
                             // Drink count display
@@ -298,7 +344,10 @@ fun GameScreen(
                             // Increment button
                             FilledTonalIconButton(
                                 onClick = {
-                                    Log.d("GameScreen", "Incrementing drink count for player: ${myPlayer.id}")
+                                    Log.d(
+                                        "GameScreen",
+                                        "Incrementing drink count for player: ${myPlayer.id}"
+                                    )
                                     gameViewModel.updateDrinks(myPlayer.id, 1)
                                 }
                             ) {
@@ -320,7 +369,9 @@ fun GameScreen(
             // Draw card button
             Button(
                 onClick = { gameViewModel.drawCard() },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 enabled = isCurrentPlayerTurn && !loading && !isGameOver // Add !isGameOver condition
             ) {
                 if (loading) {
@@ -339,7 +390,9 @@ fun GameScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     onClick = { gameViewModel.advanceTurn() },
-                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 ) {
                     Text("Next Player")
                 }
@@ -348,7 +401,9 @@ fun GameScreen(
             // Show game over banner if all cards are drawn
             if (isGameOver) {
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Column(
@@ -404,9 +459,15 @@ fun GameScreen(
     // Debug drawn cards data
     LaunchedEffect(gameRoom) {
         if (gameRoom != null) {
-            Log.d("GameScreen", "Room updated, drawn cards count: ${gameRoom?.drawnCards?.size ?: 0}")
+            Log.d(
+                "GameScreen",
+                "Room updated, drawn cards count: ${gameRoom?.drawnCards?.size ?: 0}"
+            )
             gameRoom?.drawnCards?.forEach { card ->
-                Log.d("GameScreen", "Drawn card: ${card.value} of ${card.suit} by ${card.drawnByPlayerId}")
+                Log.d(
+                    "GameScreen",
+                    "Drawn card: ${card.value} of ${card.suit} by ${card.drawnByPlayerId}"
+                )
             }
         }
     }
@@ -536,6 +597,91 @@ fun GameScreen(
     }
 }
 
+
+@Composable
+fun DrinksAlert(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row {
+                Text("Drink Alert")
+                Image(
+                    painter = painterResource(id = R.drawable.ic_coctel),
+                    contentDescription = "Coctel Icon",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                val messages = listOf(
+                    "You're a heavy drinker!",
+                    "Do you know your name?",
+                    "Calling an ambulance!",
+                    "Sobriety alert! (Or lack thereof).",
+                    "Your liver just sent a vacation request.",
+                    "Congratulations! You've unlocked the 'Bar Legend' level.",
+                    "Mirror, mirror, who's the drunkest of them all?",
+                    "Looks like someone needs some water... or a nap!",
+                    "Careful! You might start speaking unknown languages.",
+                    "The floor is calling you... for a nap.",
+                    "You've reached the point of no return! (Or so it seems).",
+                    "Remember how you got here? Neither do we.",
+                    "Time for a break! Or a very large coffee.",
+                    "Your decisions now will be tomorrow's anecdotes.",
+                    "Warning! The fun level has exceeded the coherence level.",
+                    "You unlocked 'Rhythm-less Dancer' mode!",
+                    "Your friends will thank you tomorrow... or not.",
+                    "It seems alcohol loves you more than you love yourself.",
+                    "Houston, we have a sobriety problem!",
+                    "Bravo! You've won the 'Most Committed Player' award.",
+                    "Congratulations! You've earned the hangover of the century.",
+                    "Your 'I don't care' level has reached its maximum.",
+                    "Spoiler alert! Tomorrow your head will hurt.",
+                    "Looks like the bar is going to charge you rent.",
+                    "You've exceeded the speed limit on the alcohol highway!",
+                    "Your neurons are on strike.",
+                    "Alcohol has adopted you as its favorite child!",
+                    "If you keep this up, dawn will catch you dancing alone.",
+                    "You're one drink away from becoming an urban legend!",
+                    "Your balance has decided to take the day off.",
+                    "The glass is looking at you with envy!",
+                    "Looks like you have a date with the toilet.",
+                    "Drunk alert in the perimeter!",
+                    "Your feet are dancing samba and you don't even know it.",
+                    "You've reached alcoholic Nirvana!",
+                    "The world looks better upside down, right?",
+                    "Gravity is testing you!",
+                    "Looks like the floor is your new best friend.",
+                    "You're about to discover the meaning of 'everything's spinning'!",
+                    "Your reasoning ability has been temporarily disabled."
+                )
+
+                val randomMessage = messages.random()
+
+                Text(
+                    text = randomMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
+}
+
 @Composable
 fun CardHistoryModal(
     drawnCards: List<com.benchopo.firering.model.Card>,
@@ -593,7 +739,6 @@ fun CardHistoryModal(
 }
 
 
-
 @Composable
 fun PlayerInfoSidebar(
     players: List<Player>,
@@ -612,14 +757,19 @@ fun PlayerInfoSidebar(
                     .verticalScroll(rememberScrollState())
             ) {
                 players.forEachIndexed { index, player ->
-                    Log.d("GameScreen", "Rendering player info: ${player.name}, drinks: ${player.drinkCount}")
+                    Log.d(
+                        "GameScreen",
+                        "Rendering player info: ${player.name}, drinks: ${player.drinkCount}"
+                    )
 
                     if (index > 0) {
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
                     }
 
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
                     ) {
                         // Player name with online status indicator
                         Row(
