@@ -57,3 +57,74 @@ fun getCardRule(card: Card?): String {
         else -> "Unknown card rule"
     }
 }
+
+// Temporary test function to create a deck filled with only 8s
+fun generateTestMatesDeck(count: Int = 52): List<Card> {
+    val suits = listOf("Hearts", "Diamonds", "Clubs", "Spades")
+    val rule = CardRule("Mate", "Choose a drinking buddy who drinks when you drink.")
+
+    val testDeck = mutableListOf<Card>()
+
+    // Create 'count' number of 8 cards
+    for (i in 0 until count) {
+        // Cycle through suits to make them visually different
+        val suit = suits[i % suits.size]
+
+        // Create a unique ID for each card
+        val id = "8-$suit-$i"
+
+        // Add the card to the deck
+        testDeck.add(
+            Card(
+                id = id,
+                value = "8",
+                suit = suit,
+                ruleId = rule.id,
+                ruleTitle = rule.title,
+                ruleDescription = "Mate: Choose another player as your mate. When one drinks, both drink.",
+                isDrawn = false
+            )
+        )
+    }
+
+    return testDeck
+}
+
+// Add this function for testing mate functionality
+fun generateTestMatesDeck(): List<Card> {
+    val suits = listOf("Hearts", "Diamonds", "Clubs", "Spades")
+    val values = listOf("8")
+    val deck = mutableListOf<Card>()
+    
+    // Generate a unique ID for each card to avoid collisions
+    var cardIndex = 0
+    
+    for (i in 0 until 52) {  // Create 52 cards, all 8s
+        val suit = suits[i % suits.size]
+        val value = "8"
+        val ruleId = "rule_mate"
+        val id = "8-$suit-$cardIndex"
+        cardIndex++
+        
+        deck.add(
+            Card(
+                id = id,
+                value = value,
+                suit = suit,
+                ruleId = ruleId,
+                ruleTitle = "Mate",
+                ruleDescription = "Choose a drinking buddy who drinks when you drink.",
+                isDrawn = false
+            )
+        )
+    }
+    
+    deck.shuffle()
+    return deck
+}
+
+// To use this test deck, temporarily modify the createGameRoom method in FirebaseRepository:
+// Replace:
+// val deck = generateDeck()
+// With:
+// val deck = generateTestMatesDeck()

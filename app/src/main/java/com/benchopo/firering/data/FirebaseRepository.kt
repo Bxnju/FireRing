@@ -408,6 +408,7 @@ class FirebaseRepository {
         playerRef.child("drinkCount").setValue(currentCount + increment).await()
     }
 
+    // Update the setPlayerMate method to fix the expiration logic
     suspend fun setPlayerMate(roomCode: String, playerId: String, mateId: String) {
         val roomRef = db.child("rooms").child(roomCode)
         Log.d("FirebaseRepository", "Setting mate relationship: $playerId selected $mateId")
@@ -431,6 +432,8 @@ class FirebaseRepository {
         // Get the current player ID to set as expiration marker
         val currentPlayerIdSnapshot = roomRef.child("currentPlayerId").get().await()
         val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java) ?: playerId
+
+        // IMPORTANT: We're marking these mates to expire after the CURRENT player's NEXT turn
         Log.d("FirebaseRepository", "Mates will expire after player $currentPlayerId's next turn")
 
         // Update mates list for all players in the chain
@@ -445,6 +448,8 @@ class FirebaseRepository {
         // Apply all updates at once
         roomRef.updateChildren(updates).await()
         Log.d("FirebaseRepository", "Mate relationships updated successfully")
+
+        debugMateChain(roomCode)
     }
 
     // Helper function to recursively get all mates
@@ -808,12 +813,26 @@ class FirebaseRepository {
         val playersSnapshot = roomRef.child("players").get().await()
         val updates = mutableMapOf<String, Any?>()
 
+        // Get turn order to check if this is the NEXT turn of the expiring player
+        val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
+        val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
+
+        // Get the previously active player (who just finished their turn)
+        val currentIndex = turnOrder.indexOf(currentPlayerId)
+        val previousIndex = if (currentIndex > 0) currentIndex - 1 else turnOrder.size - 1
+        val previousPlayerId = turnOrder[previousIndex]
+
+        Log.d("FirebaseRepository", "Previous player: $previousPlayerId, Current player: $currentPlayerId")
+
         playersSnapshot.children.forEach { playerSnapshot ->
             val playerId = playerSnapshot.key ?: return@forEach
             val expiresAfterPlayerIdSnapshot = playerSnapshot.child("mateExpiresAfterPlayerId").getValue(String::class.java)
 
-            if (expiresAfterPlayerIdSnapshot == currentPlayerId) {
-                Log.d("FirebaseRepository", "Found expired mate relationship for player $playerId")
+            // Only expire mates if the PREVIOUS player was the one who created them
+            // AND the current player is different (to prevent immediate expiration)
+            if (expiresAfterPlayerIdSnapshot == previousPlayerId && previousPlayerId != currentPlayerId) {
+                Log.d("FirebaseRepository", "Found expired mate relationship for player $playerId " +
+                      "(created by $previousPlayerId who just had their turn)")
                 updates["players/$playerId/mateIds"] = emptyList<String>()
                 updates["players/$playerId/mateExpiresAfterPlayerId"] = null
             }
@@ -826,4 +845,36 @@ class FirebaseRepository {
             Log.d("FirebaseRepository", "No expired mate relationships found")
         }
     }
+
+    // Add this method for debugging mate chains
+    suspend fun debugMateChain(roomCode: String) {
+        val roomRef = db.child("rooms").child(roomCode)
+        val playersSnapshot = roomRef.child("players").get().await()
+
+        Log.d("FirebaseRepository", "===== MATE CHAIN DEBUG =====")
+
+        playersSnapshot.children.forEach { playerSnapshot ->
+            val playerId = playerSnapshot.key ?: return@forEach
+            val playerName = playerSnapshot.child("name").getValue(String::class.java) ?: "Unknown"
+            val mateIds = playerSnapshot.child("mateIds").children.mapNotNull { it.getValue(String::class.java) }
+            val expiresAfter = playerSnapshot.child("mateExpiresAfterPlayerId").getValue(String::class.java)
+
+            val mateNames = mateIds.map { mateId ->
+                playersSnapshot.child(mateId).child("name").getValue(String::class.java) ?: "Unknown"
+            }
+
+            val expiresAfterName = if (expiresAfter != null) {
+                playersSnapshot.child(expiresAfter).child("name").getValue(String::class.java) ?: "Unknown"
+            } else "None"
+
+            Log.d("FirebaseRepository", "Player: $playerName")
+            Log.d("FirebaseRepository", "  Mates: ${if (mateNames.isEmpty()) "None" else mateNames.joinToString()}")
+            Log.d("FirebaseRepository", "  Expires after: $expiresAfterName's next turn")
+        }
+
+        Log.d("FirebaseRepository", "===== END MATE CHAIN DEBUG =====")
+    }
+
+    // Call this in the setPlayerMate method before returning:
+    // debugMateChain(roomCode)
 }

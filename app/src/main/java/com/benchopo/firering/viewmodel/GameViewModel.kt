@@ -831,6 +831,10 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     delay(5000)
                     _newMateRelationships.value = emptySet()
                 }
+            } else if (newMates.size < oldMates.size) {
+                // Mates were removed (expired)
+                val removedMates = oldMates - newMates
+                Log.d("GameViewModel", "Mate relationships expired: $removedMates")
             }
         }
     }
