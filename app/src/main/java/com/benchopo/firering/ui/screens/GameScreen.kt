@@ -188,7 +188,12 @@ fun GameScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Game Room: $roomCode", style = MaterialTheme.typography.bodyMedium) },
+                title = {
+                    Text(
+                        "Game Room: $roomCode",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 actions = {
                     // Add player info button
                     var showPlayerInfo by remember { mutableStateOf(false) }
@@ -398,6 +403,46 @@ fun GameScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Show game over banner if all cards are drawn
+            if (isGameOver) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Game Complete!",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "All cards have been drawn",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+
+                        // Optional: Add button to return to lobby or start new game
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Button(
+                            onClick = { showLeaveDialog = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text("End Game", color = Color.White)
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             // Draw card button
             Button(
                 onClick = {
@@ -528,7 +573,10 @@ fun GameScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         ActiveRulesSection(
                             activeRules = activeJackRules,
@@ -602,7 +650,9 @@ fun GameScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(
+                modifier = Modifier.weight(1f)
+            )
 
             // Add this LaunchedEffect to reset the button state when appropriate
             LaunchedEffect(isCurrentPlayerTurn, drawnCard) {
@@ -611,43 +661,6 @@ fun GameScreen(
                 }
             }
 
-            // Show game over banner if all cards are drawn
-            if (isGameOver) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            "Game Complete!",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "All cards have been drawn",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-
-                        // Optional: Add button to return to lobby or start new game
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Button(
-                            onClick = { showLeaveDialog = true },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text("End Game")
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -1085,7 +1098,6 @@ fun CardHistoryModal(
         }
     )
 }
-
 
 @Composable
 fun PlayerInfoSidebar(
