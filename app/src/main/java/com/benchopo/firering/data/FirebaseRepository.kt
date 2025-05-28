@@ -561,14 +561,27 @@ class FirebaseRepository {
         Log.d("FirebaseRepository", "Checking for expired Jack Rules after player $currentPlayerId's turn")
         val roomRef = db.child("rooms").child(roomCode)
 
+        // Get turn order to determine the previous player
+        val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
+        val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
+
+        // Calculate the previous player (who just finished their turn)
+        val currentIndex = turnOrder.indexOf(currentPlayerId)
+        val previousIndex = if (currentIndex > 0) currentIndex - 1 else turnOrder.size - 1
+        val previousPlayerId = turnOrder[previousIndex]
+
+        Log.d("FirebaseRepository", "Previous player: $previousPlayerId, Current player: $currentPlayerId")
+
         // Get all active rules
         val rulesSnapshot = roomRef.child("activeJackRules").get().await()
         val expiredRuleIds = mutableListOf<String>()
 
         rulesSnapshot.children.forEach { ruleSnapshot ->
             val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
-            if (rule != null && rule.expiresAfterPlayerId == currentPlayerId) {
-                Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired")
+            // Check if the rule should expire after the previous player's turn
+            // AND the current player is different (to prevent immediate expiration)
+            if (rule != null && rule.expiresAfterPlayerId == previousPlayerId && previousPlayerId != currentPlayerId) {
+                Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired (created by $previousPlayerId who just had their turn)")
                 expiredRuleIds.add(rule.id)
             }
         }
@@ -581,6 +594,8 @@ class FirebaseRepository {
                 updates["activeJackRules/$ruleId"] = null
             }
             roomRef.updateChildren(updates).await()
+        } else {
+            Log.d("FirebaseRepository", "No expired Jack Rules found")
         }
     }
 

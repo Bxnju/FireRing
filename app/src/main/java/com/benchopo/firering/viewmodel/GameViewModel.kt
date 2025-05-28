@@ -764,6 +764,8 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         val playerId = _playerId.value ?: return
         val playerName = _gameRoom.value?.players?.get(playerId)?.name ?: "Unknown"
 
+        Log.d("GameViewModel", "Player $playerName ($playerId) selected Jack Rule: ${rule.title}")
+
         viewModelScope.launch {
             try {
                 // Select the rule
@@ -781,10 +783,12 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     expiresAfterPlayerId = playerId,  // Expires after this player's next turn
                     isCustom = rule.isCustom ?: false
                 )
-                repository.addActiveJackRule(roomCode, activeRule)
 
-                Log.d("GameViewModel", "Added active Jack Rule: ${rule.title}")
+                Log.d("GameViewModel", "Created active rule that will expire after player $playerId's next turn")
+                repository.addActiveJackRule(roomCode, activeRule)
+                Log.d("GameViewModel", "Added active Jack Rule to Firebase: ${rule.title}")
             } catch (e: Exception) {
+                Log.e("GameViewModel", "Error selecting Jack Rule", e)
                 _error.value = "Failed to select rule: ${e.message}"
             }
         }
