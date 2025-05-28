@@ -558,19 +558,8 @@ class FirebaseRepository {
 
     // Check for expired Jack Rules after a player's turn
     suspend fun checkAndRemoveExpiredJackRules(roomCode: String, currentPlayerId: String) {
-        Log.d("FirebaseRepository", "Checking for expired Jack Rules after player $currentPlayerId's turn")
+        Log.d("FirebaseRepository", "Checking for expired Jack Rules for player $currentPlayerId")
         val roomRef = db.child("rooms").child(roomCode)
-
-        // Get turn order to determine the previous player
-        val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
-        val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
-
-        // Calculate the previous player (who just finished their turn)
-        val currentIndex = turnOrder.indexOf(currentPlayerId)
-        val previousIndex = if (currentIndex > 0) currentIndex - 1 else turnOrder.size - 1
-        val previousPlayerId = turnOrder[previousIndex]
-
-        Log.d("FirebaseRepository", "Previous player: $previousPlayerId, Current player: $currentPlayerId")
 
         // Get all active rules
         val rulesSnapshot = roomRef.child("activeJackRules").get().await()
@@ -578,10 +567,11 @@ class FirebaseRepository {
 
         rulesSnapshot.children.forEach { ruleSnapshot ->
             val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
-            // Check if the rule should expire after the previous player's turn
-            // AND the current player is different (to prevent immediate expiration)
-            if (rule != null && rule.expiresAfterPlayerId == previousPlayerId && previousPlayerId != currentPlayerId) {
-                Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired (created by $previousPlayerId who just had their turn)")
+
+            // FIXED: Only expire rules when the CURRENT player matches the expiration player
+            // This means the creator has completed their next turn
+            if (rule != null && rule.expiresAfterPlayerId == currentPlayerId) {
+                Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired (after ${currentPlayerId}'s turn)")
                 expiredRuleIds.add(rule.id)
             }
         }
@@ -930,33 +920,22 @@ class FirebaseRepository {
     }
 
     suspend fun checkAndClearExpiredMates(roomCode: String, currentPlayerId: String) {
-        Log.d("FirebaseRepository", "Checking for expired mates after player $currentPlayerId's turn")
+        Log.d("FirebaseRepository", "Checking for expired mates for player $currentPlayerId")
         val roomRef = db.child("rooms").child(roomCode)
 
         // Get all players
         val playersSnapshot = roomRef.child("players").get().await()
         val updates = mutableMapOf<String, Any?>()
 
-        // Get turn order to check if this is the NEXT turn of the expiring player
-        val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
-        val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
-
-        // Get the previously active player (who just finished their turn)
-        val currentIndex = turnOrder.indexOf(currentPlayerId)
-        val previousIndex = if (currentIndex > 0) currentIndex - 1 else turnOrder.size - 1
-        val previousPlayerId = turnOrder[previousIndex]
-
-        Log.d("FirebaseRepository", "Previous player: $previousPlayerId, Current player: $currentPlayerId")
-
         playersSnapshot.children.forEach { playerSnapshot ->
             val playerId = playerSnapshot.key ?: return@forEach
             val expiresAfterPlayerIdSnapshot = playerSnapshot.child("mateExpiresAfterPlayerId").getValue(String::class.java)
 
-            // Only expire mates if the PREVIOUS player was the one who created them
-            // AND the current player is different (to prevent immediate expiration)
-            if (expiresAfterPlayerIdSnapshot == previousPlayerId && previousPlayerId != currentPlayerId) {
+            // FIXED: Only expire mates when the CURRENT player matches the expiration player
+            // This means the creator has completed their next turn
+            if (expiresAfterPlayerIdSnapshot == currentPlayerId) {
                 Log.d("FirebaseRepository", "Found expired mate relationship for player $playerId " +
-                      "(created by $previousPlayerId who just had their turn)")
+                    "(expires after $currentPlayerId's turn which just completed)")
                 updates["players/$playerId/mateIds"] = emptyList<String>()
                 updates["players/$playerId/mateExpiresAfterPlayerId"] = null
             }
