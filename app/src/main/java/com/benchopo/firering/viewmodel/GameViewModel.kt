@@ -74,6 +74,15 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val _newMateRelationships = MutableStateFlow<Set<String>>(emptySet())
     val newMateRelationships: StateFlow<Set<String>> = _newMateRelationships
 
+    // Add these properties to your GameViewModel class
+    private val _activeJackRules = MutableStateFlow<Map<String, ActiveJackRule>>(emptyMap())
+    val activeJackRules: StateFlow<Map<String, ActiveJackRule>> = _activeJackRules
+
+    // Add a selected active rule state for the detail view
+    private val _selectedActiveRule = MutableStateFlow<ActiveJackRule?>(null)
+    val selectedActiveRule: StateFlow<ActiveJackRule?> = _selectedActiveRule
+
+
     private var activeRoomJob: Job? = null
 
     // New properties for game mode
@@ -753,10 +762,28 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         // Notify other players of the selection
         val roomCode = _roomCode.value ?: return
         val playerId = _playerId.value ?: return
+        val playerName = _gameRoom.value?.players?.get(playerId)?.name ?: "Unknown"
 
         viewModelScope.launch {
             try {
+                // Select the rule
                 repository.selectJackRule(roomCode, playerId, rule.id)
+
+                // Add as active rule
+                val activeRule = ActiveJackRule(
+                    ruleId = rule.id,
+                    title = rule.title,
+                    description = rule.description,
+                    type = rule.type,
+                    gameMode = rule.gameMode,
+                    createdByPlayerId = playerId,
+                    createdByPlayerName = playerName,
+                    expiresAfterPlayerId = playerId,  // Expires after this player's next turn
+                    isCustom = rule.isCustom ?: false
+                )
+                repository.addActiveJackRule(roomCode, activeRule)
+
+                Log.d("GameViewModel", "Added active Jack Rule: ${rule.title}")
             } catch (e: Exception) {
                 _error.value = "Failed to select rule: ${e.message}"
             }
@@ -986,5 +1013,14 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 _error.value = "Failed to save custom game: ${e.message}"
             }
         }
+    }
+    // Add method to view active rule details
+    fun viewActiveRuleDetails(ruleId: String) {
+        _selectedActiveRule.value = _activeJackRules.value[ruleId]
+    }
+
+    // Add method to close rule detail view
+    fun closeActiveRuleDetails() {
+        _selectedActiveRule.value = null
     }
 }
