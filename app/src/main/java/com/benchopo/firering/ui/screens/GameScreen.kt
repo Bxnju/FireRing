@@ -206,7 +206,7 @@ fun GameScreen(
                         Image(
                             painter = painterResource(id = R.drawable.ic_players),
                             contentDescription = "Players",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(30.dp)
                         )
                     }
 
@@ -217,7 +217,7 @@ fun GameScreen(
                         Image(
                             painter = painterResource(id = R.drawable.ic_card_history),
                             contentDescription = "Card History",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(30.dp)
                         )
                     }
 
@@ -226,7 +226,11 @@ fun GameScreen(
                         Log.d("GameScreen", "Exit button pressed, showing leave dialog")
                         showLeaveDialog = true
                     }) {
-                        Text("Exit")
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_leave),
+                            contentDescription = "Leave Game",
+                            modifier = Modifier.size(30.dp)
+                        )
                     }
 
                     // Player info drawer
