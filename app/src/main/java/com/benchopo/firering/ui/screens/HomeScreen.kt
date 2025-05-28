@@ -2,6 +2,8 @@ package com.benchopo.firering.ui.screens
 
 import android.media.MediaPlayer
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +31,7 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
     val context = LocalContext.current
     var clickCount by remember { mutableStateOf(0) }
     var mediaPlayer: MediaPlayer? by remember { mutableStateOf(null) }
+    var clickCountVersion by remember { mutableStateOf(0) }
 
     // Se limpia al salir
     DisposableEffect(Unit) {
@@ -164,7 +167,34 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
         Text(
             "Version 0.1",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .clickable {
+                    clickCountVersion++
+                    val remaining = 5 - clickCountVersion
+
+                    if (clickCountVersion >= 3 && clickCountVersion < 5) {
+                        Toast.makeText(
+                            context,
+                            "Touch $remaining ${if (remaining == 1) "more time" else "more times"}",
+                            Toast.LENGTH_SHORT
+                        ).apply {
+                            setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 150)
+                        }.show()
+                    }
+
+                    if (clickCountVersion == 5) {
+                        Toast.makeText(
+                            context,
+                            "You have unlocked the Bo' Rai Cho mode",
+                            Toast.LENGTH_LONG
+                        ).apply {
+                            setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 150)
+                        }.show()
+                        clickCountVersion = 0
+                    }
+                }
+                .padding(top = 8.dp)
         )
     }
 }
