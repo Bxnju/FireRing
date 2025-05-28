@@ -54,6 +54,8 @@ fun GameModeSelector(
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Game mode description
         Text(
             getGameModeDescription(selectedMode),
