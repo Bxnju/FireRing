@@ -257,9 +257,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                         // For non-special cards, auto-advance the turn after a short delay
                         if (card != null && !isSpecialCard(card.value)) {
                             viewModelScope.launch {
-                                delay(5000) // 5 seconds
                                 repository.advanceTurn(roomCode)
-                                _drawnCard.value = null
+                                // Remove this line to keep the card visible:
+                                // _drawnCard.value = null
                             }
                         }
                     }
@@ -284,7 +284,8 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         viewModelScope.launch {
             try {
                 repository.advanceTurn(roomCode)
-                _drawnCard.value = null
+                // Remove this line to keep the card visible:
+                // _drawnCard.value = null
             } catch (e: Exception) {
                 e.printStackTrace()
                 _error.value = "Failed to advance turn: ${e.message}"
@@ -573,10 +574,6 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             } else {
                 Log.d("GameViewModel", "Could not find card with ID: $currentCardId in drawn cards")
             }
-        } else if (currentCardId == null && _drawnCard.value != null) {
-            // If there's no current card in the room but we have one locally, clear it
-            Log.d("GameViewModel", "Clearing local drawn card as room has no current card")
-            _drawnCard.value = null
         }
 
         // Check for Jack Rule selection by any player

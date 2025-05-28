@@ -509,19 +509,6 @@ fun GameScreen(
                 }
             }
 
-            // Next player button (only show after drawing a card)
-            if (drawnCard != null && isCurrentPlayerTurn) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { gameViewModel.advanceTurn() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    Text("Next Player")
-                }
-            }
-
             // Show game over banner if all cards are drawn
             if (isGameOver) {
                 Card(
