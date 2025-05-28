@@ -35,7 +35,7 @@ fun JoinRoomScreen(
     gameViewModel: GameViewModel
 ) {
     val context = LocalContext.current
-    var clickCount by remember { mutableStateOf(0) }
+    var clickCount by remember { mutableIntStateOf(0) }
 
     var playerName by remember { mutableStateOf("") }
     var roomCode by remember { mutableStateOf("") }
