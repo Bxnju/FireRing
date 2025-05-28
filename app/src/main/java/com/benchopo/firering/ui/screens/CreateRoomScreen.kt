@@ -28,7 +28,6 @@ import com.benchopo.firering.viewmodel.UserViewModel
 @Composable
 fun CreateRoomScreen(
     navController: NavController,
-    userViewModel: UserViewModel,
     gameViewModel: GameViewModel
 ) {
     var playerName by remember { mutableStateOf("") }
