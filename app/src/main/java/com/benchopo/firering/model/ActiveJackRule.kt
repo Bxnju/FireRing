@@ -12,7 +12,6 @@ data class ActiveJackRule(
     val createdByPlayerId: String = "",
     val createdByPlayerName: String = "",
     val expiresAfterPlayerId: String = "",
-    val timestamp: Long = System.currentTimeMillis(),
     val isCustom: Boolean = false,
     val createdTurnCount: Int = 0
 )

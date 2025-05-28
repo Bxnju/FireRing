@@ -164,13 +164,7 @@ fun GameScreen(
     val drawnCards = remember(gameRoom) {
         val cards =
             gameRoom?.drawnCards?.sortedByDescending { it.drawnTimestamp ?: 0 } ?: emptyList()
-        Log.d("GameScreen", "Drawn cards from gameRoom: ${cards.size} cards")
-        cards.forEachIndexed { index, card ->
-            Log.d(
-                "GameScreen",
-                "  Card $index: ${card.value} of ${card.suit}, drawn by: ${card.drawnByPlayerId}, timestamp: ${card.drawnTimestamp}"
-            )
-        }
+
         cards
     }
 
@@ -673,22 +667,6 @@ fun GameScreen(
     LaunchedEffect(Unit) {
         Log.d("GameScreen", "Initial load - forcing refresh of room data")
         gameViewModel.ensureRoomLoaded(roomCode)
-    }
-
-    // Debug drawn cards data
-    LaunchedEffect(gameRoom) {
-        if (gameRoom != null) {
-            Log.d(
-                "GameScreen",
-                "Room updated, drawn cards count: ${gameRoom?.drawnCards?.size ?: 0}"
-            )
-            gameRoom?.drawnCards?.forEach { card ->
-                Log.d(
-                    "GameScreen",
-                    "Drawn card: ${card.value} of ${card.suit} by ${card.drawnByPlayerId}"
-                )
-            }
-        }
     }
 
     // Add the leave confirmation dialog

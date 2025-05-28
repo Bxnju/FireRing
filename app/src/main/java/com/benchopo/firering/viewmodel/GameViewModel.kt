@@ -762,17 +762,23 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         _selectedJackRule.value = rule
         _showJackRuleSelector.value = false
 
+        // Notify other players of the selection
         val roomCode = _roomCode.value ?: return
         val playerId = _playerId.value ?: return
         val playerName = _gameRoom.value?.players?.get(playerId)?.name ?: "Unknown"
 
+        Log.d("GameViewModel", "Player $playerName ($playerId) selected Jack Rule: ${rule.title}")
+
         viewModelScope.launch {
             try {
+                // Select the rule
                 repository.selectJackRule(roomCode, playerId, rule.id)
 
-                // Get current turn count
-                val gameRoom = repository.getRoomOnce(roomCode) ?: return@launch
-                val currentTurnCount = gameRoom.turnCount
+                // Get current turn count DIRECTLY FROM FIREBASE, not from GameRoom object
+                val turnCountSnapshot = repository.getTurnCount(roomCode)
+                val currentTurnCount = turnCountSnapshot ?: 0
+
+                Log.d("GameViewModel", "Current turn count for Jack Rule (from Firebase): $currentTurnCount")
 
                 // Add as active rule with turn count
                 val activeRule = ActiveJackRule(
@@ -789,7 +795,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 )
 
                 repository.addActiveJackRule(roomCode, activeRule)
+                Log.d("GameViewModel", "Added active Jack Rule with turn count: $currentTurnCount")
             } catch (e: Exception) {
+                Log.e("GameViewModel", "Error selecting Jack Rule", e)
                 _error.value = "Failed to select rule: ${e.message}"
             }
         }

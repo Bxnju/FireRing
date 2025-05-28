@@ -192,7 +192,6 @@ class FirebaseRepository {
                                 val card = cardSnapshot.getValue(Card::class.java)
                                 if (card != null) {
                                     drawnCards.add(card)
-                                    Log.d("FirebaseRepository", "Found drawn card: ${card.value} of ${card.suit}")
                                 }
                             }
 
@@ -567,26 +566,35 @@ class FirebaseRepository {
         Log.d("FirebaseRepository", "Checking for expired Jack Rules for player $currentPlayerId")
         val roomRef = db.child("rooms").child(roomCode)
 
+        // Get the current turn count
+        val turnCountSnapshot = roomRef.child("info/turnCount").get().await()
+        val currentTurnCount = turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
+        Log.d("FirebaseRepository", "Current turn count: $currentTurnCount")
+
         // Get all active rules
         val rulesSnapshot = roomRef.child("activeJackRules").get().await()
         val expiredRuleIds = mutableListOf<String>()
 
-        // Get the current turn count to avoid immediate deletion
-        val turnCountSnapshot = roomRef.child("info/turnCount").get().await()
-        val currentTurnCount = turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
-
         rulesSnapshot.children.forEach { ruleSnapshot ->
             val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
 
-            // Only expire rules when:
-            // 1. Current player matches the expiration player AND
-            // 2. The rule wasn't created in the current turn (check createdTurnCount)
-            if (rule != null &&
-                rule.expiresAfterPlayerId == currentPlayerId &&
-                rule.createdTurnCount < currentTurnCount) {
+            if (rule != null) {
+                Log.d("FirebaseRepository", "Checking rule: ${rule.title}, " +
+                    "expiresAfter: ${rule.expiresAfterPlayerId}, " +
+                    "createdTurn: ${rule.createdTurnCount}, " +
+                    "currentTurn: $currentTurnCount")
 
-                Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired (after ${currentPlayerId}'s turn)")
-                expiredRuleIds.add(rule.id)
+                // Only expire rules when:
+                // 1. Current player matches the expiration player AND
+                // 2. The rule wasn't created in the current turn
+                if (rule.expiresAfterPlayerId == currentPlayerId &&
+                    rule.createdTurnCount < currentTurnCount) {
+
+                    Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired (after ${currentPlayerId}'s turn)")
+                    expiredRuleIds.add(rule.id)
+                } else {
+                    Log.d("FirebaseRepository", "Jack Rule '${rule.title}' remains active")
+                }
             }
         }
 
@@ -601,6 +609,11 @@ class FirebaseRepository {
         } else {
             Log.d("FirebaseRepository", "No expired Jack Rules found")
         }
+    }
+
+    suspend fun getTurnCount(roomCode: String): Int {
+        val turnCountSnapshot = db.child("rooms").child(roomCode).child("info/turnCount").get().await()
+        return turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
     }
 
     private fun getDefaultDrinks(): List<Drink> {
@@ -757,6 +770,9 @@ class FirebaseRepository {
                     infoSnapshot.child("createdAt").getValue(Long::class.java)
                             ?: System.currentTimeMillis()
 
+            // Extract turn count
+            val turnCount = infoSnapshot.child("turnCount").getValue(Long::class.java)?.toInt() ?: 0
+
             // Extract players
             val playersMap = mutableMapOf<String, Player>()
             snapshot.child("players").children.forEach { playerSnapshot ->
@@ -787,7 +803,6 @@ class FirebaseRepository {
                 val card = cardSnapshot.getValue(Card::class.java)
                 if (card != null) {
                     drawnCards.add(card)
-                    Log.d("FirebaseRepository", "Found drawn card: ${card.value} of ${card.suit}")
                 }
             }
 
@@ -864,6 +879,7 @@ class FirebaseRepository {
                     kingsCupCount = kingsCupCount,
                     gameMode = gameMode,
                     createdAt = createdAt,
+                    turnCount = turnCount,
                     currentJackRuleId = currentJackRuleId,
                     currentJackRuleSelectedBy = currentJackRuleSelectedBy,
                     currentMiniGameId = currentMiniGameId,
