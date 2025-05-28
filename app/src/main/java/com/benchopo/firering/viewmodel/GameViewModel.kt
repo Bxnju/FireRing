@@ -722,6 +722,12 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         val roomCode = _roomCode.value ?: return
         val playerId = _playerId.value ?: return
 
+        // Get player names for better logging
+        val playerName = _gameRoom.value?.players?.get(playerId)?.name ?: "Unknown"
+        val mateName = _gameRoom.value?.players?.get(mateId)?.name ?: "Unknown"
+
+        Log.d("GameViewModel", "Player '$playerName' selected '$mateName' as mate")
+
         viewModelScope.launch {
             try {
                 // Get existing mates before making changes
@@ -731,6 +737,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 // Record the old mate chains to compare after update
                 val oldPlayerMates = playerBefore?.mateIds?.toSet() ?: emptySet()
                 val oldMateMates = mateBefore?.mateIds?.toSet() ?: emptySet()
+
+                Log.d("GameViewModel", "Player '$playerName' existing mates: $oldPlayerMates")
+                Log.d("GameViewModel", "Mate '$mateName' existing mates: $oldMateMates")
 
                 // Perform the mate update
                 repository.setPlayerMate(roomCode, playerId, mateId)
@@ -746,8 +755,12 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     val newPlayerMates = updatedRoom.players[playerId]?.mateIds?.toSet() ?: emptySet()
                     val newMateMates = updatedRoom.players[mateId]?.mateIds?.toSet() ?: emptySet()
 
+                    Log.d("GameViewModel", "After update - Player '$playerName' mates: $newPlayerMates")
+                    Log.d("GameViewModel", "After update - Mate '$mateName' mates: $newMateMates")
+
                     // Find all new relationships that were created
                     val allNewRelationships = (newPlayerMates - oldPlayerMates) + (newMateMates - oldMateMates)
+                    Log.d("GameViewModel", "All new mate relationships: $allNewRelationships")
 
                     // Update state to trigger notifications
                     _newMateRelationships.value = allNewRelationships
@@ -755,14 +768,17 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     // Schedule auto-advance after notification period
                     viewModelScope.launch {
                         delay(5000) // Wait 5 seconds for notification
+                        Log.d("GameViewModel", "Clearing mate notification and advancing turn")
                         _newMateRelationships.value = emptySet()
                         advanceTurn()
                     }
                 } else {
                     // If we couldn't get updated data, just advance the turn
+                    Log.d("GameViewModel", "Failed to get updated room data, advancing turn")
                     advanceTurn()
                 }
             } catch (e: Exception) {
+                Log.e("GameViewModel", "Error setting mate relationship", e)
                 _error.value = "Failed to set mate: ${e.message}"
                 advanceTurn() // Advance turn even if there was an error
             }
@@ -800,9 +816,14 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             val oldMates = oldPlayer.mateIds.toSet()
             val newMates = newPlayer.mateIds.toSet()
 
+            Log.d("GameViewModel", "Checking mate changes for player ${newPlayer.name}")
+            Log.d("GameViewModel", "Old mates: $oldMates")
+            Log.d("GameViewModel", "New mates: $newMates")
+
             if (newMates.size > oldMates.size) {
                 // New mates were added
                 val addedMates = newMates - oldMates
+                Log.d("GameViewModel", "New mate relationships detected: $addedMates")
                 _newMateRelationships.value = addedMates
 
                 // Schedule auto-clear of notification after 5 seconds

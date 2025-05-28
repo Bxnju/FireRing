@@ -17,6 +17,7 @@ data class Player(
         val selectedDrinkId: String? = null,
         val drinkCount: Int = 0,
         val mateIds: List<String> = emptyList(),
+        val mateExpiresAfterPlayerId: String? = null,  // New field to track when mates expire
 
         @get:PropertyName("isConnected")
         @set:PropertyName("isConnected")

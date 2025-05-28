@@ -217,6 +217,37 @@ fun MateSelector(
                             Text("Select Random Mate")
                         }
 
+                        // Add this in the MateSelector's text area before displaying the player grid
+                        if (players.all { it.id == currentPlayerId || it.mateIds.isNotEmpty() }) {
+                            // All players already have mates or are the current player
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer
+                                )
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        "All players already have mates!",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+
+                                    Spacer(modifier = Modifier.height(4.dp))
+
+                                    Text(
+                                        "Selecting a player will merge all existing mate groups into one giant drinking chain!",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        textAlign = TextAlign.Center,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                }
+                            }
+                        }
+
                         players.forEach { player ->
                             if (player.id != currentPlayerId) {  // Don't show current player
                                 Card(

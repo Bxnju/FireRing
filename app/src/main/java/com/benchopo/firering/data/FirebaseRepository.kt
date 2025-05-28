@@ -367,6 +367,9 @@ class FirebaseRepository {
         val currentPlayerIdSnapshot = roomRef.child("currentPlayerId").get().await()
         val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java) ?: return
 
+        // Check for expired mates before advancing turn
+        checkAndClearExpiredMates(roomCode, currentPlayerId)
+
         val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
         val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
 
@@ -395,6 +398,7 @@ class FirebaseRepository {
 
         // Apply all updates at once
         roomRef.updateChildren(updates).await()
+        Log.d("FirebaseRepository", "Advanced turn from player $currentPlayerId to $nextPlayerId")
     }
 
     suspend fun updatePlayerDrinkCount(roomCode: String, playerId: String, increment: Int = 1) {
@@ -406,47 +410,83 @@ class FirebaseRepository {
 
     suspend fun setPlayerMate(roomCode: String, playerId: String, mateId: String) {
         val roomRef = db.child("rooms").child(roomCode)
+        Log.d("FirebaseRepository", "Setting mate relationship: $playerId selected $mateId")
+
+        // First get all players to check if everyone already has mates
+        val playersSnapshot = roomRef.child("players").get().await()
+        val allPlayers = playersSnapshot.children.mapNotNull { it.key }
+        Log.d("FirebaseRepository", "Total players: ${allPlayers.size}")
 
         // Get all existing mates for both players
         val playerMates = getMateIdsRecursively(roomRef, playerId)
+        Log.d("FirebaseRepository", "Player $playerId existing mates: $playerMates")
+
         val mateMates = getMateIdsRecursively(roomRef, mateId)
+        Log.d("FirebaseRepository", "Player $mateId existing mates: $mateMates")
 
         // Combine all mates from both players
         val allMates = (playerMates + mateMates + setOf(playerId, mateId)).toSet()
+        Log.d("FirebaseRepository", "All mates after combining: $allMates")
+
+        // Get the current player ID to set as expiration marker
+        val currentPlayerIdSnapshot = roomRef.child("currentPlayerId").get().await()
+        val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java) ?: playerId
+        Log.d("FirebaseRepository", "Mates will expire after player $currentPlayerId's next turn")
 
         // Update mates list for all players in the chain
         val updates = mutableMapOf<String, Any>()
         for (id in allMates) {
             val matesList = allMates.filter { it != id }
             updates["players/$id/mateIds"] = matesList
+            updates["players/$id/mateExpiresAfterPlayerId"] = currentPlayerId
         }
 
+        Log.d("FirebaseRepository", "Applying mate updates to ${updates.size} players")
         // Apply all updates at once
         roomRef.updateChildren(updates).await()
+        Log.d("FirebaseRepository", "Mate relationships updated successfully")
     }
 
     // Helper function to recursively get all mates
     private suspend fun getMateIdsRecursively(
-            roomRef: DatabaseReference,
-            playerId: String
+        roomRef: DatabaseReference,
+        playerId: String,
+        depth: Int = 0,
+        visited: MutableSet<String> = mutableSetOf()
     ): Set<String> {
+        // Prevent infinite recursion with cycles in mate relationships
+        if (playerId in visited) {
+            Log.d("FirebaseRepository", "${"  ".repeat(depth)}Player $playerId already visited, stopping recursion")
+            return emptySet()
+        }
+        visited.add(playerId)
+
+        Log.d("FirebaseRepository", "${"  ".repeat(depth)}Getting mates for player $playerId at depth $depth")
         val matesSnapshot = roomRef.child("players/$playerId/mateIds").get().await()
         val directMates = mutableSetOf<String>()
 
         matesSnapshot.children.forEach {
             val mate = it.getValue(String::class.java)
-            if (mate != null) directMates.add(mate)
+            if (mate != null) {
+                directMates.add(mate)
+                Log.d("FirebaseRepository", "${"  ".repeat(depth)}Found direct mate: $mate")
+            }
         }
 
         // If no mates, return empty set
-        if (directMates.isEmpty()) return emptySet()
+        if (directMates.isEmpty()) {
+            Log.d("FirebaseRepository", "${"  ".repeat(depth)}No mates found for player $playerId")
+            return emptySet()
+        }
 
         // Recursively get mates of mates
         val allMates = directMates.toMutableSet()
         for (mateId in directMates) {
-            allMates.addAll(getMateIdsRecursively(roomRef, mateId))
+            Log.d("FirebaseRepository", "${"  ".repeat(depth)}Getting recursive mates for $mateId")
+            allMates.addAll(getMateIdsRecursively(roomRef, mateId, depth + 1, visited))
         }
 
+        Log.d("FirebaseRepository", "${"  ".repeat(depth)}Total mates for player $playerId (including chain): $allMates")
         return allMates
     }
 
@@ -758,5 +798,32 @@ class FirebaseRepository {
 
         // Increment the selected player's drink count
         updatePlayerDrinkCount(roomCode, selectedPlayerId, 1)
+    }
+
+    suspend fun checkAndClearExpiredMates(roomCode: String, currentPlayerId: String) {
+        Log.d("FirebaseRepository", "Checking for expired mates after player $currentPlayerId's turn")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        // Get all players
+        val playersSnapshot = roomRef.child("players").get().await()
+        val updates = mutableMapOf<String, Any?>()
+
+        playersSnapshot.children.forEach { playerSnapshot ->
+            val playerId = playerSnapshot.key ?: return@forEach
+            val expiresAfterPlayerIdSnapshot = playerSnapshot.child("mateExpiresAfterPlayerId").getValue(String::class.java)
+
+            if (expiresAfterPlayerIdSnapshot == currentPlayerId) {
+                Log.d("FirebaseRepository", "Found expired mate relationship for player $playerId")
+                updates["players/$playerId/mateIds"] = emptyList<String>()
+                updates["players/$playerId/mateExpiresAfterPlayerId"] = null
+            }
+        }
+
+        if (updates.isNotEmpty()) {
+            Log.d("FirebaseRepository", "Clearing expired mate relationships for ${updates.size / 2} players")
+            roomRef.updateChildren(updates).await()
+        } else {
+            Log.d("FirebaseRepository", "No expired mate relationships found")
+        }
     }
 }

@@ -408,6 +408,19 @@ fun GameScreen(
                             }
                         }
 
+                        // Add expiration information
+                        val expiresAfterPlayerId = myPlayer.mateExpiresAfterPlayerId
+                        if (expiresAfterPlayerId != null) {
+                            val expiresAfterPlayerName = gameRoom?.players?.get(expiresAfterPlayerId)?.name ?: "Unknown"
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "These mate relationships will end after ${expiresAfterPlayerName}'s next turn",
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
                         Text(
                             "When you drink, they drink too!",
                             style = MaterialTheme.typography.bodySmall,
@@ -740,6 +753,14 @@ fun GameScreen(
             }.joinToString(", ")
         }
 
+        // Get expiration information
+        val expiresAfterPlayerId = remember(gameRoom, playerId) {
+            gameRoom?.players?.get(playerId)?.mateExpiresAfterPlayerId
+        }
+        val expiresAfterPlayerName = remember(gameRoom, expiresAfterPlayerId) {
+            expiresAfterPlayerId?.let { gameRoom?.players?.get(it)?.name } ?: mateSelectorName
+        }
+
         AlertDialog(
             onDismissRequest = { },
             title = { Text("New Drinking Mates!") },
@@ -750,6 +771,12 @@ fun GameScreen(
                     Text("You're now connected with: $mateNames")
                     Spacer(modifier = Modifier.height(8.dp))
                     Text("When any of you drink, everyone in the chain drinks! 🍻")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "These mate relationships will end after $expiresAfterPlayerName's next turn",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             },
             confirmButton = {
