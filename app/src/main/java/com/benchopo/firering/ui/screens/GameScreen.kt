@@ -63,7 +63,8 @@ fun GameScreen(
     val shakeThreshold = 12f
     var lastShakeTime by remember { mutableLongStateOf(0L) }
     var shakeCount by remember { mutableIntStateOf(0) }
-    val sensorManager = remember { context.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
+    val sensorManager =
+        remember { context.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
     val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     var mediaPlayer: MediaPlayer? by remember { mutableStateOf(null) }
 
@@ -98,7 +99,11 @@ fun GameScreen(
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
 
-        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager.registerListener(
+            sensorEventListener,
+            accelerometer,
+            SensorManager.SENSOR_DELAY_NORMAL
+        )
 
         onDispose {
             sensorManager.unregisterListener(sensorEventListener)
@@ -189,7 +194,7 @@ fun GameScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Game Room: $roomCode") },
+                title = { Text("Game Room: $roomCode", style = MaterialTheme.typography.bodyMedium) },
                 actions = {
                     // Add player info button
                     var showPlayerInfo by remember { mutableStateOf(false) }
@@ -198,14 +203,22 @@ fun GameScreen(
                         Log.d("GameScreen", "Player info button clicked, showing sidebar")
                         showPlayerInfo = true
                     }) {
-                        Icon(Icons.Default.Info, contentDescription = "Player Info")
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_players),
+                            contentDescription = "Players",
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
 
                     // Card History button
                     IconButton(onClick = {
                         showCardHistoryModal = true
                     }) {
-                        Icon(Icons.Default.Notifications, contentDescription = "Card History")
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_card_history),
+                            contentDescription = "Card History",
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
 
                     // Exit button
@@ -472,7 +485,9 @@ fun GameScreen(
             if (myPlayer != null && myPlayer.mateIds.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -502,7 +517,8 @@ fun GameScreen(
                         // Add expiration information
                         val expiresAfterPlayerId = myPlayer.mateExpiresAfterPlayerId
                         if (expiresAfterPlayerId != null) {
-                            val expiresAfterPlayerName = gameRoom?.players?.get(expiresAfterPlayerId)?.name ?: "Unknown"
+                            val expiresAfterPlayerName =
+                                gameRoom?.players?.get(expiresAfterPlayerId)?.name ?: "Unknown"
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 "These mate relationships will end after ${expiresAfterPlayerName}'s next turn",
@@ -720,7 +736,10 @@ fun GameScreen(
             gameRoom?.selectedDrinkerBy?.let { gameRoom?.players?.get(it)?.name } ?: "Someone"
         }
 
-        Log.d("GameScreen", "Showing selected player notification. Current player selected: $isCurrentPlayerSelected")
+        Log.d(
+            "GameScreen",
+            "Showing selected player notification. Current player selected: $isCurrentPlayerSelected"
+        )
 
         AlertDialog(
             onDismissRequest = {
