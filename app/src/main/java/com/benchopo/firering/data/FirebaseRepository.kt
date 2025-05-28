@@ -405,6 +405,11 @@ class FirebaseRepository {
         checkAndClearExpiredMates(roomCode, currentPlayerId)
         checkAndRemoveExpiredJackRules(roomCode, currentPlayerId)
 
+        // Get and increment turn count
+        val turnCountSnapshot = roomRef.child("info/turnCount").get().await()
+        val currentTurnCount = turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
+        val newTurnCount = currentTurnCount + 1
+
         val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
         val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
 
@@ -419,6 +424,8 @@ class FirebaseRepository {
         val updates = hashMapOf<String, Any?>(
             // Update current player
             "currentPlayerId" to nextPlayerId,
+            // Update turn count
+            "info/turnCount" to newTurnCount,
             // Clear current card
             "currentCardId" to null,
             // Clear Jack Rule and Mini Game selections
@@ -433,7 +440,7 @@ class FirebaseRepository {
 
         // Apply all updates at once
         roomRef.updateChildren(updates).await()
-        Log.d("FirebaseRepository", "Advanced turn from player $currentPlayerId to $nextPlayerId")
+        Log.d("FirebaseRepository", "Advanced turn from player $currentPlayerId to $nextPlayerId (turn #$newTurnCount)")
     }
 
     suspend fun updatePlayerDrinkCount(roomCode: String, playerId: String, increment: Int = 1) {
@@ -447,6 +454,10 @@ class FirebaseRepository {
     suspend fun setPlayerMate(roomCode: String, playerId: String, mateId: String) {
         val roomRef = db.child("rooms").child(roomCode)
         Log.d("FirebaseRepository", "Setting mate relationship: $playerId selected $mateId")
+
+        // Get current turn count
+        val turnCountSnapshot = roomRef.child("info/turnCount").get().await()
+        val currentTurnCount = turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
 
         // First get all players to check if everyone already has mates
         val playersSnapshot = roomRef.child("players").get().await()
@@ -464,19 +475,14 @@ class FirebaseRepository {
         val allMates = (playerMates + mateMates + setOf(playerId, mateId)).toSet()
         Log.d("FirebaseRepository", "All mates after combining: $allMates")
 
-        // Get the current player ID to set as expiration marker
-        val currentPlayerIdSnapshot = roomRef.child("currentPlayerId").get().await()
-        val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java) ?: playerId
-
-        // IMPORTANT: We're marking these mates to expire after the CURRENT player's NEXT turn
-        Log.d("FirebaseRepository", "Mates will expire after player $currentPlayerId's next turn")
-
         // Update mates list for all players in the chain
         val updates = mutableMapOf<String, Any>()
         for (id in allMates) {
             val matesList = allMates.filter { it != id }
             updates["players/$id/mateIds"] = matesList
-            updates["players/$id/mateExpiresAfterPlayerId"] = currentPlayerId
+            // FIXED: Use playerId instead of undefined currentPlayerId
+            updates["players/$id/mateExpiresAfterPlayerId"] = playerId
+            updates["players/$id/mateCreatedTurnCount"] = currentTurnCount
         }
 
         Log.d("FirebaseRepository", "Applying mate updates to ${updates.size} players")
@@ -565,12 +571,20 @@ class FirebaseRepository {
         val rulesSnapshot = roomRef.child("activeJackRules").get().await()
         val expiredRuleIds = mutableListOf<String>()
 
+        // Get the current turn count to avoid immediate deletion
+        val turnCountSnapshot = roomRef.child("info/turnCount").get().await()
+        val currentTurnCount = turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
+
         rulesSnapshot.children.forEach { ruleSnapshot ->
             val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
 
-            // FIXED: Only expire rules when the CURRENT player matches the expiration player
-            // This means the creator has completed their next turn
-            if (rule != null && rule.expiresAfterPlayerId == currentPlayerId) {
+            // Only expire rules when:
+            // 1. Current player matches the expiration player AND
+            // 2. The rule wasn't created in the current turn (check createdTurnCount)
+            if (rule != null &&
+                rule.expiresAfterPlayerId == currentPlayerId &&
+                rule.createdTurnCount < currentTurnCount) {
+
                 Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired (after ${currentPlayerId}'s turn)")
                 expiredRuleIds.add(rule.id)
             }
@@ -923,6 +937,10 @@ class FirebaseRepository {
         Log.d("FirebaseRepository", "Checking for expired mates for player $currentPlayerId")
         val roomRef = db.child("rooms").child(roomCode)
 
+        // Get current turn count to avoid immediate deletion
+        val turnCountSnapshot = roomRef.child("info/turnCount").get().await()
+        val currentTurnCount = turnCountSnapshot.getValue(Long::class.java)?.toInt() ?: 0
+
         // Get all players
         val playersSnapshot = roomRef.child("players").get().await()
         val updates = mutableMapOf<String, Any?>()
@@ -930,19 +948,22 @@ class FirebaseRepository {
         playersSnapshot.children.forEach { playerSnapshot ->
             val playerId = playerSnapshot.key ?: return@forEach
             val expiresAfterPlayerIdSnapshot = playerSnapshot.child("mateExpiresAfterPlayerId").getValue(String::class.java)
+            val createdTurnCountSnapshot = playerSnapshot.child("mateCreatedTurnCount").getValue(Long::class.java)?.toInt() ?: 0
 
-            // FIXED: Only expire mates when the CURRENT player matches the expiration player
-            // This means the creator has completed their next turn
-            if (expiresAfterPlayerIdSnapshot == currentPlayerId) {
+            // Only expire mates when:
+            // 1. Current player matches the expiration player AND
+            // 2. The mate relationship wasn't created in the current turn
+            if (expiresAfterPlayerIdSnapshot == currentPlayerId && createdTurnCountSnapshot < currentTurnCount) {
                 Log.d("FirebaseRepository", "Found expired mate relationship for player $playerId " +
                     "(expires after $currentPlayerId's turn which just completed)")
                 updates["players/$playerId/mateIds"] = emptyList<String>()
                 updates["players/$playerId/mateExpiresAfterPlayerId"] = null
+                updates["players/$playerId/mateCreatedTurnCount"] = null
             }
         }
 
         if (updates.isNotEmpty()) {
-            Log.d("FirebaseRepository", "Clearing expired mate relationships for ${updates.size / 2} players")
+            Log.d("FirebaseRepository", "Clearing expired mate relationships for ${updates.size / 3} players")
             roomRef.updateChildren(updates).await()
         } else {
             Log.d("FirebaseRepository", "No expired mate relationships found")

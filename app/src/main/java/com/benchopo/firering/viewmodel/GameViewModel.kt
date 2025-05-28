@@ -762,19 +762,19 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         _selectedJackRule.value = rule
         _showJackRuleSelector.value = false
 
-        // Notify other players of the selection
         val roomCode = _roomCode.value ?: return
         val playerId = _playerId.value ?: return
         val playerName = _gameRoom.value?.players?.get(playerId)?.name ?: "Unknown"
 
-        Log.d("GameViewModel", "Player $playerName ($playerId) selected Jack Rule: ${rule.title}")
-
         viewModelScope.launch {
             try {
-                // Select the rule
                 repository.selectJackRule(roomCode, playerId, rule.id)
 
-                // Add as active rule
+                // Get current turn count
+                val gameRoom = repository.getRoomOnce(roomCode) ?: return@launch
+                val currentTurnCount = gameRoom.turnCount
+
+                // Add as active rule with turn count
                 val activeRule = ActiveJackRule(
                     ruleId = rule.id,
                     title = rule.title,
@@ -783,15 +783,13 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     gameMode = rule.gameMode,
                     createdByPlayerId = playerId,
                     createdByPlayerName = playerName,
-                    expiresAfterPlayerId = playerId,  // Expires after this player's next turn
-                    isCustom = rule.isCustom ?: false
+                    expiresAfterPlayerId = playerId,
+                    isCustom = rule.isCustom ?: false,
+                    createdTurnCount = currentTurnCount
                 )
 
-                Log.d("GameViewModel", "Created active rule that will expire after player $playerId's next turn")
                 repository.addActiveJackRule(roomCode, activeRule)
-                Log.d("GameViewModel", "Added active Jack Rule to Firebase: ${rule.title}")
             } catch (e: Exception) {
-                Log.e("GameViewModel", "Error selecting Jack Rule", e)
                 _error.value = "Failed to select rule: ${e.message}"
             }
         }
