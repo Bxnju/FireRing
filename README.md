@@ -2,7 +2,6 @@
   
   <img src="https://i.imgur.com/dzUS4EV.png" alt="FireRing Banner" width="100%" />
 
-  <br><br>
 
   <pre><b>FireRing</b> is a fun and chaotic drinking game app inspired by the classic "Ring of Fire" card game.  
 Whether you're with friends at a party or chilling at home, FireRing brings laughter, drinks,  
