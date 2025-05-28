@@ -33,6 +33,7 @@ import com.benchopo.firering.model.Player
 import com.benchopo.firering.ui.components.JackRuleSelector
 import com.benchopo.firering.ui.components.MiniGameSelector
 import com.benchopo.firering.ui.components.PlayerSelector
+import com.benchopo.firering.ui.components.MateSelector
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +73,12 @@ fun GameScreen(
     val showPlayerSelector by gameViewModel.showPlayerSelector.collectAsState(false)
     val selectedDrinkerId by gameViewModel.selectedDrinkerId.collectAsState()
     val selectedDrinkerName by gameViewModel.selectedDrinkerName.collectAsState()
+
+    // Add this state collection at the top of GameScreen with other state collections
+    val showMateSelector by gameViewModel.showMateSelector.collectAsState(false)
+
+    // Add to the GameScreen state collection
+    val newMateRelationships by gameViewModel.newMateRelationships.collectAsState()
 
     // Determine if it's this player's turn
     val isCurrentPlayerTurn = remember(gameRoom, playerId) {
@@ -319,6 +326,46 @@ fun GameScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error
                 )
+            }
+
+            // Add after the player's drink counter section - only if player has mates
+            if (myPlayer != null && myPlayer.mateIds.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Your Drinking Mates",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Display mates in a simple column
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            myPlayer.mateIds.forEach { mateId ->
+                                val mateName = gameRoom?.players?.get(mateId)?.name ?: "Unknown"
+                                Text(
+                                    "• $mateName",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Text(
+                            "When you drink, they drink too!",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -602,6 +649,55 @@ fun GameScreen(
             }
         )
     }
+
+    // Add mate selector dialog
+    if (showMateSelector && isCurrentPlayerTurn) {
+        Log.d("GameScreen", "Showing mate selector")
+        MateSelector(
+            players = gameRoom?.players?.values?.toList() ?: emptyList(),
+            currentPlayerId = playerId ?: "",
+            onMateSelected = { mateId ->
+                Log.d("GameScreen", "Mate selected: $mateId")
+                gameViewModel.selectMate(mateId)
+            },
+            onDismiss = {
+                Log.d("GameScreen", "Mate selection cancelled")
+                gameViewModel.clearSelections()
+            }
+        )
+    }
+
+    // Show mate notification when a player becomes someone's mate
+    if (newMateRelationships.isNotEmpty() && drawnCard?.value == "8") {
+        val mateSelectorName = remember(gameRoom) {
+            gameRoom?.currentPlayerId?.let { gameRoom?.players?.get(it)?.name } ?: "Someone"
+        }
+
+        val mateNames = remember(gameRoom, newMateRelationships) {
+            newMateRelationships.mapNotNull { mateId ->
+                gameRoom?.players?.get(mateId)?.name
+            }.joinToString(", ")
+        }
+
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("New Drinking Mates!") },
+            text = {
+                Column {
+                    Text("$mateSelectorName has made you a drinking mate!")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("You're now connected with: $mateNames")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("When any of you drink, everyone in the chain drinks! 🍻")
+                }
+            },
+            confirmButton = {
+                Button(onClick = { }) {
+                    Text("Cheers! 🍻")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -736,6 +832,24 @@ fun PlayerInfoSidebar(
                                 "Drinking: ${getDrinkName(drinkId)} ${getDrinkEmoji(drinkId)}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
+                        }
+
+                        // Show mates
+                        if (player.mateIds.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "Drinking Mates:",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+
+                            player.mateIds.forEach { mateId ->
+                                val mateName = players.find { it.id == mateId }?.name ?: "Unknown"
+                                Text(
+                                    "• $mateName",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }

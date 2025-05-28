@@ -61,11 +61,18 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val _showPlayerSelector = MutableStateFlow(false)
     val showPlayerSelector: StateFlow<Boolean> = _showPlayerSelector
 
+    // State for mate selection (Card 8)
+    private val _showMateSelector = MutableStateFlow(false)
+    val showMateSelector: StateFlow<Boolean> = _showMateSelector
+
     private val _selectedDrinkerId = MutableStateFlow<String?>(null)
     val selectedDrinkerId: StateFlow<String?> = _selectedDrinkerId
 
     private val _selectedDrinkerName = MutableStateFlow<String?>(null)
     val selectedDrinkerName: StateFlow<String?> = _selectedDrinkerName
+
+    private val _newMateRelationships = MutableStateFlow<Set<String>>(emptySet())
+    val newMateRelationships: StateFlow<Set<String>> = _newMateRelationships
 
     private var activeRoomJob: Job? = null
 
@@ -229,6 +236,10 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                     "2" -> {
                         // Show player selector for choosing who drinks
                         _showPlayerSelector.value = true
+                    }
+                    "8" -> {
+                        // Show mate selector
+                        _showMateSelector.value = true
                     }
                     "J" -> {
                         _showJackRuleSelector.value = true
@@ -564,7 +575,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             _drawnCard.value = null
         }
 
-        // NEW CODE: Check for Jack Rule selection by any player
+        // Check for Jack Rule selection by any player
         if (gameRoom.currentJackRuleId != null && _selectedJackRule.value == null) {
             // A Jack Rule was selected, but we don't have it locally - load it
             Log.d("GameViewModel", "Jack Rule selected by another player, loading rule details")
@@ -586,7 +597,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             _selectedJackRule.value = null
         }
 
-        // NEW CODE: Check for Mini Game selection by any player
+        // Check for Mini Game selection by any player
         if (gameRoom.currentMiniGameId != null && _selectedMiniGame.value == null) {
             // A Mini Game was selected, but we don't have it locally - load it
             Log.d("GameViewModel", "Mini Game selected by another player, loading game details")
@@ -608,8 +619,6 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             _selectedMiniGame.value = null
         }
 
-        // Add to updateCurrentCardFromRoom method in GameViewModel
-
         // Check for selected drinker by any player
         if (gameRoom.selectedDrinkerId != null && _selectedDrinkerId.value == null) {
             // A player was selected to drink, but we don't have it locally
@@ -626,6 +635,18 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             Log.d("GameViewModel", "Selected drinker was cleared, updating local state")
             _selectedDrinkerId.value = null
             _selectedDrinkerName.value = null
+        }
+
+        // Check for mate changes
+        val oldPlayer = _currentPlayer.value
+        val newPlayer = gameRoom.players[_playerId.value]
+
+        // First check for mate changes before updating current player
+        detectNewMates(oldPlayer, newPlayer)
+
+        // Update current player after checking for changes
+        _playerId.value?.let { pid ->
+            _currentPlayer.value = gameRoom.players[pid]
         }
     }
 
@@ -691,6 +712,63 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
         }
     }
 
+    // Add method to handle mate selection
+    // Update the selectMate method to handle mate chain notifications
+    fun selectMate(mateId: String) {
+        Log.d("GameViewModel", "Selecting mate with ID: $mateId")
+
+        _showMateSelector.value = false
+
+        val roomCode = _roomCode.value ?: return
+        val playerId = _playerId.value ?: return
+
+        viewModelScope.launch {
+            try {
+                // Get existing mates before making changes
+                val playerBefore = _gameRoom.value?.players?.get(playerId)
+                val mateBefore = _gameRoom.value?.players?.get(mateId)
+
+                // Record the old mate chains to compare after update
+                val oldPlayerMates = playerBefore?.mateIds?.toSet() ?: emptySet()
+                val oldMateMates = mateBefore?.mateIds?.toSet() ?: emptySet()
+
+                // Perform the mate update
+                repository.setPlayerMate(roomCode, playerId, mateId)
+
+                // No need to advance turn here - we'll wait for the notification dialog to be acknowledged
+                delay(2000) // Small delay to ensure Firebase updates are processed
+
+                // Get updated room data to see new mate relationships
+                val updatedRoom = repository.getRoomOnce(roomCode)
+
+                if (updatedRoom != null) {
+                    // Analyze mate chains to see who was affected
+                    val newPlayerMates = updatedRoom.players[playerId]?.mateIds?.toSet() ?: emptySet()
+                    val newMateMates = updatedRoom.players[mateId]?.mateIds?.toSet() ?: emptySet()
+
+                    // Find all new relationships that were created
+                    val allNewRelationships = (newPlayerMates - oldPlayerMates) + (newMateMates - oldMateMates)
+
+                    // Update state to trigger notifications
+                    _newMateRelationships.value = allNewRelationships
+
+                    // Schedule auto-advance after notification period
+                    viewModelScope.launch {
+                        delay(5000) // Wait 5 seconds for notification
+                        _newMateRelationships.value = emptySet()
+                        advanceTurn()
+                    }
+                } else {
+                    // If we couldn't get updated data, just advance the turn
+                    advanceTurn()
+                }
+            } catch (e: Exception) {
+                _error.value = "Failed to set mate: ${e.message}"
+                advanceTurn() // Advance turn even if there was an error
+            }
+        }
+    }
+
     // Clear selections
     fun clearSelections() {
         val roomCode = _roomCode.value ?: return
@@ -703,6 +781,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 _showJackRuleSelector.value = false
                 _showMiniGameSelector.value = false
                 _showPlayerSelector.value = false
+                _showMateSelector.value = false
                 _selectedDrinkerId.value = null
                 _selectedDrinkerName.value = null
 
@@ -711,6 +790,26 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Error clearing selections: ${e.message}")
                 _error.value = "Failed to clear selections: ${e.message}"
+            }
+        }
+    }
+
+    private fun detectNewMates(oldPlayer: Player?, newPlayer: Player?) {
+        if (oldPlayer != null && newPlayer != null && oldPlayer.id == newPlayer.id) {
+            // Check if any new mates were added
+            val oldMates = oldPlayer.mateIds.toSet()
+            val newMates = newPlayer.mateIds.toSet()
+
+            if (newMates.size > oldMates.size) {
+                // New mates were added
+                val addedMates = newMates - oldMates
+                _newMateRelationships.value = addedMates
+
+                // Schedule auto-clear of notification after 5 seconds
+                viewModelScope.launch {
+                    delay(5000)
+                    _newMateRelationships.value = emptySet()
+                }
             }
         }
     }
