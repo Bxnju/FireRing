@@ -19,7 +19,10 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         setContent {
-            FireRingTheme {
+            FireRingTheme (
+                darkTheme = true,
+                dynamicColor = false
+            ) {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     // Create ViewModels at the app root level
                     val userViewModel: UserViewModel = viewModel()
