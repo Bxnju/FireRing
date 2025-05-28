@@ -16,7 +16,6 @@ import androidx.navigation.NavController
 import com.benchopo.firering.navigation.Routes
 import com.benchopo.firering.viewmodel.GameViewModel
 import com.benchopo.firering.viewmodel.UserViewModel
-import androidx.compose.ui.unit.sp
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.material3.ButtonDefaults
@@ -30,6 +29,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
@@ -43,7 +44,6 @@ fun GameScreen(
     navController: NavController,
     roomCode: String,
     gameViewModel: GameViewModel,
-    userViewModel: UserViewModel,
 ) {
     // Add exit dialog state
     var showLeaveDialog by remember { mutableStateOf(false) }
@@ -702,7 +702,11 @@ fun CardHistoryModal(
                 } else {
                     drawnCards.forEachIndexed { index, card ->
                         if (index > 0) {
-                            Divider(modifier = Modifier.padding(vertical = 8.dp))
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                thickness = 1.dp,
+                                color = Color.White
+                            )
                         }
 
                         // Get player who drew this card
@@ -762,7 +766,11 @@ fun PlayerInfoSidebar(
                     )
 
                     if (index > 0) {
-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 1.dp,
+                            color = Color.White
+                        )
                     }
 
                     Column(
