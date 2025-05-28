@@ -177,6 +177,9 @@ fun GameScreen(
         (gameRoom?.deck?.isEmpty() == true)
     }
 
+    // Add this state variable near your other state declarations at the top of GameScreen
+    var drawButtonDisabled by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -498,11 +501,16 @@ fun GameScreen(
 
             // Draw card button
             Button(
-                onClick = { gameViewModel.drawCard() },
+                onClick = {
+                    // Immediately disable button on click
+                    drawButtonDisabled = true
+                    gameViewModel.drawCard()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = isCurrentPlayerTurn && !loading && !isGameOver // Add !isGameOver condition
+                // Add drawButtonDisabled to the enabled conditions
+                enabled = isCurrentPlayerTurn && !loading && !isGameOver && !drawButtonDisabled
             ) {
                 if (loading) {
                     CircularProgressIndicator(
@@ -512,6 +520,13 @@ fun GameScreen(
                     )
                 } else {
                     Text(if (isGameOver) "Game Over" else "Draw Card")
+                }
+            }
+
+            // Add this LaunchedEffect to reset the button state when appropriate
+            LaunchedEffect(isCurrentPlayerTurn, drawnCard) {
+                if (!isCurrentPlayerTurn || drawnCard != null) {
+                    drawButtonDisabled = false
                 }
             }
 
