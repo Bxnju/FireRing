@@ -898,59 +898,40 @@ fun GameScreen(
         )
     }
 
-    // Show mate notification when a player becomes someone's mate
-    Log.d("GameScreen", "Current playerId: $playerId, newMateRelationships: $newMateRelationships")
-
-    if (newMateRelationships.contains(playerId)) {
-        Log.d("GameScreen", "SHOWING MATE NOTIFICATION for player: $playerId")
-        // This player was selected as a mate (not the drawer of the 8)
+    // Replace the existing mate notification dialog with this simpler Snackbar
+    if (gameRoom?.players?.get(playerId)?.mateIds?.isNotEmpty() == true) {
+        // Get who created the most recent mate relationship
         val mateSelectorId = gameRoom?.players?.get(playerId)?.mateExpiresAfterPlayerId
         val mateSelectorName = remember(gameRoom, mateSelectorId) {
             mateSelectorId?.let { gameRoom?.players?.get(it)?.name } ?: "Someone"
         }
 
-        val mateNames = remember(gameRoom, newMateRelationships) {
-            // Get names of other mates (excluding self)
-            val otherMates = newMateRelationships.filter { it != playerId }
-            otherMates.mapNotNull { mateId ->
-                gameRoom?.players?.get(mateId)?.name
-            }.joinToString(", ")
+        // Get all the players who were added as mates
+        val mateNames = remember(gameRoom) {
+            gameRoom?.players?.values
+                ?.filter { it.mateExpiresAfterPlayerId == mateSelectorId && it.id != mateSelectorId }
+                ?.joinToString(", ") { it.name } ?: ""
         }
 
-        // Get expiration information
-        val expiresAfterPlayerId = remember(gameRoom, playerId) {
-            gameRoom?.players?.get(playerId)?.mateExpiresAfterPlayerId
-        }
-        val expiresAfterPlayerName = remember(gameRoom, expiresAfterPlayerId) {
-            expiresAfterPlayerId?.let { gameRoom?.players?.get(it)?.name } ?: mateSelectorName
-        }
-
-        AlertDialog(
-            onDismissRequest = { gameViewModel.clearMateNotification() },
-            title = { Text("New Drinking Mate!") },
-            text = {
-                Column {
-                    Text("$mateSelectorName has made you a drinking mate!")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    if (mateNames.isNotEmpty()) {
-                        Text("You're now connected with: $mateNames")
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    Text("When any of you drink, everyone in the chain drinks! 🍻")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "These mate relationships will end after $expiresAfterPlayerName's next turn",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            },
-            confirmButton = {
-                Button(onClick = { gameViewModel.clearMateNotification() }) {
-                    Text("Cheers! 🍻")
-                }
+        // Show the notification to all players about new mates
+        if (newMateRelationships.isNotEmpty()) {
+            val message = if (playerId == mateSelectorId) {
+                "You selected $mateNames as your drinking mate(s)"
+            } else {
+                "$mateSelectorName selected $mateNames as drinking mate(s)"
             }
-        )
+
+            Snackbar(
+                modifier = Modifier.padding(16.dp),
+                action = {
+                    TextButton(onClick = { gameViewModel.dismissMateNotification() }) {
+                        Text("OK")
+                    }
+                }
+            ) {
+                Text(message)
+            }
+        }
     }
 
     // Active Rule Detail Dialog

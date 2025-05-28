@@ -851,11 +851,10 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     }
 
     // Add method to handle mate selection
-    // Update the selectMate method to handle mate chain notifications
+    // Update the selectMate method to advance turn automatically
     fun selectMate(mateId: String) {
         Log.d("GameViewModel", "Selecting mate with ID: $mateId")
 
-        mateSelectionInProgress = true  // Set flag to prevent override
         _showMateSelector.value = false
 
         val roomCode = _roomCode.value ?: return
@@ -868,37 +867,32 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Set the notification immediately so it shows right away
+                // Set the notification for a brief moment to show the Snackbar
                 _newMateRelationships.value = setOf(mateId)
-                Log.d("GameViewModel", "Setting notification for mate: $mateId (${mateName})")
 
-                // Update the database
+                // Update the database with the mate relationship
                 repository.setPlayerMate(roomCode, playerId, mateId)
 
-                // Wait a short time to make sure the Firebase update propagates
-                delay(500)
+                // Wait a short time for UI feedback before advancing
+                delay(1500)
 
-                // Clear the flag
-                mateSelectionInProgress = false
+                // Automatically advance turn (no need to wait for button click)
+                advanceTurn()
+
+                // Clear notifications after a delay to allow UI feedback
+                delay(3000)
+                _newMateRelationships.value = emptySet()
+
             } catch (e: Exception) {
-                mateSelectionInProgress = false  // Clear flag on error
                 Log.e("GameViewModel", "Error setting mate relationship", e)
                 _error.value = "Failed to set mate: ${e.message}"
             }
         }
     }
 
-    // Add a method to clear the mate notification and advance the turn
-    fun clearMateNotification() {
+    // Replace clearMateNotification with a simpler dismissal method
+    fun dismissMateNotification() {
         _newMateRelationships.value = emptySet()
-
-        // If this was the player who drew the 8, advance the turn
-        val currentPlayerId = _gameRoom.value?.currentPlayerId
-        val playerId = _playerId.value
-
-        if (currentPlayerId == playerId) {
-            advanceTurn()
-        }
     }
 
     // Clear selections
