@@ -20,5 +20,6 @@ data class GameRoom(
     val selectedDrinkerId: String? = null,
     val selectedDrinkerBy: String? = null,
     val customJackRules: List<JackRule> = emptyList(),
-    val customMiniGames: List<MiniGame> = emptyList()
+    val customMiniGames: List<MiniGame> = emptyList(),
+    val activeJackRules: Map<String, ActiveJackRule> = emptyMap()
 )

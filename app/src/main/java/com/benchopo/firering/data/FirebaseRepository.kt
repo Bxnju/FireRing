@@ -250,6 +250,15 @@ class FirebaseRepository {
                                 }
                             }
 
+                            // Extract active Jack Rules
+                            val activeJackRules = mutableMapOf<String, ActiveJackRule>()
+                            snapshot.child("activeJackRules").children.forEach { ruleSnapshot ->
+                                val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
+                                if (rule != null) {
+                                    activeJackRules[rule.id] = rule
+                                }
+                            }
+
                             // Build GameRoom object
                             val gameRoom =
                                     GameRoom(
@@ -272,7 +281,8 @@ class FirebaseRepository {
                                             selectedDrinkerId = selectedDrinkerId,
                                             selectedDrinkerBy = selectedDrinkerBy,
                                             customJackRules = customJackRules,
-                                            customMiniGames = customMiniGames
+                                            customMiniGames = customMiniGames,
+                                            activeJackRules = activeJackRules
                                     )
 
                             trySend(gameRoom)
@@ -391,8 +401,9 @@ class FirebaseRepository {
         val currentPlayerIdSnapshot = roomRef.child("currentPlayerId").get().await()
         val currentPlayerId = currentPlayerIdSnapshot.getValue(String::class.java) ?: return
 
-        // Check for expired mates before advancing turn
+        // Check for expired mates and rules before advancing turn
         checkAndClearExpiredMates(roomCode, currentPlayerId)
+        checkAndRemoveExpiredJackRules(roomCode, currentPlayerId)
 
         val turnOrderSnapshot = roomRef.child("turnOrder").get().await()
         val turnOrder = turnOrderSnapshot.children.map { it.getValue(String::class.java)!! }
@@ -527,6 +538,50 @@ class FirebaseRepository {
     suspend fun removeActiveRule(roomCode: String, ruleId: String) {
         val rulesRef = db.child("rooms").child(roomCode).child("activeRules")
         rulesRef.child(ruleId).removeValue().await()
+    }
+
+    // Add active Jack Rule to the room
+    suspend fun addActiveJackRule(roomCode: String, activeRule: ActiveJackRule) {
+        Log.d("FirebaseRepository", "Adding active Jack Rule: ${activeRule.title}")
+        val roomRef = db.child("rooms").child(roomCode)
+        roomRef.child("activeJackRules").child(activeRule.id).setValue(activeRule).await()
+        Log.d("FirebaseRepository", "Active Jack Rule added successfully")
+    }
+
+    // Remove active Jack Rule from the room
+    suspend fun removeActiveJackRule(roomCode: String, ruleId: String) {
+        Log.d("FirebaseRepository", "Removing active Jack Rule: $ruleId")
+        val roomRef = db.child("rooms").child(roomCode)
+        roomRef.child("activeJackRules").child(ruleId).removeValue().await()
+        Log.d("FirebaseRepository", "Active Jack Rule removed successfully")
+    }
+
+    // Check for expired Jack Rules after a player's turn
+    suspend fun checkAndRemoveExpiredJackRules(roomCode: String, currentPlayerId: String) {
+        Log.d("FirebaseRepository", "Checking for expired Jack Rules after player $currentPlayerId's turn")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        // Get all active rules
+        val rulesSnapshot = roomRef.child("activeJackRules").get().await()
+        val expiredRuleIds = mutableListOf<String>()
+
+        rulesSnapshot.children.forEach { ruleSnapshot ->
+            val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
+            if (rule != null && rule.expiresAfterPlayerId == currentPlayerId) {
+                Log.d("FirebaseRepository", "Jack Rule '${rule.title}' has expired")
+                expiredRuleIds.add(rule.id)
+            }
+        }
+
+        // Remove expired rules
+        if (expiredRuleIds.isNotEmpty()) {
+            Log.d("FirebaseRepository", "Removing ${expiredRuleIds.size} expired Jack Rules")
+            val updates = hashMapOf<String, Any?>()
+            expiredRuleIds.forEach { ruleId ->
+                updates["activeJackRules/$ruleId"] = null
+            }
+            roomRef.updateChildren(updates).await()
+        }
     }
 
     private fun getDefaultDrinks(): List<Drink> {
@@ -767,6 +822,15 @@ class FirebaseRepository {
                 }
             }
 
+            // Extract active Jack Rules
+            val activeJackRules = mutableMapOf<String, ActiveJackRule>()
+            snapshot.child("activeJackRules").children.forEach { ruleSnapshot ->
+                val rule = ruleSnapshot.getValue(ActiveJackRule::class.java)
+                if (rule != null) {
+                    activeJackRules[rule.id] = rule
+                }
+            }
+
             // Build GameRoom object
             return GameRoom(
                     roomCode = roomCode,
@@ -788,7 +852,8 @@ class FirebaseRepository {
                     selectedDrinkerId = selectedDrinkerId,
                     selectedDrinkerBy = selectedDrinkerBy,
                     customJackRules = customJackRules,
-                    customMiniGames = customMiniGames
+                    customMiniGames = customMiniGames,
+                    activeJackRules = activeJackRules
             )
         } catch (e: Exception) {
             Log.e("FirebaseRepository", "Error parsing room snapshot", e)

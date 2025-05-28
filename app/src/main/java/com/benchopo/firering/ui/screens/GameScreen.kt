@@ -41,6 +41,8 @@ import androidx.compose.ui.res.painterResource
 import com.benchopo.firering.model.GameMode
 import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
+import com.benchopo.firering.ui.components.ActiveRuleDetailDialog
+import com.benchopo.firering.ui.components.ActiveRulesSection
 import com.benchopo.firering.ui.components.JackRuleSelector
 import com.benchopo.firering.ui.components.MiniGameSelector
 import com.benchopo.firering.ui.components.PlayerSelector
@@ -179,6 +181,10 @@ fun GameScreen(
 
     // Add this state variable near your other state declarations at the top of GameScreen
     var drawButtonDisabled by remember { mutableStateOf(false) }
+
+    // Add this to your state collection in GameScreen
+    val activeJackRules by gameViewModel.activeJackRules.collectAsState()
+    val selectedActiveRule by gameViewModel.selectedActiveRule.collectAsState()
 
     Scaffold(
         topBar = {
@@ -360,6 +366,24 @@ fun GameScreen(
                         cardRule,
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            // Active Rules Section
+            if (activeJackRules.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    ActiveRulesSection(
+                        activeRules = activeJackRules,
+                        onRuleClick = { ruleId ->
+                            gameViewModel.viewActiveRuleDetails(ruleId)
+                        }
                     )
                 }
             }
@@ -859,6 +883,16 @@ fun GameScreen(
                 Button(onClick = { }) {
                     Text("Cheers! 🍻")
                 }
+            }
+        )
+    }
+
+    // Active Rule Detail Dialog
+    if (selectedActiveRule != null) {
+        ActiveRuleDetailDialog(
+            rule = selectedActiveRule!!,
+            onDismiss = {
+                gameViewModel.closeActiveRuleDetails()
             }
         )
     }
