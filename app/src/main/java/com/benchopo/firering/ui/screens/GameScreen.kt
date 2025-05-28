@@ -390,14 +390,33 @@ fun GameScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    ActiveRulesSection(
-                        activeRules = activeJackRules,
-                        onRuleClick = { ruleId ->
-                            gameViewModel.viewActiveRuleDetails(ruleId)
-                        }
+                        .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
+                ) {
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        // Add count of active rules for debugging
+                        Text(
+                            "${activeJackRules.size} Active Rules",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+
+                        ActiveRulesSection(
+                            activeRules = activeJackRules,
+                            onRuleClick = { ruleId ->
+                                gameViewModel.viewActiveRuleDetails(ruleId)
+                            }
+                        )
+                    }
+                }
+
+                // Add debug text to see active rules in UI
+                Log.d("GameScreen", "Active Jack Rules in GameScreen: ${activeJackRules.size}")
+                activeJackRules.forEach { (id, rule) ->
+                    Log.d("GameScreen", "Displaying active rule: ${rule.title}")
                 }
             }
 
