@@ -1,21 +1,728 @@
-2025-05-28 03:33:23.455  9976-9976  FirebaseRepository      com.benchopo.firering                D  Active Jack Rule added successfully
-2025-05-28 03:33:23.456  9976-9976  GameViewModel           com.benchopo.firering                D  Added active Jack Rule to Firebase: Truth or Dare
-2025-05-28 03:33:45.916  9976-9976  GameScreen              com.benchopo.firering                D  Jack Rule completed, advancing turn
-2025-05-28 03:33:45.927  9976-9976  GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
-2025-05-28 03:33:45.927  9976-9976  GameScreen              com.benchopo.firering                D  Displaying active rule: Truth or Dare
-2025-05-28 03:33:45.974  9976-9976  GameViewModel           com.benchopo.firering                D  Room update received: 2 players
-2025-05-28 03:33:45.974  9976-9976  GameViewModel           com.benchopo.firering                D  Current player updated: test
-2025-05-28 03:33:45.974  9976-9976  GameViewModel           com.benchopo.firering                D  Checking mate changes for player test
-2025-05-28 03:33:45.974  9976-9976  GameViewModel           com.benchopo.firering                D  Old mates: []
-2025-05-28 03:33:45.974  9976-9976  GameViewModel           com.benchopo.firering                D  New mates: []
-2025-05-28 03:33:45.975  9976-9976  FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player 12ea269e-cbd8-48bd-8a7b-e9238f407b2a
-2025-05-28 03:33:45.981  9976-9976  GameScreen              com.benchopo.firering                D  Current player: test, drink count: 0
-2025-05-28 03:33:45.982  9976-9976  GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
-2025-05-28 03:33:45.982  9976-9976  GameScreen              com.benchopo.firering                D  Displaying active rule: Truth or Dare
-2025-05-28 03:33:45.989  9976-9976  GameScreen              com.benchopo.firering                D  Room updated, drawn cards count: 36
-2025-05-28 03:33:45.990  9976-9976  FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
-2025-05-28 03:33:45.990  9976-9976  FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player 12ea269e-cbd8-48bd-8a7b-e9238f407b2a
-2025-05-28 03:33:45.991  9976-9976  FirebaseRepository      com.benchopo.firering                D  Current turn count: 35
-2025-05-28 03:33:45.994  9976-9976  FirebaseRepository      com.benchopo.firering                D  Checking rule: Truth or Dare, expiresAfter: 12ea269e-cbd8-48bd-8a7b-e9238f407b2a, createdTurn: 0, currentTurn: 35
-2025-05-28 03:33:45.994  9976-9976  FirebaseRepository      com.benchopo.firering                D  Jack Rule 'Truth or Dare' has expired (after 12ea269e-cbd8-48bd-8a7b-e9238f407b2a's turn)
-2025-05-28 03:33:45.994  9976-9976  FirebaseRepository      com.benchopo.firering                D  Removing 1 expired Jack Rules
+--------- beginning of main
+--------- beginning of system
+---------------------------- PROCESS STARTED (29483) for package com.benchopo.firering ----------------------------
+2025-05-28 04:41:18.925 29483-29483 GameViewModel           com.benchopo.firering                D  Clearing all game data
+2025-05-28 04:41:18.926 29483-29483 GameViewModel           com.benchopo.firering                D  Game data cleared
+2025-05-28 04:43:52.464 29483-29483 GameViewModel           com.benchopo.firering                D  Joining room: HKD1K with player name: Porras
+2025-05-28 04:43:52.465 29483-29483 FirebaseRepository      com.benchopo.firering                D  Joining room: HKD1K with player name: Porras
+2025-05-28 04:43:53.019 29483-29483 FirebaseRepository      com.benchopo.firering                D  Room game state: WAITING
+2025-05-28 04:43:53.425 29483-29483 FirebaseRepository      com.benchopo.firering                D  Player successfully joined room. ID: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:43:53.426 29483-29483 GameViewModel           com.benchopo.firering                D  Successfully joined room. Player ID: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:43:53.606 29483-29483 FirebaseRepository      com.benchopo.firering                D  Using fallback cards filter, found 0 drawn cards
+2025-05-28 04:43:53.606 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 52 undrawn cards
+2025-05-28 04:43:53.608 29483-29483 GameViewModel           com.benchopo.firering                D  Initial room data loaded: 2 players
+2025-05-28 04:43:53.615 29483-29483 GameViewModel           com.benchopo.firering                D  Starting to collect room updates
+2025-05-28 04:43:53.617 29483-29483 GameViewModel           com.benchopo.firering                D  Join room process completed, loading = false
+2025-05-28 04:43:53.635 29483-29483 LobbyScreen             com.benchopo.firering                D  isHost calculation: false (currentPlayerId=Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, hostId=26189078-3f6f-4449-895d-8dfe08d0f7fd)
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Room data updated: HKD1K
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Players: [MMessi, Porras]
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Is host: false (playerId=Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, hostId=26189078-3f6f-4449-895d-8dfe08d0f7fd)
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Setting up room code: HKD1K
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Current player ID: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Host ID from room: 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Room players: [26189078-3f6f-4449-895d-8dfe08d0f7fd, Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d]
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Current player isHost property: false
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: false
+2025-05-28 04:43:53.862 29483-29483 LobbyScreen             com.benchopo.firering                D  Ensuring room loaded: HKD1K with player: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:43:53.863 29483-29483 GameViewModel           com.benchopo.firering                D  Ensuring room is loaded: HKD1K, current room: HKD1K
+2025-05-28 04:43:53.863 29483-29483 GameViewModel           com.benchopo.firering                D  Game room already loaded, skipping data collection
+2025-05-28 04:43:53.904 29483-29483 FirebaseRepository      com.benchopo.firering                D  Using fallback cards filter, found 0 drawn cards
+2025-05-28 04:43:53.904 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 52 undrawn cards
+2025-05-28 04:43:53.905 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:43:53.905 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:43:53.905 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:43:53.905 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:43:57.067 29483-29483 FirebaseRepository      com.benchopo.firering                D  Using fallback cards filter, found 0 drawn cards
+2025-05-28 04:43:57.067 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 52 undrawn cards
+2025-05-28 04:43:57.068 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:43:57.069 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:43:57.069 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:43:57.069 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:43:57.082 29483-29483 FirebaseRepository      com.benchopo.firering                D  Using fallback cards filter, found 0 drawn cards
+2025-05-28 04:43:57.082 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 52 undrawn cards
+2025-05-28 04:43:57.083 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:43:57.083 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:43:57.083 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:43:57.083 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:43:57.087 29483-29483 LobbyScreen             com.benchopo.firering                D  isHost calculation: false (currentPlayerId=Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, hostId=26189078-3f6f-4449-895d-8dfe08d0f7fd)
+2025-05-28 04:43:57.102 29483-29483 LobbyScreen             com.benchopo.firering                D  Room data updated: HKD1K
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Players: [MMessi, Porras]
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Is host: false (playerId=Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, hostId=26189078-3f6f-4449-895d-8dfe08d0f7fd)
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Current player ID: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Host ID from room: 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Room players: [26189078-3f6f-4449-895d-8dfe08d0f7fd, Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d]
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Current player isHost property: false
+2025-05-28 04:43:57.103 29483-29483 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: false
+2025-05-28 04:43:57.493 29483-29483 FirebaseRepository      com.benchopo.firering                D  Using fallback cards filter, found 0 drawn cards
+2025-05-28 04:43:57.493 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 52 undrawn cards
+2025-05-28 04:43:57.494 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:43:57.494 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:43:57.494 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:43:57.494 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:43:57.511 29483-29483 LobbyScreen             com.benchopo.firering                D  isHost calculation: false (currentPlayerId=Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, hostId=26189078-3f6f-4449-895d-8dfe08d0f7fd)
+2025-05-28 04:43:57.535 29483-29483 LobbyScreen             com.benchopo.firering                D  Room data updated: HKD1K
+2025-05-28 04:43:57.536 29483-29483 LobbyScreen             com.benchopo.firering                D  Players: [MMessi, Porras]
+2025-05-28 04:43:57.536 29483-29483 LobbyScreen             com.benchopo.firering                D  Is host: false (playerId=Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, hostId=26189078-3f6f-4449-895d-8dfe08d0f7fd)
+2025-05-28 04:43:57.539 29483-29483 LobbyScreen             com.benchopo.firering                D  Current player ID: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:43:57.539 29483-29483 LobbyScreen             com.benchopo.firering                D  Host ID from room: 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:43:57.539 29483-29483 LobbyScreen             com.benchopo.firering                D  Room players: [26189078-3f6f-4449-895d-8dfe08d0f7fd, Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d]
+2025-05-28 04:43:57.539 29483-29483 LobbyScreen             com.benchopo.firering                D  Current player isHost property: false
+2025-05-28 04:43:57.539 29483-29483 LobbyScreen             com.benchopo.firering                D  Host check by ID comparison: false
+2025-05-28 04:43:57.729 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:43:57.810 29483-29483 GameScreen              com.benchopo.firering                D  Initial load - forcing refresh of room data
+2025-05-28 04:43:57.810 29483-29483 GameViewModel           com.benchopo.firering                D  Ensuring room is loaded: HKD1K, current room: HKD1K
+2025-05-28 04:43:57.810 29483-29483 GameViewModel           com.benchopo.firering                D  Game room already loaded, skipping data collection
+2025-05-28 04:44:05.727 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 0 cards in drawnCardsList
+2025-05-28 04:44:05.742 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 52 undrawn cards after filtering
+2025-05-28 04:44:05.744 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 10 of Spades (10-Spades-48)
+2025-05-28 04:44:05.744 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:05.744 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:05.764 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 51 undrawn cards
+2025-05-28 04:44:05.765 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:05.765 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 10-Spades-48
+2025-05-28 04:44:05.765 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 10 of Spades
+2025-05-28 04:44:05.765 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:05.765 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:05.765 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:05.777 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:44:05.906 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:05.908 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetching custom Jack Rules for room HKD1K
+2025-05-28 04:44:05.910 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetched 0 custom Jack Rules
+2025-05-28 04:44:05.910 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetching custom Mini Games for room HKD1K
+2025-05-28 04:44:05.912 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetched 0 custom Mini Games
+2025-05-28 04:44:05.913 29483-29483 GameViewModel           com.benchopo.firering                D  Loaded 0 custom Jack Rules
+2025-05-28 04:44:05.913 29483-29483 GameViewModel           com.benchopo.firering                D  Loaded 0 custom Mini Games
+2025-05-28 04:44:05.913 29483-29483 GameViewModel           com.benchopo.firering                D  Finished loading rules and games: 9 rules, 9 games
+2025-05-28 04:44:05.916 29483-29483 GameScreen              com.benchopo.firering                D  Showing Mini Game selector with 9 games
+2025-05-28 04:44:08.393 29483-29483 GameScreen              com.benchopo.firering                D  Mini Game selected: Body Art
+2025-05-28 04:44:08.406 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Mini Game: Body Art
+2025-05-28 04:44:08.528 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 51 undrawn cards
+2025-05-28 04:44:08.529 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:08.529 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:08.529 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:08.529 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:08.537 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Mini Game: Body Art
+2025-05-28 04:44:08.543 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:44:14.991 29483-29483 GameScreen              com.benchopo.firering                D  Mini Game completed, advancing turn
+2025-05-28 04:44:15.038 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 51 undrawn cards
+2025-05-28 04:44:15.039 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:15.039 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:15.039 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:15.039 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:15.040 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:15.049 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:44:15.058 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:15.058 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:15.060 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 0
+2025-05-28 04:44:15.061 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:15.082 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 51 undrawn cards
+2025-05-28 04:44:15.083 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:15.083 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:15.083 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:15.083 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:15.093 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:44:15.210 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #1)
+2025-05-28 04:44:17.683 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 50 undrawn cards
+2025-05-28 04:44:17.686 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:17.686 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 2-Spades-40
+2025-05-28 04:44:17.687 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 2 of Spades
+2025-05-28 04:44:17.687 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:17.687 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:17.687 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:17.712 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:44:20.236 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 50 undrawn cards
+2025-05-28 04:44:20.238 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:20.239 29483-29483 GameViewModel           com.benchopo.firering                D  Player selected to drink by another player
+2025-05-28 04:44:20.239 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:20.239 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:20.239 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:20.261 29483-29483 GameScreen              com.benchopo.firering                D  Showing selected player notification. Current player selected: true
+2025-05-28 04:44:20.275 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 0
+2025-05-28 04:44:20.847 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 50 undrawn cards
+2025-05-28 04:44:20.847 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:20.848 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:20.848 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:20.848 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:20.851 29483-29483 GameScreen              com.benchopo.firering                D  Showing selected player notification. Current player selected: true
+2025-05-28 04:44:20.856 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:21.780 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 50 undrawn cards
+2025-05-28 04:44:21.782 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:21.782 29483-29483 GameViewModel           com.benchopo.firering                D  Selected drinker was cleared, updating local state
+2025-05-28 04:44:21.782 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:21.782 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:21.782 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:21.792 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:22.064 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 50 undrawn cards
+2025-05-28 04:44:22.065 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:22.065 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:22.065 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:22.065 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:22.084 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:22.938 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 2 cards in drawnCardsList
+2025-05-28 04:44:22.950 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 50 undrawn cards after filtering
+2025-05-28 04:44:22.950 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: J of Diamonds (J-Diamonds-23)
+2025-05-28 04:44:22.951 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:22.951 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:22.969 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 49 undrawn cards
+2025-05-28 04:44:22.969 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:22.970 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: J-Diamonds-23
+2025-05-28 04:44:22.970 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: J of Diamonds
+2025-05-28 04:44:22.970 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:22.970 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:22.970 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:22.979 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:23.120 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:23.121 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetching custom Jack Rules for room HKD1K
+2025-05-28 04:44:23.123 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetched 0 custom Jack Rules
+2025-05-28 04:44:23.123 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetching custom Mini Games for room HKD1K
+2025-05-28 04:44:23.125 29483-29483 FirebaseRepository      com.benchopo.firering                D  Fetched 0 custom Mini Games
+2025-05-28 04:44:23.125 29483-29483 GameViewModel           com.benchopo.firering                D  Loaded 0 custom Jack Rules
+2025-05-28 04:44:23.125 29483-29483 GameViewModel           com.benchopo.firering                D  Loaded 0 custom Mini Games
+2025-05-28 04:44:23.125 29483-29483 GameViewModel           com.benchopo.firering                D  Finished loading rules and games: 9 rules, 9 games
+2025-05-28 04:44:23.129 29483-29483 GameScreen              com.benchopo.firering                D  Showing Jack Rule selector with 9 rules
+2025-05-28 04:44:24.960 29483-29483 GameScreen              com.benchopo.firering                D  Jack Rule selected: Never Have I Ever
+2025-05-28 04:44:24.961 29483-29483 GameViewModel           com.benchopo.firering                D  Player Porras (Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d) selected Jack Rule: Never Have I Ever
+2025-05-28 04:44:24.971 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Jack Rule: Never Have I Ever
+2025-05-28 04:44:25.086 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 49 undrawn cards
+2025-05-28 04:44:25.087 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:25.087 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:25.088 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:25.088 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:25.095 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Jack Rule: Never Have I Ever
+2025-05-28 04:44:25.101 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:25.121 29483-29483 GameViewModel           com.benchopo.firering                D  Current turn count for Jack Rule (from Firebase): 2
+2025-05-28 04:44:25.121 29483-29483 FirebaseRepository      com.benchopo.firering                D  Adding active Jack Rule: Never Have I Ever
+2025-05-28 04:44:25.140 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 49 undrawn cards
+2025-05-28 04:44:25.141 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:25.142 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:25.142 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:25.142 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:25.146 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Jack Rule: Never Have I Ever
+2025-05-28 04:44:25.150 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:25.162 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:25.162 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:25.233 29483-29483 FirebaseRepository      com.benchopo.firering                D  Active Jack Rule added successfully
+2025-05-28 04:44:25.233 29483-29483 GameViewModel           com.benchopo.firering                D  Added active Jack Rule with turn count: 2
+2025-05-28 04:44:28.758 29483-29483 GameScreen              com.benchopo.firering                D  Jack Rule completed, advancing turn
+2025-05-28 04:44:28.775 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:28.775 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:28.807 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 49 undrawn cards
+2025-05-28 04:44:28.809 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:28.809 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:28.809 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:28.809 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:28.809 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:28.817 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:28.820 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:28.820 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:28.827 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:28.827 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:28.828 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 2
+2025-05-28 04:44:28.831 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking rule: Never Have I Ever, expiresAfter: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, createdTurn: 2, currentTurn: 2
+2025-05-28 04:44:28.831 29483-29483 FirebaseRepository      com.benchopo.firering                D  Jack Rule 'Never Have I Ever' remains active
+2025-05-28 04:44:28.831 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:28.851 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 49 undrawn cards
+2025-05-28 04:44:28.852 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:28.853 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:28.853 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:28.853 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:28.861 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:28.864 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:28.864 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:29.007 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #3)
+2025-05-28 04:44:30.183 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 48 undrawn cards
+2025-05-28 04:44:30.189 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:30.189 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: Q-Spades-50
+2025-05-28 04:44:30.189 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: Q of Spades
+2025-05-28 04:44:30.190 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:30.190 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:30.190 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:30.206 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:30.210 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:30.210 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:30.359 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 48 undrawn cards
+2025-05-28 04:44:30.361 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:30.361 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:30.361 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:30.361 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:30.371 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:30.374 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:30.374 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:31.384 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 4 cards in drawnCardsList
+2025-05-28 04:44:31.396 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 48 undrawn cards after filtering
+2025-05-28 04:44:31.396 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 8 of Diamonds (8-Diamonds-20)
+2025-05-28 04:44:31.396 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:31.396 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:31.407 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:31.407 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:31.429 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 47 undrawn cards
+2025-05-28 04:44:31.430 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:31.430 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 8-Diamonds-20
+2025-05-28 04:44:31.430 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 8 of Diamonds
+2025-05-28 04:44:31.430 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:31.430 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:31.430 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:31.439 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:31.443 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:31.443 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:31.561 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:31.568 29483-29483 GameScreen              com.benchopo.firering                D  Showing mate selector
+2025-05-28 04:44:31.587 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:31.587 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:35.468 29483-29483 GameScreen              com.benchopo.firering                D  Mate selected: 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:44:35.468 29483-29483 GameViewModel           com.benchopo.firering                D  Selecting mate with ID: 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:44:35.468 29483-29483 GameViewModel           com.benchopo.firering                D  Player 'Porras' selected 'MMessi' as mate
+2025-05-28 04:44:35.469 29483-29483 GameViewModel           com.benchopo.firering                D  Player 'Porras' existing mates: []
+2025-05-28 04:44:35.469 29483-29483 GameViewModel           com.benchopo.firering                D  Mate 'MMessi' existing mates: []
+2025-05-28 04:44:35.470 29483-29483 FirebaseRepository      com.benchopo.firering                D  Setting mate relationship: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d selected 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:44:35.477 29483-29483 FirebaseRepository      com.benchopo.firering                D  Total players: 2
+2025-05-28 04:44:35.477 29483-29483 FirebaseRepository      com.benchopo.firering                D  Getting mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d at depth 0
+2025-05-28 04:44:35.489 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:35.489 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:35.513 29483-29483 FirebaseRepository      com.benchopo.firering                D  No mates found for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:35.513 29483-29483 FirebaseRepository      com.benchopo.firering                D  Player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d existing mates: []
+2025-05-28 04:44:35.513 29483-29483 FirebaseRepository      com.benchopo.firering                D  Getting mates for player 26189078-3f6f-4449-895d-8dfe08d0f7fd at depth 0
+2025-05-28 04:44:35.517 29483-29483 FirebaseRepository      com.benchopo.firering                D  No mates found for player 26189078-3f6f-4449-895d-8dfe08d0f7fd
+2025-05-28 04:44:35.518 29483-29483 FirebaseRepository      com.benchopo.firering                D  Player 26189078-3f6f-4449-895d-8dfe08d0f7fd existing mates: []
+2025-05-28 04:44:35.518 29483-29483 FirebaseRepository      com.benchopo.firering                D  All mates after combining: [Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, 26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:35.518 29483-29483 FirebaseRepository      com.benchopo.firering                D  Applying mate updates to 6 players
+2025-05-28 04:44:35.535 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 47 undrawn cards
+2025-05-28 04:44:35.536 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:35.537 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:35.537 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:35.537 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:35.543 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:35.546 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:35.546 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:35.636 29483-29483 FirebaseRepository      com.benchopo.firering                D  Mate relationships updated successfully
+2025-05-28 04:44:35.639 29483-29483 FirebaseRepository      com.benchopo.firering                D  ===== MATE CHAIN DEBUG =====
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D  Player: MMessi
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D    Mates: Porras
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D    Expires after: Porras's next turn
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D  Player: Porras
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D    Mates: MMessi
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D    Expires after: Porras's next turn
+2025-05-28 04:44:35.640 29483-29483 FirebaseRepository      com.benchopo.firering                D  ===== END MATE CHAIN DEBUG =====
+2025-05-28 04:44:35.656 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 47 undrawn cards
+2025-05-28 04:44:35.657 29483-29483 GameViewModel           com.benchopo.firering                D  After update - Player 'Porras' mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:35.657 29483-29483 GameViewModel           com.benchopo.firering                D  After update - Mate 'MMessi' mates: [Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d]
+2025-05-28 04:44:35.657 29483-29483 GameViewModel           com.benchopo.firering                D  All new mate relationships: [26189078-3f6f-4449-895d-8dfe08d0f7fd, Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d]
+2025-05-28 04:44:35.685 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:35.685 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:39.365 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:39.380 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:39.380 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Never Have I Ever
+2025-05-28 04:44:39.402 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:39.402 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:39.406 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 4
+2025-05-28 04:44:39.407 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking rule: Never Have I Ever, expiresAfter: Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d, createdTurn: 2, currentTurn: 4
+2025-05-28 04:44:39.407 29483-29483 FirebaseRepository      com.benchopo.firering                D  Jack Rule 'Never Have I Ever' has expired (after Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d's turn)
+2025-05-28 04:44:39.407 29483-29483 FirebaseRepository      com.benchopo.firering                D  Removing 1 expired Jack Rules
+2025-05-28 04:44:39.422 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 47 undrawn cards
+2025-05-28 04:44:39.423 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:39.423 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:39.423 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:39.423 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:39.428 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:39.585 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 47 undrawn cards
+2025-05-28 04:44:39.586 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:39.586 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:39.586 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:39.586 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:39.599 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:39.687 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #5)
+2025-05-28 04:44:41.496 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 46 undrawn cards
+2025-05-28 04:44:41.497 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:41.498 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 5-Clubs-30
+2025-05-28 04:44:41.498 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 5 of Clubs
+2025-05-28 04:44:41.498 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:41.498 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:41.498 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:41.529 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:41.656 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 46 undrawn cards
+2025-05-28 04:44:41.657 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:41.658 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:41.658 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:41.658 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:41.674 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:43.256 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 6 cards in drawnCardsList
+2025-05-28 04:44:43.269 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 46 undrawn cards after filtering
+2025-05-28 04:44:43.269 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 9 of Clubs (9-Clubs-34)
+2025-05-28 04:44:43.269 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:43.269 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:43.295 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 45 undrawn cards
+2025-05-28 04:44:43.295 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:43.295 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 9-Clubs-34
+2025-05-28 04:44:43.295 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 9 of Clubs
+2025-05-28 04:44:43.295 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:43.295 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:43.295 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:43.303 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:43.421 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:43.442 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:43.447 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found expired mate relationship for player 26189078-3f6f-4449-895d-8dfe08d0f7fd (expires after Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d's turn which just completed)
+2025-05-28 04:44:43.447 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found expired mate relationship for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d (expires after Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d's turn which just completed)
+2025-05-28 04:44:43.447 29483-29483 FirebaseRepository      com.benchopo.firering                D  Clearing expired mate relationships for 2 players
+2025-05-28 04:44:43.464 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 45 undrawn cards
+2025-05-28 04:44:43.465 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:43.465 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:43.465 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:43.465 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:43.471 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:43.590 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:43.592 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 6
+2025-05-28 04:44:43.595 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:43.622 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 45 undrawn cards
+2025-05-28 04:44:43.623 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:43.623 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:43.623 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:43.623 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:43.647 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:43.757 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #7)
+2025-05-28 04:44:44.923 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 44 undrawn cards
+2025-05-28 04:44:44.924 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:44.924 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: A-Spades-39
+2025-05-28 04:44:44.924 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: A of Spades
+2025-05-28 04:44:44.924 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:44.924 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:44.924 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:44.934 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:45.002 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 44 undrawn cards
+2025-05-28 04:44:45.002 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:45.003 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:45.003 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:45.003 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:45.026 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:45.726 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 8 cards in drawnCardsList
+2025-05-28 04:44:45.736 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 44 undrawn cards after filtering
+2025-05-28 04:44:45.736 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 7 of Hearts (7-Hearts-6)
+2025-05-28 04:44:45.736 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:45.736 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:45.756 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 43 undrawn cards
+2025-05-28 04:44:45.757 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:45.757 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 7-Hearts-6
+2025-05-28 04:44:45.757 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 7 of Hearts
+2025-05-28 04:44:45.757 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:45.757 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:45.757 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:45.763 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:45.882 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:45.884 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:45.906 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:45.906 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:45.909 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 8
+2025-05-28 04:44:45.911 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:45.931 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 43 undrawn cards
+2025-05-28 04:44:45.931 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:45.931 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:45.932 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:45.932 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:45.938 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:46.064 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #9)
+2025-05-28 04:44:46.966 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 42 undrawn cards
+2025-05-28 04:44:46.967 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:46.967 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: J-Clubs-36
+2025-05-28 04:44:46.967 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: J of Clubs
+2025-05-28 04:44:46.967 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:46.967 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:46.967 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:46.992 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:48.699 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 42 undrawn cards
+2025-05-28 04:44:48.700 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:48.700 29483-29483 GameViewModel           com.benchopo.firering                D  Jack Rule selected by another player, loading rule details
+2025-05-28 04:44:48.700 29483-29483 GameViewModel           com.benchopo.firering                D  Found selected Jack Rule: Most Likely To
+2025-05-28 04:44:48.700 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:48.700 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:48.700 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:48.706 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Jack Rule: Most Likely To
+2025-05-28 04:44:48.716 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:48.886 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 42 undrawn cards
+2025-05-28 04:44:48.887 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:48.887 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:48.887 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:48.887 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:48.900 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Jack Rule: Most Likely To
+2025-05-28 04:44:48.904 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:48.911 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:48.911 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Most Likely To
+2025-05-28 04:44:49.833 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 42 undrawn cards
+2025-05-28 04:44:49.834 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:49.835 29483-29483 GameViewModel           com.benchopo.firering                D  Jack Rule was cleared, updating local state
+2025-05-28 04:44:49.835 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:49.835 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:49.835 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:49.848 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 42 undrawn cards
+2025-05-28 04:44:49.849 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:49.849 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:49.849 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:49.849 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:49.860 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:49.863 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:49.863 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Most Likely To
+2025-05-28 04:44:50.737 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:50.737 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Most Likely To
+2025-05-28 04:44:50.755 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 10 cards in drawnCardsList
+2025-05-28 04:44:50.767 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 42 undrawn cards after filtering
+2025-05-28 04:44:50.767 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 9 of Hearts (9-Hearts-8)
+2025-05-28 04:44:50.767 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:50.767 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:50.784 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 41 undrawn cards
+2025-05-28 04:44:50.785 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:50.785 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 9-Hearts-8
+2025-05-28 04:44:50.785 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 9 of Hearts
+2025-05-28 04:44:50.785 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:50.785 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:50.785 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:50.791 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:50.794 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:50.794 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Most Likely To
+2025-05-28 04:44:50.920 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:50.929 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:50.929 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Most Likely To
+2025-05-28 04:44:50.939 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:50.943 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:50.943 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:50.944 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 10
+2025-05-28 04:44:50.945 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking rule: Most Likely To, expiresAfter: 26189078-3f6f-4449-895d-8dfe08d0f7fd, createdTurn: 9, currentTurn: 10
+2025-05-28 04:44:50.945 29483-29483 FirebaseRepository      com.benchopo.firering                D  Jack Rule 'Most Likely To' remains active
+2025-05-28 04:44:50.945 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:50.961 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 41 undrawn cards
+2025-05-28 04:44:50.962 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:50.962 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:50.962 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:50.962 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:50.972 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:50.974 29483-29483 GameScreen              com.benchopo.firering                D  Active Jack Rules in GameScreen: 1
+2025-05-28 04:44:50.974 29483-29483 GameScreen              com.benchopo.firering                D  Displaying active rule: Most Likely To
+2025-05-28 04:44:51.096 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #11)
+2025-05-28 04:44:52.187 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 40 undrawn cards
+2025-05-28 04:44:52.188 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:52.188 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: A-Hearts-0
+2025-05-28 04:44:52.188 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: A of Hearts
+2025-05-28 04:44:52.188 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:52.188 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:52.188 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:52.201 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 40 undrawn cards
+2025-05-28 04:44:52.202 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:52.202 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:52.202 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:52.202 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:52.206 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:52.497 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 40 undrawn cards
+2025-05-28 04:44:52.498 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:52.499 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:52.499 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:52.499 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:52.530 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:53.417 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 12 cards in drawnCardsList
+2025-05-28 04:44:53.426 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 40 undrawn cards after filtering
+2025-05-28 04:44:53.426 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 3 of Diamonds (3-Diamonds-15)
+2025-05-28 04:44:53.426 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:53.426 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:53.447 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 39 undrawn cards
+2025-05-28 04:44:53.447 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:53.448 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 3-Diamonds-15
+2025-05-28 04:44:53.448 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 3 of Diamonds
+2025-05-28 04:44:53.448 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:53.448 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:53.448 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:53.453 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:53.588 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:53.606 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:53.610 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:53.610 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:53.611 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 12
+2025-05-28 04:44:53.612 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:53.628 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 39 undrawn cards
+2025-05-28 04:44:53.628 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:53.628 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:53.629 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:53.629 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:53.640 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:53.727 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #13)
+2025-05-28 04:44:54.750 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 38 undrawn cards
+2025-05-28 04:44:54.750 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:54.751 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 9-Diamonds-21
+2025-05-28 04:44:54.751 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 9 of Diamonds
+2025-05-28 04:44:54.751 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:54.751 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:54.751 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:54.760 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:54.826 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 38 undrawn cards
+2025-05-28 04:44:54.827 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:54.827 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:54.827 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:54.827 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:54.848 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:55.526 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 14 cards in drawnCardsList
+2025-05-28 04:44:55.537 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 38 undrawn cards after filtering
+2025-05-28 04:44:55.537 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 5 of Spades (5-Spades-43)
+2025-05-28 04:44:55.537 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:55.537 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:55.553 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 37 undrawn cards
+2025-05-28 04:44:55.554 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:55.554 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 5-Spades-43
+2025-05-28 04:44:55.554 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 5 of Spades
+2025-05-28 04:44:55.554 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:55.554 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:55.554 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:55.560 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:55.688 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:55.706 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:55.710 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:55.711 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:55.711 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 14
+2025-05-28 04:44:55.711 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:55.729 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 37 undrawn cards
+2025-05-28 04:44:55.729 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:55.730 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:55.730 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:55.730 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:55.738 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:55.852 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #15)
+2025-05-28 04:44:56.690 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 36 undrawn cards
+2025-05-28 04:44:56.691 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:56.691 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 3-Spades-41
+2025-05-28 04:44:56.691 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 3 of Spades
+2025-05-28 04:44:56.691 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:56.691 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:56.691 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:56.710 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:56.792 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 36 undrawn cards
+2025-05-28 04:44:56.793 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:56.793 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:56.793 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:56.793 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:56.806 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:57.404 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 16 cards in drawnCardsList
+2025-05-28 04:44:57.414 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 36 undrawn cards after filtering
+2025-05-28 04:44:57.414 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 6 of Diamonds (6-Diamonds-18)
+2025-05-28 04:44:57.414 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:44:57.414 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:44:57.431 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 35 undrawn cards
+2025-05-28 04:44:57.432 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:57.432 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 6-Diamonds-18
+2025-05-28 04:44:57.432 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 6 of Diamonds
+2025-05-28 04:44:57.432 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:57.432 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:57.432 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:57.437 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:57.573 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:44:57.575 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:57.595 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:44:57.595 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:44:57.596 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 16
+2025-05-28 04:44:57.596 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:44:57.612 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 35 undrawn cards
+2025-05-28 04:44:57.612 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:57.612 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:57.612 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:57.612 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:57.629 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:57.742 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #17)
+2025-05-28 04:44:58.533 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 34 undrawn cards
+2025-05-28 04:44:58.534 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:58.534 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 8-Hearts-7
+2025-05-28 04:44:58.534 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 8 of Hearts
+2025-05-28 04:44:58.534 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:58.535 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:44:58.535 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:44:58.555 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:44:59.973 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 34 undrawn cards
+2025-05-28 04:44:59.974 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:44:59.974 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:44:59.974 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:59.975 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:44:59.986 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:09.292 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 34 undrawn cards
+2025-05-28 04:45:09.293 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:09.293 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:09.293 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:09.293 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:09.314 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:11.079 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 18 cards in drawnCardsList
+2025-05-28 04:45:11.086 29483-29483 FirebaseRepository      com.benchopo.firering                D  Found 34 undrawn cards after filtering
+2025-05-28 04:45:11.086 29483-29483 FirebaseRepository      com.benchopo.firering                D  Drawing card: 4 of Clubs (4-Clubs-29)
+2025-05-28 04:45:11.086 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card currently drawn status: false
+2025-05-28 04:45:11.086 29483-29483 FirebaseRepository      com.benchopo.firering                D  Writing updates to database
+2025-05-28 04:45:11.103 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 33 undrawn cards
+2025-05-28 04:45:11.103 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:11.103 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 4-Clubs-29
+2025-05-28 04:45:11.103 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 4 of Clubs
+2025-05-28 04:45:11.104 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:11.104 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:11.104 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:11.109 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:11.229 29483-29483 FirebaseRepository      com.benchopo.firering                D  Card successfully marked as drawn
+2025-05-28 04:45:11.233 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired mates for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:45:11.250 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired mate relationships found
+2025-05-28 04:45:11.250 29483-29483 FirebaseRepository      com.benchopo.firering                D  Checking for expired Jack Rules for player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d
+2025-05-28 04:45:11.251 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn count: 18
+2025-05-28 04:45:11.252 29483-29483 FirebaseRepository      com.benchopo.firering                D  No expired Jack Rules found
+2025-05-28 04:45:11.269 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 33 undrawn cards
+2025-05-28 04:45:11.270 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:11.270 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:11.270 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:11.270 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:11.279 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:11.399 29483-29483 FirebaseRepository      com.benchopo.firering                D  Advanced turn from player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d to 26189078-3f6f-4449-895d-8dfe08d0f7fd (turn #19)
+2025-05-28 04:45:12.777 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 32 undrawn cards
+2025-05-28 04:45:12.778 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:12.778 29483-29483 GameViewModel           com.benchopo.firering                D  Updating current card to match room's currentCardId: 10-Diamonds-22
+2025-05-28 04:45:12.778 29483-29483 GameViewModel           com.benchopo.firering                D  Found current card: 10 of Diamonds
+2025-05-28 04:45:12.778 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:12.778 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:12.778 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:12.795 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:15.641 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 32 undrawn cards
+2025-05-28 04:45:15.641 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:15.641 29483-29483 GameViewModel           com.benchopo.firering                D  Mini Game selected by another player, loading game details
+2025-05-28 04:45:15.642 29483-29483 GameViewModel           com.benchopo.firering                D  Found selected Mini Game: Categories
+2025-05-28 04:45:15.642 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:15.642 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:15.642 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:15.661 29483-29483 GameScreen              com.benchopo.firering                D  Displaying selected Mini Game: Categories
+2025-05-28 04:45:15.682 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:16.759 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 32 undrawn cards
+2025-05-28 04:45:16.760 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:16.760 29483-29483 GameViewModel           com.benchopo.firering                D  Mini Game was cleared, updating local state
+2025-05-28 04:45:16.761 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:16.761 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:16.761 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: [26189078-3f6f-4449-895d-8dfe08d0f7fd]
+2025-05-28 04:45:16.775 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 32 undrawn cards
+2025-05-28 04:45:16.775 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:16.775 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:16.775 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:45:16.775 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:45:16.780 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:16.823 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 32 undrawn cards
+2025-05-28 04:45:16.824 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 2 players
+2025-05-28 04:45:16.824 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:16.824 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:45:16.824 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:45:16.831 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:19.521 29483-29483 FirebaseRepository      com.benchopo.firering                D  Deck contains 32 undrawn cards
+2025-05-28 04:45:19.522 29483-29483 GameViewModel           com.benchopo.firering                D  Room update received: 1 players
+2025-05-28 04:45:19.522 29483-29483 GameViewModel           com.benchopo.firering                D  Checking mate changes for player Porras
+2025-05-28 04:45:19.522 29483-29483 GameViewModel           com.benchopo.firering                D  Old mates: []
+2025-05-28 04:45:19.522 29483-29483 GameViewModel           com.benchopo.firering                D  New mates: []
+2025-05-28 04:45:19.548 29483-29483 GameScreen              com.benchopo.firering                D  Current player: Porras, drink count: 1
+2025-05-28 04:45:20.985 29483-29483 GameScreen              com.benchopo.firering                D  Exit button pressed, showing leave dialog
+2025-05-28 04:45:21.879 29483-29483 GameScreen              com.benchopo.firering                D  Confirming leave game
+2025-05-28 04:45:21.880 29483-29483 FirebaseRepository      com.benchopo.firering                D  Removing player Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d from room HKD1K
+2025-05-28 04:45:21.912 29483-29483 FirebaseRepository      com.benchopo.firering                D  Current turn order: [Porras68f79fd1-c39f-4c17-9a70-2fe28638a91d]
+2025-05-28 04:45:21.913 29483-29483 FirebaseRepository      com.benchopo.firering                D  New turn order after removal: []
+2025-05-28 04:45:21.913 29483-29483 FirebaseRepository      com.benchopo.firering                D  Last player leaving room HKD1K - deleting room
+2025-05-28 04:45:21.915 29483-29483 GameViewModel           com.benchopo.firering                W  Received null room data in join flow
+2025-05-28 04:45:22.067 29483-29483 FirebaseRepository      com.benchopo.firering                D  Room HKD1K deleted successfully
+2025-05-28 04:45:22.067 29483-29483 GameViewModel           com.benchopo.firering                D  Clearing all game data
+2025-05-28 04:45:22.068 29483-29483 GameViewModel           com.benchopo.firering                D  Game data cleared
+2025-05-28 04:45:22.068 29483-29483 GameScreen              com.benchopo.firering                D  Navigating to home
+2025-05-28 04:45:22.176 29483-29483 GameScreen              com.benchopo.firering                D  Current player: null, drink count: null
+2025-05-28 04:45:22.232 29483-29483 GameScreen              com.benchopo.firering                D  Room no longer exists or has no players, returning to home
+2025-05-28 04:45:22.232 29483-29483 GameViewModel           com.benchopo.firering                D  Clearing all game data
+2025-05-28 04:45:22.232 29483-29483 GameViewModel           com.benchopo.firering                D  Game data cleared
+2025-05-28 04:45:22.236 29483-29483 GameViewModel           com.benchopo.firering                D  Clearing all game data
+2025-05-28 04:45:22.236 29483-29483 GameViewModel           com.benchopo.firering                D  Game data cleared
+2025-05-28 04:45:22.325 29483-29483 GameViewModel           com.benchopo.firering                D  Clearing all game data
+2025-05-28 04:45:22.325 29483-29483 GameViewModel           com.benchopo.firering                D  Game data cleared

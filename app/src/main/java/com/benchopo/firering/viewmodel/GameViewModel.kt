@@ -15,6 +15,8 @@ import kotlinx.coroutines.delay
 class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     private val repository = FirebaseRepository()
 
+    private var mateSelectionInProgress = false
+
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
@@ -255,20 +257,24 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                         _showMateSelector.value = true
                     }
                     "J" -> {
-                        _showJackRuleSelector.value = true
-                        loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL)
+                        // FIXED: Load rules first, then show selector
+                        loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL, onLoadComplete = {
+                            // Only show selector after rules are loaded
+                            _showJackRuleSelector.value = true
+                        })
                     }
                     "10" -> {
-                        _showMiniGameSelector.value = true
-                        loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL)
+                        // FIXED: Load games first, then show selector
+                        loadRulesAndGames(_gameRoom.value?.gameMode ?: GameMode.NORMAL, onLoadComplete = {
+                            // Only show selector after games are loaded
+                            _showMiniGameSelector.value = true
+                        })
                     }
                     else -> {
-                        // For non-special cards, auto-advance the turn after a short delay
+                        // For non-special cards, auto-advance the turn
                         if (card != null && !isSpecialCard(card.value)) {
                             viewModelScope.launch {
                                 repository.advanceTurn(roomCode)
-                                // Remove this line to keep the card visible:
-                                // _drawnCard.value = null
                             }
                         }
                     }
@@ -700,7 +706,7 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     }
 
     // Load rules and games
-    private fun loadRulesAndGames(gameMode: GameMode) {
+    private fun loadRulesAndGames(gameMode: GameMode, onLoadComplete: () -> Unit = {}) {
         viewModelScope.launch {
             try {
                 // Get default rules and games
@@ -750,6 +756,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 }
 
                 Log.d("GameViewModel", "Finished loading rules and games: ${_jackRules.value.size} rules, ${_miniGames.value.size} games")
+
+                // ADDED: Call completion callback after data is loaded
+                onLoadComplete()
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Error loading rules and games", e)
                 _error.value = "Failed to load rules and games: ${e.message}"
@@ -846,12 +855,12 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     fun selectMate(mateId: String) {
         Log.d("GameViewModel", "Selecting mate with ID: $mateId")
 
+        mateSelectionInProgress = true  // Set flag to prevent override
         _showMateSelector.value = false
 
         val roomCode = _roomCode.value ?: return
         val playerId = _playerId.value ?: return
 
-        // Get player names for better logging
         val playerName = _gameRoom.value?.players?.get(playerId)?.name ?: "Unknown"
         val mateName = _gameRoom.value?.players?.get(mateId)?.name ?: "Unknown"
 
@@ -859,58 +868,36 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Get existing mates before making changes
-                val playerBefore = _gameRoom.value?.players?.get(playerId)
-                val mateBefore = _gameRoom.value?.players?.get(mateId)
+                // Set the notification immediately so it shows right away
+                _newMateRelationships.value = setOf(mateId)
+                Log.d("GameViewModel", "Setting notification for mate: $mateId (${mateName})")
 
-                // Record the old mate chains to compare after update
-                val oldPlayerMates = playerBefore?.mateIds?.toSet() ?: emptySet()
-                val oldMateMates = mateBefore?.mateIds?.toSet() ?: emptySet()
-
-                Log.d("GameViewModel", "Player '$playerName' existing mates: $oldPlayerMates")
-                Log.d("GameViewModel", "Mate '$mateName' existing mates: $oldMateMates")
-
-                // Perform the mate update
+                // Update the database
                 repository.setPlayerMate(roomCode, playerId, mateId)
 
-                // No need to advance turn here - we'll wait for the notification dialog to be acknowledged
-                delay(2000) // Small delay to ensure Firebase updates are processed
+                // Wait a short time to make sure the Firebase update propagates
+                delay(500)
 
-                // Get updated room data to see new mate relationships
-                val updatedRoom = repository.getRoomOnce(roomCode)
-
-                if (updatedRoom != null) {
-                    // Analyze mate chains to see who was affected
-                    val newPlayerMates = updatedRoom.players[playerId]?.mateIds?.toSet() ?: emptySet()
-                    val newMateMates = updatedRoom.players[mateId]?.mateIds?.toSet() ?: emptySet()
-
-                    Log.d("GameViewModel", "After update - Player '$playerName' mates: $newPlayerMates")
-                    Log.d("GameViewModel", "After update - Mate '$mateName' mates: $newMateMates")
-
-                    // Find all new relationships that were created
-                    val allNewRelationships = (newPlayerMates - oldPlayerMates) + (newMateMates - oldMateMates)
-                    Log.d("GameViewModel", "All new mate relationships: $allNewRelationships")
-
-                    // Update state to trigger notifications
-                    _newMateRelationships.value = allNewRelationships
-
-                    // Schedule auto-advance after notification period
-                    viewModelScope.launch {
-                        delay(5000) // Wait 5 seconds for notification
-                        Log.d("GameViewModel", "Clearing mate notification and advancing turn")
-                        _newMateRelationships.value = emptySet()
-                        advanceTurn()
-                    }
-                } else {
-                    // If we couldn't get updated data, just advance the turn
-                    Log.d("GameViewModel", "Failed to get updated room data, advancing turn")
-                    advanceTurn()
-                }
+                // Clear the flag
+                mateSelectionInProgress = false
             } catch (e: Exception) {
+                mateSelectionInProgress = false  // Clear flag on error
                 Log.e("GameViewModel", "Error setting mate relationship", e)
                 _error.value = "Failed to set mate: ${e.message}"
-                advanceTurn() // Advance turn even if there was an error
             }
+        }
+    }
+
+    // Add a method to clear the mate notification and advance the turn
+    fun clearMateNotification() {
+        _newMateRelationships.value = emptySet()
+
+        // If this was the player who drew the 8, advance the turn
+        val currentPlayerId = _gameRoom.value?.currentPlayerId
+        val playerId = _playerId.value
+
+        if (currentPlayerId == playerId) {
+            advanceTurn()
         }
     }
 
@@ -940,6 +927,12 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
     }
 
     private fun detectNewMates(oldPlayer: Player?, newPlayer: Player?) {
+        // Skip automatic detection if manual selection is in progress
+        if (mateSelectionInProgress) {
+            Log.d("GameViewModel", "Skipping automatic mate detection during manual selection")
+            return
+        }
+
         if (oldPlayer != null && newPlayer != null && oldPlayer.id == newPlayer.id) {
             // Check if any new mates were added
             val oldMates = oldPlayer.mateIds.toSet()
@@ -953,17 +946,10 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 // New mates were added
                 val addedMates = newMates - oldMates
                 Log.d("GameViewModel", "New mate relationships detected: $addedMates")
-                _newMateRelationships.value = addedMates
-
-                // Schedule auto-clear of notification after 5 seconds
-                viewModelScope.launch {
-                    delay(5000)
-                    _newMateRelationships.value = emptySet()
+                // Only set if we have changes and aren't in manual selection mode
+                if (addedMates.isNotEmpty()) {
+                    _newMateRelationships.value = addedMates
                 }
-            } else if (newMates.size < oldMates.size) {
-                // Mates were removed (expired)
-                val removedMates = oldMates - newMates
-                Log.d("GameViewModel", "Mate relationships expired: $removedMates")
             }
         }
     }
