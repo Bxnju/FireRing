@@ -331,11 +331,25 @@ fun GameScreen(
                 )
 
                 if (drawnCard == null) {
-                    Text(
-                        "No card drawn yet",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
-                    )
+                    Card(
+                        modifier = Modifier
+                            .size(140.dp, 200.dp)
+                            .padding(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                "Draw a Card",
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 } else {
                     Card(
                         modifier = Modifier
@@ -355,7 +369,7 @@ fun GameScreen(
                             )
                             Text(
                                 drawnCard?.suit ?: "",
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -389,7 +403,7 @@ fun GameScreen(
 
             // Active Rules Section
             if (activeJackRules.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Card(
                     modifier = Modifier
@@ -425,7 +439,6 @@ fun GameScreen(
             }
 
             // Player Drink Counter Section - Only current player
-            Spacer(modifier = Modifier.height(24.dp))
 
             // Find current player from the players list
             val myPlayer = remember(gameRoom, playerId) {
