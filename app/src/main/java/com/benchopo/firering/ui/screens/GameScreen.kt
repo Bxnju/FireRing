@@ -29,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.benchopo.firering.model.GameRoom
@@ -44,12 +43,13 @@ fun GameScreen(
     navController: NavController,
     roomCode: String,
     gameViewModel: GameViewModel,
+    userViewModel: UserViewModel,
 ) {
     // Add exit dialog state
     var showLeaveDialog by remember { mutableStateOf(false) }
     var showCardHistoryModal by remember { mutableStateOf(false) }
     var showDrinkAlert by remember { mutableStateOf(false) }
-    var lastDrinkMilestone by remember { mutableStateOf(-1) }
+    var lastDrinkMilestone by remember { mutableIntStateOf(-1) }
 
     // Handle system back button
     BackHandler {
@@ -490,7 +490,7 @@ fun GameScreen(
                             }
                         }
                     }
-                ) { Text("Leave", color = androidx.compose.ui.graphics.Color.White) }
+                ) { Text("Leave", color = Color.White) }
             },
             dismissButton = {
                 TextButton(onClick = { showLeaveDialog = false }) { Text("Cancel") }
