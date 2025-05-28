@@ -333,7 +333,7 @@ fun GameScreen(
                 if (drawnCard == null) {
                     Card(
                         modifier = Modifier
-                            .size(140.dp, 200.dp)
+                            .size(150.dp, 210.dp)
                             .padding(8.dp)
                     ) {
                         Column(
@@ -353,7 +353,7 @@ fun GameScreen(
                 } else {
                     Card(
                         modifier = Modifier
-                            .size(140.dp, 200.dp)
+                            .size(150.dp, 210.dp)
                             .padding(8.dp)
                     ) {
                         Column(
