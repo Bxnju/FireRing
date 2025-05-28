@@ -1,5 +1,11 @@
 package com.benchopo.firering.ui.screens
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.media.MediaPlayer
 import android.util.Log
 import com.benchopo.firering.R
 import androidx.compose.foundation.background
@@ -30,6 +36,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
@@ -37,6 +44,7 @@ import com.benchopo.firering.ui.components.JackRuleSelector
 import com.benchopo.firering.ui.components.MiniGameSelector
 import com.benchopo.firering.ui.components.PlayerSelector
 import com.benchopo.firering.ui.components.MateSelector
+import kotlin.math.sqrt
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +55,55 @@ fun GameScreen(
     gameViewModel: GameViewModel,
     userViewModel: UserViewModel,
 ) {
+    //Easter egg smash botlle
+    val context = LocalContext.current
+    val shakeThreshold = 12f
+    var lastShakeTime by remember { mutableLongStateOf(0L) }
+    var shakeCount by remember { mutableIntStateOf(0) }
+    val sensorManager = remember { context.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
+    val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    var mediaPlayer: MediaPlayer? by remember { mutableStateOf(null) }
+
+    // Easter egg smash botlle - Shake detection logic
+    DisposableEffect(Unit) {
+        val sensorEventListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent?) {
+                event?.let {
+                    val x = it.values[0]
+                    val y = it.values[1]
+                    val z = it.values[2]
+
+                    val acceleration = sqrt(x * x + y * y + z * z) - SensorManager.GRAVITY_EARTH
+
+                    if (acceleration > shakeThreshold) {
+                        val currentTime = System.currentTimeMillis()
+
+                        if (currentTime - lastShakeTime > 500) {
+                            shakeCount++
+                            lastShakeTime = currentTime
+
+                            if (shakeCount >= 4) {
+                                mediaPlayer = MediaPlayer.create(context, R.raw.bottle_smash)
+                                mediaPlayer?.start()
+                                shakeCount = 0
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+
+        onDispose {
+            sensorManager.unregisterListener(sensorEventListener)
+            mediaPlayer?.release()
+            mediaPlayer = null
+        }
+    }
+
     // Add exit dialog state
     var showLeaveDialog by remember { mutableStateOf(false) }
     var showCardHistoryModal by remember { mutableStateOf(false) }
