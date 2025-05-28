@@ -76,9 +76,13 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     private var activeRoomJob: Job? = null
 
+    // New properties for game mode
+    private val _selectedGameMode = MutableStateFlow(GameMode.NORMAL)
+    val selectedGameMode: StateFlow<GameMode> = _selectedGameMode
+
     // Called when creating a new room
     fun createRoom(hostPlayerName: String, onComplete: () -> Unit = {}) {
-        Log.d("GameViewModel", "Creating room with host: $hostPlayerName")
+        Log.d("GameViewModel", "Creating room with host: $hostPlayerName, mode: ${_selectedGameMode.value}")
         _loading.value = true
         viewModelScope.launch {
             try {
@@ -86,9 +90,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 val userId = UUID.randomUUID().toString()
                 Log.d("GameViewModel", "Generated user ID: $userId")
 
-                // 2. Create the room in Firebase
-                val code = repository.createGameRoom(hostPlayerName, userId)
-                Log.d("GameViewModel", "Room created successfully with code: $code")
+                // 2. Create the room in Firebase with the selected game mode
+                val code = repository.createGameRoom(hostPlayerName, userId, _selectedGameMode.value)
+                Log.d("GameViewModel", "Room created successfully with code: $code and mode: ${_selectedGameMode.value}")
 
                 // 3. Set local state
                 _playerId.value = userId
@@ -837,5 +841,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 Log.d("GameViewModel", "Mate relationships expired: $removedMates")
             }
         }
+    }
+
+    fun setGameMode(mode: GameMode) {
+        _selectedGameMode.value = mode
     }
 }

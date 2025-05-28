@@ -14,13 +14,18 @@ class FirebaseRepository {
     private val db = FirebaseDatabase.getInstance().reference
 
     // Room Operations
-    suspend fun createGameRoom(hostPlayerName: String, userId: String): String {
-        Log.d("FirebaseRepository", "Creating game room for host: $hostPlayerName with ID: $userId")
+    suspend fun createGameRoom(
+        hostPlayerName: String,
+        userId: String,
+        gameMode: GameMode = GameMode.NORMAL
+    ): String {
+        Log.d("FirebaseRepository", "Creating game room for host: $hostPlayerName with ID: $userId, mode: $gameMode")
         val roomCode = generateRoomCode()
         Log.d("FirebaseRepository", "Generated room code: $roomCode")
 
-        val deck = generateDeck()
-        Log.d("FirebaseRepository", "Generated deck with ${deck.size} cards")
+        // Generate a deck appropriate for the game mode
+        val deck = generateDeckForGameMode(gameMode)
+        Log.d("FirebaseRepository", "Generated deck with ${deck.size} cards for mode: $gameMode")
 
         val hostPlayerId = userId // Use the provided userId instead of generating one
         val player =
@@ -36,15 +41,14 @@ class FirebaseRepository {
         Log.d("FirebaseRepository", "Preparing room data structure")
 
         // Create the room info
-        val roomInfo =
-                mapOf(
-                        "roomCode" to roomCode,
-                        "hostId" to hostPlayerId,
-                        "gameState" to GameState.WAITING.name,
-                        "kingsCupCount" to 0,
-                        "gameMode" to GameMode.NORMAL.name,
-                        "createdAt" to System.currentTimeMillis()
-                )
+        val roomInfo = mapOf(
+            "roomCode" to roomCode,
+            "hostId" to hostPlayerId,
+            "gameState" to GameState.WAITING.name,
+            "kingsCupCount" to 0,
+            "gameMode" to gameMode.name,
+            "createdAt" to System.currentTimeMillis()
+        )
 
         // Set up initial data
         val updates =
@@ -877,4 +881,159 @@ class FirebaseRepository {
 
     // Call this in the setPlayerMate method before returning:
     // debugMateChain(roomCode)
+
+    // Add this helper method to create decks tailored to game modes
+    fun generateDeckForGameMode(gameMode: GameMode): List<Card> {
+        val suits = listOf("Hearts", "Diamonds", "Clubs", "Spades")
+        val values = listOf("A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K")
+        val deck = mutableListOf<Card>()
+
+        // Rules customized by game mode
+        val ruleMap = getRuleMapForGameMode(gameMode)
+
+        for (suit in suits) {
+            for (value in values) {
+                val ruleId = "rule_${value.lowercase()}"
+                val ruleTitle = getRuleTitleForCard(value)
+                val ruleDescription = ruleMap[value] ?: getDefaultRuleDescription(value)
+
+                deck.add(
+                    Card(
+                        id = "$value-$suit-${deck.size}",
+                        value = value,
+                        suit = suit,
+                        ruleId = ruleId,
+                        ruleTitle = ruleTitle,
+                        ruleDescription = ruleDescription,
+                        isDrawn = false
+                    )
+                )
+            }
+        }
+
+        deck.shuffle()
+        return deck
+    }
+
+    private fun getRuleMapForGameMode(gameMode: GameMode): Map<String, String> {
+        return when (gameMode) {
+            GameMode.NORMAL -> mapOf(
+                "A" to "Waterfall: Everyone starts drinking; no one can stop until the person to their right stops.",
+                "2" to "You: Choose someone to take a drink.",
+                "3" to "Me: You take a drink.",
+                "4" to "Floor: Last person to touch the floor drinks.",
+                "5" to "Guys: All guys drink.",
+                "6" to "Chicks: All girls drink.",
+                "7" to "Heaven: Last person to point up drinks.",
+                "8" to "Mate: Choose a drinking buddy. They drink when you drink.",
+                "9" to "Rhyme: Say a word, and the next person must say a word that rhymes.",
+                "10" to "Categories: Choose a category, and each player must name something in that category.",
+                "J" to "Rule: Make a rule that everyone must follow until the next Jack is drawn.",
+                "Q" to "Question Master: You are the Question Master. Anyone who answers your questions drinks.",
+                "K" to "King's Cup: Pour some of your drink into the center cup. Last King drawn drinks it all."
+            )
+
+            GameMode.CAMIONERO -> mapOf(
+                "A" to "Road Trip: Everyone starts drinking; no one can stop until the person to their right stops.",
+                "2" to "Pit Stop: Choose someone to take TWO drinks.",
+                "3" to "Fuel Up: You take TWO drinks.",
+                "4" to "Highway: Last person to pretend to drive a truck drinks twice.",
+                "5" to "Radio Check: Everyone must speak like a trucker using CB radio lingo.",
+                "6" to "Passing Lane: Person to your left drinks twice.",
+                "7" to "Long Haul: Count to 7, replacing any number containing 7 with 'BEEP'. Fail = drink.",
+                "8" to "Co-pilot: Choose a drinking buddy. They drink double when you drink.",
+                "9" to "Rest Area: Take a break - everyone else drinks.",
+                "10" to "Truck Stop: Everyone drinks & shares their best road trip story.",
+                "J" to "Weigh Station: Make a hard-drinking rule everyone must follow.",
+                "Q" to "Ticket: You are the Highway Patrol. Hand out drinking tickets until next Queen.",
+                "K" to "Diesel King: Pour your drink into the center. Last King drinks it all and does a trucker impression."
+            )
+
+            GameMode.DESPECHADO -> mapOf(
+                "A" to "Tearfall: Everyone drinks to forget, starting with you and continuing around the circle.",
+                "2" to "Ex's Friend: Choose someone to drink - they remind you of your ex's friend.",
+                "3" to "Memory Lane: Drink and share something you miss about an ex.",
+                "4" to "Drunk Text: Last person to pretend to send a drunk text drinks.",
+                "5" to "Situationship: If you've ever been in a situationship, drink.",
+                "6" to "Ghosted: If you've ever been ghosted, drink.",
+                "7" to "On The Rebound: Last person to grab a personal item drinks.",
+                "8" to "Heartbreak Buddy: Choose someone who'll drink whenever love songs are mentioned.",
+                "9" to "Red Flags: Everyone names a relationship red flag. Anyone who's ignored that flag drinks.",
+                "10" to "Breakup Song: Start singing a breakup song. Everyone must join or drink.",
+                "J" to "Therapy Session: Make a rule about oversharing that everyone must follow.",
+                "Q" to "Drama Queen/King: You assign drinks to anyone talking about happy relationships.",
+                "K" to "Crying in the Club: Pour some drink in the center. Last King drinks it all while pretending to cry."
+            )
+
+            GameMode.CALENTURIENTOS -> mapOf(
+                "A" to "Hot Waterfall: Everyone drinks; can't stop until the person before stops.",
+                "2" to "Truth: Choose someone to answer a spicy truth question or drink twice.",
+                "3" to "Dare: You must perform a flirty dare or drink twice.",
+                "4" to "Floor is Lava: Last to get their feet off the floor drinks twice.",
+                "5" to "Never Have I Ever: Play one round of spicy Never Have I Ever.",
+                "6" to "Exes: Take a drink for each of your exes.",
+                "7" to "Heaven or Hell: Last to point up or down (your choice) drinks.",
+                "8" to "Flirt Mate: Choose someone to flirt with until next 8 is drawn.",
+                "9" to "Body Shots: If willing, take a body shot from someone of your choice.",
+                "10" to "Touchy Categories: Name spicy categories; everyone must answer.",
+                "J" to "Spicy Rule: Make a flirty rule everyone follows until next Jack.",
+                "Q" to "Strip Question: Ask questions; wrong answers mean removing an accessory.",
+                "K" to "Seduction King/Queen: Pour drink in center. Last King drinks while performing a seductive dance."
+            )
+
+            GameMode.MEDIA_COPAS -> mapOf(
+                "A" to "Dizzy Waterfall: Everyone drinks, spinning around once before stopping.",
+                "2" to "Double Vision: Choose two people to drink.",
+                "3" to "Triple Threat: You take three drinks.",
+                "4" to "Floor-ish: Last person to touch something low drinks.",
+                "5" to "High Five: Everyone must high five you or drink.",
+                "6" to "Sick Six: Make a sick face, last to copy drinks.",
+                "7" to "No Heaven: No pointing up at all until next 7, violations = drink.",
+                "8" to "Mate Squared: Choose TWO drinking buddies who drink whenever you drink.",
+                "9" to "Slurred Rhyme: Say a word, next person rhymes while speaking with a slur.",
+                "10" to "Forgotten Categories: Choose category, name items, but must forget previous ones.",
+                "J" to "Confusing Rule: Make a complex rule that's hard to follow when tipsy.",
+                "Q" to "Question Quandary: Everyone must speak in questions or drink.",
+                "K" to "Tipsy Royalty: Pour drink in center. Last King drinks it while trying to recite the alphabet backward."
+            )
+        }
+    }
+
+    private fun getRuleTitleForCard(value: String): String {
+        return when (value) {
+            "A" -> "Waterfall"
+            "2" -> "You"
+            "3" -> "Me"
+            "4" -> "Floor"
+            "5" -> "Guys"
+            "6" -> "Chicks"
+            "7" -> "Heaven"
+            "8" -> "Mate"
+            "9" -> "Rhyme"
+            "10" -> "Categories"
+            "J" -> "Make a Rule"
+            "Q" -> "Question Master"
+            "K" -> "King's Cup"
+            else -> "Unknown Rule"
+        }
+    }
+
+    private fun getDefaultRuleDescription(value: String): String {
+        return when (value) {
+            "A" -> "Waterfall: Everyone starts drinking; no one can stop until the person to their right stops."
+            "2" -> "You: Choose someone to take a drink."
+            "3" -> "Me: You take a drink."
+            "4" -> "Floor: Last person to touch the floor drinks."
+            "5" -> "Guys: All guys drink."
+            "6" -> "Chicks: All girls drink."
+            "7" -> "Heaven: Last person to point up drinks."
+            "8" -> "Mate: Choose a drinking buddy. They drink when you drink."
+            "9" -> "Rhyme: Say a word, and the next person must say a word that rhymes."
+            "10" -> "Categories: Choose a category, and each player must name something in that category."
+            "J" -> "Rule: Make a rule that everyone must follow until the next Jack is drawn."
+            "Q" -> "Question Master: You are the Question Master. Anyone who answers your questions drinks."
+            "K" -> "King's Cup: Pour some of your drink into the center cup. Last King drawn drinks it all."
+            else -> "Draw a card to see the rule"
+        }
+    }
 }

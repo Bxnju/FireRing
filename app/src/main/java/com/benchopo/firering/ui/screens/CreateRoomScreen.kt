@@ -23,6 +23,8 @@ import com.benchopo.firering.R
 import com.benchopo.firering.navigation.Routes
 import com.benchopo.firering.viewmodel.GameViewModel
 import com.benchopo.firering.viewmodel.UserViewModel
+import com.benchopo.firering.ui.components.GameModeSelector
+import com.benchopo.firering.model.GameMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +38,9 @@ fun CreateRoomScreen(
     val roomCode by gameViewModel.roomCode.collectAsState()
     val loading by gameViewModel.loading.collectAsState()
     var clickCount by remember { mutableStateOf(0) }
+
+    // Add state for selected game mode
+    val selectedGameMode by gameViewModel.selectedGameMode.collectAsState()
 
     LaunchedEffect(Unit) {
         Log.d("CreateRoomScreen", "Entered CreateRoomScreen, resetting loading state")
@@ -114,6 +119,15 @@ fun CreateRoomScreen(
                 value = playerName,
                 onValueChange = { playerName = it },
                 label = { Text("Your Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Game Mode Selector
+            GameModeSelector(
+                selectedMode = selectedGameMode,
+                onModeSelected = { gameViewModel.setGameMode(it) },
                 modifier = Modifier.fillMaxWidth()
             )
 
