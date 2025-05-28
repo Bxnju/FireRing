@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.benchopo.firering.model.Player
 import androidx.activity.compose.BackHandler
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun MateSelector(
@@ -177,20 +178,21 @@ fun MateSelector(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            Row(
+                            Column(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Button(
-                                    onClick = { expandedPlayerId = null }
-                                ) {
-                                    Text("Back")
-                                }
-
                                 Button(
                                     onClick = { onMateSelected(player.id) }
                                 ) {
-                                    Text("Select as Mate")
+                                    Text("Select as Mate", style = MaterialTheme.typography.bodySmall, color = Color.White)
+                                }
+
+                                Button(
+                                    onClick = { expandedPlayerId = null }
+                                ) {
+                                    Text("Back", style = MaterialTheme.typography.bodySmall, color = Color.White)
                                 }
                             }
                         }
