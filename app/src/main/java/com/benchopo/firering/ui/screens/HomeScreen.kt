@@ -165,7 +165,16 @@ fun HomeScreen(navController: NavController, gameViewModel: GameViewModel) {
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            "Version 0.1",
+            "Made by Benchopo - All rights reserved © 2025",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            "Version 1.0",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier

@@ -418,7 +418,7 @@ fun GameScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(if (isGameOver) "Game Over" else "Draw Card")
+                    Text(if (isGameOver) "Game Over" else "Draw Card", color = Color.White)
                 }
             }
 
