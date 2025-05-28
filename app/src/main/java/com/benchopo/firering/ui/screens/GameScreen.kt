@@ -608,9 +608,9 @@ fun DrinksAlert(
             Row {
                 Text("Drink Alert")
                 Image(
-                    painter = painterResource(id = R.drawable.ic_coctel),
-                    contentDescription = "Coctel Icon",
-                    modifier = Modifier.size(24.dp)
+                    painter = painterResource(id = R.drawable.ic_ron_glass),
+                    contentDescription = "Ron Glass Icon",
+                    modifier = Modifier.size(30.dp)
                 )
             }
         },
@@ -669,7 +669,6 @@ fun DrinksAlert(
                 Text(
                     text = randomMessage,
                     style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
                     modifier = Modifier.padding(8.dp)
                 )
             }
