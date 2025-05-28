@@ -22,18 +22,20 @@ import androidx.navigation.NavController
 import com.benchopo.firering.R
 import com.benchopo.firering.navigation.Routes
 import com.benchopo.firering.viewmodel.GameViewModel
+import com.benchopo.firering.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateRoomScreen(
     navController: NavController,
+    userViewModel: UserViewModel,
     gameViewModel: GameViewModel
 ) {
     var playerName by remember { mutableStateOf("") }
 
     val roomCode by gameViewModel.roomCode.collectAsState()
     val loading by gameViewModel.loading.collectAsState()
-    var clickCount by remember { mutableIntStateOf(0) }
+    var clickCount by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         Log.d("CreateRoomScreen", "Entered CreateRoomScreen, resetting loading state")
@@ -99,7 +101,7 @@ fun CreateRoomScreen(
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
                         clickCount++
-                        if (clickCount > 10) {
+                        if (clickCount >= 10) {
                             clickCount = 0
                         }
                     }
