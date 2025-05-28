@@ -293,11 +293,17 @@ fun GameScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .background(Color.Transparent),
                 contentAlignment = Alignment.Center
             ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_firering),
+                    contentDescription = "Card Back",
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 if (drawnCard == null) {
                     Text(
                         "No card drawn yet",
