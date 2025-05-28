@@ -402,42 +402,33 @@ fun GameScreen(
                 }
             }
 
-            // Active Rules Section
-            if (activeJackRules.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+            // Draw card button
+            Button(
+                onClick = {
+                    // Immediately disable button on click
+                    // drawButtonDisabled = true
+                    gameViewModel.drawCard()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                // Add drawButtonDisabled to the enabled conditions
+                enabled = isCurrentPlayerTurn && !loading && !isGameOver && !drawButtonDisabled
+            ) {
+                if (loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
                     )
-                ) {
-                    Column(modifier = Modifier.padding(top = 8.dp)) {
-                        // Add count of active rules for debugging
-                        Text(
-                            "${activeJackRules.size} Active Rules",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-
-                        ActiveRulesSection(
-                            activeRules = activeJackRules,
-                            onRuleClick = { ruleId ->
-                                gameViewModel.viewActiveRuleDetails(ruleId)
-                            }
-                        )
-                    }
-                }
-
-                // Add debug text to see active rules in UI
-                Log.d("GameScreen", "Active Jack Rules in GameScreen: ${activeJackRules.size}")
-                activeJackRules.forEach { (id, rule) ->
-                    Log.d("GameScreen", "Displaying active rule: ${rule.title}")
+                } else {
+                    Text(if (isGameOver) "Game Over" else "Draw Card")
                 }
             }
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Player Drink Counter Section - Only current player
 
@@ -518,6 +509,43 @@ fun GameScreen(
                 )
             }
 
+            // Active Rules Section
+            if (activeJackRules.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                        // Add count of active rules for debugging
+                        Text(
+                            "${activeJackRules.size} Active Rules",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+
+                        ActiveRulesSection(
+                            activeRules = activeJackRules,
+                            onRuleClick = { ruleId ->
+                                gameViewModel.viewActiveRuleDetails(ruleId)
+                            }
+                        )
+                    }
+                }
+
+                // Add debug text to see active rules in UI
+                Log.d("GameScreen", "Active Jack Rules in GameScreen: ${activeJackRules.size}")
+                activeJackRules.forEach { (id, rule) ->
+                    Log.d("GameScreen", "Displaying active rule: ${rule.title}")
+                }
+            }
+
             // Add after the player's drink counter section - only if player has mates
             if (myPlayer != null && myPlayer.mateIds.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -575,30 +603,6 @@ fun GameScreen(
             }
 
             Spacer(modifier = Modifier.weight(1f))
-
-            // Draw card button
-            Button(
-                onClick = {
-                    // Immediately disable button on click
-                    drawButtonDisabled = true
-                    gameViewModel.drawCard()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                // Add drawButtonDisabled to the enabled conditions
-                enabled = isCurrentPlayerTurn && !loading && !isGameOver && !drawButtonDisabled
-            ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(if (isGameOver) "Game Over" else "Draw Card")
-                }
-            }
 
             // Add this LaunchedEffect to reset the button state when appropriate
             LaunchedEffect(isCurrentPlayerTurn, drawnCard) {
