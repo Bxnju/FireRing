@@ -656,8 +656,28 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     // Load rules and games
     private fun loadRulesAndGames(gameMode: GameMode) {
-        _jackRules.value = GameRulesProvider.getDefaultJackRules(gameMode)
-        _miniGames.value = GameRulesProvider.getDefaultMiniGames(gameMode)
+        viewModelScope.launch {
+            try {
+                // Get default rules and games
+                val defaultRules = GameRulesProvider.getDefaultJackRules(gameMode)
+                val defaultGames = GameRulesProvider.getDefaultMiniGames(gameMode)
+
+                // Get custom rules and games from Firebase
+                val roomCode = _roomCode.value ?: return@launch
+                val customRules = repository.getCustomJackRules(roomCode)
+                val customGames = repository.getCustomMiniGames(roomCode)
+
+                // Combine default and custom content
+                _jackRules.value = defaultRules + customRules
+                _miniGames.value = defaultGames + customGames
+
+                Log.d("GameViewModel", "Loaded ${_jackRules.value.size} Jack Rules (${customRules.size} custom)")
+                Log.d("GameViewModel", "Loaded ${_miniGames.value.size} Mini Games (${customGames.size} custom)")
+            } catch (e: Exception) {
+                Log.e("GameViewModel", "Error loading rules and games", e)
+                _error.value = "Failed to load rules and games: ${e.message}"
+            }
+        }
     }
 
     // Select a Jack Rule
@@ -845,5 +865,61 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     fun setGameMode(mode: GameMode) {
         _selectedGameMode.value = mode
+    }
+
+    // Method to create a custom Jack Rule
+    fun createCustomJackRule(rule: JackRule) {
+        Log.d("GameViewModel", "Creating custom Jack Rule: ${rule.title}")
+
+        // Ensure the room and player IDs are available
+        val roomCode = _roomCode.value ?: return
+        val playerId = _playerId.value ?: return
+
+        // Set the creator ID
+        val updatedRule = rule.copy(createdByPlayerId = playerId)
+
+        // Add to local list for immediate use
+        val currentRules = _jackRules.value.toMutableList()
+        currentRules.add(updatedRule)
+        _jackRules.value = currentRules
+
+        // Save to Firebase
+        viewModelScope.launch {
+            try {
+                repository.saveCustomJackRule(roomCode, updatedRule)
+                Log.d("GameViewModel", "Custom Jack Rule saved successfully")
+            } catch (e: Exception) {
+                Log.e("GameViewModel", "Error saving custom Jack Rule", e)
+                _error.value = "Failed to save custom rule: ${e.message}"
+            }
+        }
+    }
+
+    // Method to create a custom Mini Game
+    fun createCustomMiniGame(game: MiniGame) {
+        Log.d("GameViewModel", "Creating custom Mini Game: ${game.title}")
+
+        // Ensure the room and player IDs are available
+        val roomCode = _roomCode.value ?: return
+        val playerId = _playerId.value ?: return
+
+        // Set the creator ID
+        val updatedGame = game.copy(createdByPlayerId = playerId)
+
+        // Add to local list for immediate use
+        val currentGames = _miniGames.value.toMutableList()
+        currentGames.add(updatedGame)
+        _miniGames.value = currentGames
+
+        // Save to Firebase
+        viewModelScope.launch {
+            try {
+                repository.saveCustomMiniGame(roomCode, updatedGame)
+                Log.d("GameViewModel", "Custom Mini Game saved successfully")
+            } catch (e: Exception) {
+                Log.e("GameViewModel", "Error saving custom Mini Game", e)
+                _error.value = "Failed to save custom game: ${e.message}"
+            }
+        }
     }
 }

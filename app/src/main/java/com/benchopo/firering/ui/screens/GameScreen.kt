@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import com.benchopo.firering.model.GameMode
 import com.benchopo.firering.model.GameRoom
 import com.benchopo.firering.model.Player
 import com.benchopo.firering.ui.components.JackRuleSelector
@@ -55,7 +56,7 @@ fun GameScreen(
     gameViewModel: GameViewModel,
     userViewModel: UserViewModel,
 ) {
-    //Easter egg smash botlle
+    //Easter egg smash bottle
     val context = LocalContext.current
     val shakeThreshold = 12f
     var lastShakeTime by remember { mutableLongStateOf(0L) }
@@ -64,7 +65,7 @@ fun GameScreen(
     val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     var mediaPlayer: MediaPlayer? by remember { mutableStateOf(null) }
 
-    // Easter egg smash botlle - Shake detection logic
+    // Easter egg smash bottle - Shake detection logic
     DisposableEffect(Unit) {
         val sensorEventListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
@@ -621,7 +622,7 @@ fun GameScreen(
         )
     }
 
-    // Add Jack Rule selection dialog
+    // Update the Jack Rule selection dialog
     if (showJackRuleSelector && isCurrentPlayerTurn) {
         Log.d("GameScreen", "Showing Jack Rule selector with ${jackRules.size} rules")
         JackRuleSelector(
@@ -630,14 +631,19 @@ fun GameScreen(
                 Log.d("GameScreen", "Jack Rule selected: ${it.title}")
                 gameViewModel.selectJackRule(it)
             },
+            onCustomRuleCreated = {
+                Log.d("GameScreen", "Custom Jack Rule created: ${it.title}")
+                gameViewModel.createCustomJackRule(it)
+            },
             onDismiss = {
                 Log.d("GameScreen", "Jack Rule selection cancelled")
                 gameViewModel.clearSelections()
-            }
+            },
+            currentGameMode = gameRoom?.gameMode ?: GameMode.NORMAL
         )
     }
 
-    // Add Mini Game selection dialog
+    // Update the Mini Game selection dialog
     if (showMiniGameSelector && isCurrentPlayerTurn) {
         Log.d("GameScreen", "Showing Mini Game selector with ${miniGames.size} games")
         MiniGameSelector(
@@ -646,10 +652,15 @@ fun GameScreen(
                 Log.d("GameScreen", "Mini Game selected: ${it.title}")
                 gameViewModel.selectMiniGame(it)
             },
+            onCustomGameCreated = {
+                Log.d("GameScreen", "Custom Mini Game created: ${it.title}")
+                gameViewModel.createCustomMiniGame(it)
+            },
             onDismiss = {
                 Log.d("GameScreen", "Mini Game selection cancelled")
                 gameViewModel.clearSelections()
-            }
+            },
+            currentGameMode = gameRoom?.gameMode ?: GameMode.NORMAL
         )
     }
 

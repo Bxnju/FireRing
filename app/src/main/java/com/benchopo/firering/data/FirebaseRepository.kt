@@ -232,6 +232,24 @@ class FirebaseRepository {
                             val selectedDrinkerId = snapshot.child("selectedDrinkerId").getValue(String::class.java)
                             val selectedDrinkerBy = snapshot.child("selectedDrinkerBy").getValue(String::class.java)
 
+                            // Extract custom Jack Rules
+                            val customJackRules = mutableListOf<JackRule>()
+                            snapshot.child("customJackRules").children.forEach { ruleSnapshot ->
+                                val rule = ruleSnapshot.getValue(JackRule::class.java)
+                                if (rule != null) {
+                                    customJackRules.add(rule)
+                                }
+                            }
+
+                            // Extract custom Mini Games
+                            val customMiniGames = mutableListOf<MiniGame>()
+                            snapshot.child("customMiniGames").children.forEach { gameSnapshot ->
+                                val game = gameSnapshot.getValue(MiniGame::class.java)
+                                if (game != null) {
+                                    customMiniGames.add(game)
+                                }
+                            }
+
                             // Build GameRoom object
                             val gameRoom =
                                     GameRoom(
@@ -252,7 +270,9 @@ class FirebaseRepository {
                                             currentMiniGameId = currentMiniGameId,
                                             currentMiniGameSelectedBy = currentMiniGameSelectedBy,
                                             selectedDrinkerId = selectedDrinkerId,
-                                            selectedDrinkerBy = selectedDrinkerBy
+                                            selectedDrinkerBy = selectedDrinkerBy,
+                                            customJackRules = customJackRules,
+                                            customMiniGames = customMiniGames
                                     )
 
                             trySend(gameRoom)
@@ -729,6 +749,24 @@ class FirebaseRepository {
             val selectedDrinkerId = snapshot.child("selectedDrinkerId").getValue(String::class.java)
             val selectedDrinkerBy = snapshot.child("selectedDrinkerBy").getValue(String::class.java)
 
+            // Extract custom Jack Rules
+            val customJackRules = mutableListOf<JackRule>()
+            snapshot.child("customJackRules").children.forEach { ruleSnapshot ->
+                val rule = ruleSnapshot.getValue(JackRule::class.java)
+                if (rule != null) {
+                    customJackRules.add(rule)
+                }
+            }
+
+            // Extract custom Mini Games
+            val customMiniGames = mutableListOf<MiniGame>()
+            snapshot.child("customMiniGames").children.forEach { gameSnapshot ->
+                val game = gameSnapshot.getValue(MiniGame::class.java)
+                if (game != null) {
+                    customMiniGames.add(game)
+                }
+            }
+
             // Build GameRoom object
             return GameRoom(
                     roomCode = roomCode,
@@ -748,7 +786,9 @@ class FirebaseRepository {
                     currentMiniGameId = currentMiniGameId,
                     currentMiniGameSelectedBy = currentMiniGameSelectedBy,
                     selectedDrinkerId = selectedDrinkerId,
-                    selectedDrinkerBy = selectedDrinkerBy
+                    selectedDrinkerBy = selectedDrinkerBy,
+                    customJackRules = customJackRules,
+                    customMiniGames = customMiniGames
             )
         } catch (e: Exception) {
             Log.e("FirebaseRepository", "Error parsing room snapshot", e)
@@ -1035,5 +1075,65 @@ class FirebaseRepository {
             "K" -> "King's Cup: Pour some of your drink into the center cup. Last King drawn drinks it all."
             else -> "Draw a card to see the rule"
         }
+    }
+
+    // Add these methods to the FirebaseRepository class
+
+    // Save a custom Jack Rule
+    suspend fun saveCustomJackRule(roomCode: String, rule: JackRule) {
+        Log.d("FirebaseRepository", "Saving custom Jack Rule: ${rule.title}")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        // Save to the custom rules collection
+        roomRef.child("customJackRules").child(rule.id).setValue(rule).await()
+        Log.d("FirebaseRepository", "Custom Jack Rule saved successfully")
+    }
+
+    // Save a custom Mini Game
+    suspend fun saveCustomMiniGame(roomCode: String, game: MiniGame) {
+        Log.d("FirebaseRepository", "Saving custom Mini Game: ${game.title}")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        // Save to the custom games collection
+        roomRef.child("customMiniGames").child(game.id).setValue(game).await()
+        Log.d("FirebaseRepository", "Custom Mini Game saved successfully")
+    }
+
+    // Get all custom Jack Rules for a room
+    suspend fun getCustomJackRules(roomCode: String): List<JackRule> {
+        Log.d("FirebaseRepository", "Fetching custom Jack Rules for room $roomCode")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val rulesSnapshot = roomRef.child("customJackRules").get().await()
+        val rules = mutableListOf<JackRule>()
+
+        rulesSnapshot.children.forEach { ruleSnapshot ->
+            val rule = ruleSnapshot.getValue(JackRule::class.java)
+            if (rule != null) {
+                rules.add(rule)
+            }
+        }
+
+        Log.d("FirebaseRepository", "Fetched ${rules.size} custom Jack Rules")
+        return rules
+    }
+
+    // Get all custom Mini Games for a room
+    suspend fun getCustomMiniGames(roomCode: String): List<MiniGame> {
+        Log.d("FirebaseRepository", "Fetching custom Mini Games for room $roomCode")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val gamesSnapshot = roomRef.child("customMiniGames").get().await()
+        val games = mutableListOf<MiniGame>()
+
+        gamesSnapshot.children.forEach { gameSnapshot ->
+            val game = gameSnapshot.getValue(MiniGame::class.java)
+            if (game != null) {
+                games.add(game)
+            }
+        }
+
+        Log.d("FirebaseRepository", "Fetched ${games.size} custom Mini Games")
+        return games
     }
 }

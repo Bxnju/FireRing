@@ -24,7 +24,9 @@ import kotlin.random.Random
 fun MiniGameSelector(
     games: List<MiniGame>,
     onGameSelected: (MiniGame) -> Unit,
-    onDismiss: () -> Unit
+    onCustomGameCreated: (MiniGame) -> Unit,
+    onDismiss: () -> Unit,
+    currentGameMode: GameMode = GameMode.NORMAL
 ) {
     var expandedGameId by remember { mutableStateOf<String?>(null) }
 
@@ -65,7 +67,16 @@ fun MiniGameSelector(
                     .fillMaxWidth()
                     .heightIn(max = 400.dp)
             ) {
-                if (expandedGameId != null) {
+                if (expandedGameId == "create_custom") {
+                    CustomGameCreator(
+                        onGameCreated = { newGame ->
+                            onCustomGameCreated(newGame)
+                            onGameSelected(newGame)
+                        },
+                        onCancel = { expandedGameId = null },
+                        currentGameMode = currentGameMode
+                    )
+                } else if (expandedGameId != null) {
                     // Show expanded game details
                     val game = games.find { it.id == expandedGameId }
                     if (game != null) {
@@ -123,6 +134,18 @@ fun MiniGameSelector(
                             Text("Select Random Game")
                         }
 
+                        // Add Create Custom Game button
+                        Button(
+                            onClick = { expandedGameId = "create_custom" },
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        ) {
+                            Text("Create Custom Game")
+                        }
+
                         games.forEach { game ->
                             Card(
                                 modifier = Modifier
@@ -162,6 +185,7 @@ fun MiniGameSelectorPreview() {
     MiniGameSelector(
         games = games,
         onGameSelected = { },
+        onCustomGameCreated = { },
         onDismiss = { }
     )
 }

@@ -19,7 +19,9 @@ import com.benchopo.firering.model.GameMode
 fun JackRuleSelector(
     rules: List<JackRule>,
     onRuleSelected: (JackRule) -> Unit,
-    onDismiss: () -> Unit
+    onCustomRuleCreated: (JackRule) -> Unit,
+    onDismiss: () -> Unit,
+    currentGameMode: GameMode = GameMode.NORMAL
 ) {
     var expandedRuleId by remember { mutableStateOf<String?>(null) }
 
@@ -60,7 +62,16 @@ fun JackRuleSelector(
                     .fillMaxWidth()
                     .heightIn(max = 400.dp)
             ) {
-                if (expandedRuleId != null) {
+                if (expandedRuleId == "create_custom") {
+                    CustomRuleCreator(
+                        onRuleCreated = { newRule ->
+                            onCustomRuleCreated(newRule)
+                            onRuleSelected(newRule)
+                        },
+                        onCancel = { expandedRuleId = null },
+                        currentGameMode = currentGameMode
+                    )
+                } else if (expandedRuleId != null) {
                     // Show expanded rule details
                     val rule = rules.find { it.id == expandedRuleId }
                     if (rule != null) {
@@ -118,6 +129,18 @@ fun JackRuleSelector(
                             Text("Select Random Rule")
                         }
 
+                        // Move the Create Custom Rule button INSIDE the scrollable Column
+                        Button(
+                            onClick = { expandedRuleId = "create_custom" },
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        ) {
+                            Text("Create Custom Rule")
+                        }
+
                         rules.forEach { rule ->
                             Card(
                                 modifier = Modifier
@@ -162,6 +185,7 @@ fun JackRuleSelectorPreview() {
             onRuleSelected = { rule ->
                 selectedRule = rule
             },
+            onCustomRuleCreated = { /* Handle custom rule creation */ },
             onDismiss = {}
         )
     }
