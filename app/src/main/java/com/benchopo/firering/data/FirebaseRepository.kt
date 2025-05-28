@@ -1136,4 +1136,35 @@ class FirebaseRepository {
         Log.d("FirebaseRepository", "Fetched ${games.size} custom Mini Games")
         return games
     }
+
+    // Add these methods to fetch individual custom rules and games
+    suspend fun getCustomJackRule(roomCode: String, ruleId: String): JackRule? {
+        Log.d("FirebaseRepository", "Fetching custom Jack Rule with ID: $ruleId")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val ruleSnapshot = roomRef.child("customJackRules").child(ruleId).get().await()
+        if (!ruleSnapshot.exists()) {
+            Log.d("FirebaseRepository", "Custom Jack Rule not found: $ruleId")
+            return null
+        }
+
+        val rule = ruleSnapshot.getValue(JackRule::class.java)
+        Log.d("FirebaseRepository", "Found custom Jack Rule: ${rule?.title}")
+        return rule
+    }
+
+    suspend fun getCustomMiniGame(roomCode: String, gameId: String): MiniGame? {
+        Log.d("FirebaseRepository", "Fetching custom Mini Game with ID: $gameId")
+        val roomRef = db.child("rooms").child(roomCode)
+
+        val gameSnapshot = roomRef.child("customMiniGames").child(gameId).get().await()
+        if (!gameSnapshot.exists()) {
+            Log.d("FirebaseRepository", "Custom Mini Game not found: $gameId")
+            return null
+        }
+
+        val game = gameSnapshot.getValue(MiniGame::class.java)
+        Log.d("FirebaseRepository", "Found custom Mini Game: ${game?.title}")
+        return game
+    }
 }

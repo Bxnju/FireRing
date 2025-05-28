@@ -581,16 +581,34 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             // A Jack Rule was selected, but we don't have it locally - load it
             Log.d("GameViewModel", "Jack Rule selected by another player, loading rule details")
 
-            // Load the jack rules if not already loaded
-            if (_jackRules.value.isEmpty()) {
-                loadRulesAndGames(gameRoom.gameMode)
-            }
-
             // Find the selected rule in our local list
             val rule = _jackRules.value.find { it.id == gameRoom.currentJackRuleId }
             if (rule != null) {
                 Log.d("GameViewModel", "Found selected Jack Rule: ${rule.title}")
                 _selectedJackRule.value = rule
+            } else {
+                // Rule not found locally - might be a custom rule created by another player
+                // Load it directly from Firebase
+                Log.d("GameViewModel", "Rule not found locally. Loading from Firebase: ${gameRoom.currentJackRuleId}")
+                viewModelScope.launch {
+                    try {
+                        val roomCode = _roomCode.value ?: return@launch
+                        val customRule = repository.getCustomJackRule(roomCode, gameRoom.currentJackRuleId)
+                        if (customRule != null) {
+                            Log.d("GameViewModel", "Loaded custom rule from Firebase: ${customRule.title}")
+
+                            // Add to local list for future reference
+                            val updatedRules = _jackRules.value.toMutableList()
+                            updatedRules.add(customRule)
+                            _jackRules.value = updatedRules
+
+                            // Update selected rule
+                            _selectedJackRule.value = customRule
+                        }
+                    } catch (e: Exception) {
+                        Log.e("GameViewModel", "Error loading custom rule", e)
+                    }
+                }
             }
         } else if (gameRoom.currentJackRuleId == null && _selectedJackRule.value != null) {
             // The Jack Rule was cleared in the database, clear it locally too
@@ -603,16 +621,34 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
             // A Mini Game was selected, but we don't have it locally - load it
             Log.d("GameViewModel", "Mini Game selected by another player, loading game details")
 
-            // Load the mini games if not already loaded
-            if (_miniGames.value.isEmpty()) {
-                loadRulesAndGames(gameRoom.gameMode)
-            }
-
             // Find the selected game in our local list
             val game = _miniGames.value.find { it.id == gameRoom.currentMiniGameId }
             if (game != null) {
                 Log.d("GameViewModel", "Found selected Mini Game: ${game.title}")
                 _selectedMiniGame.value = game
+            } else {
+                // Game not found locally - might be a custom game created by another player
+                // Load it directly from Firebase
+                Log.d("GameViewModel", "Game not found locally. Loading from Firebase: ${gameRoom.currentMiniGameId}")
+                viewModelScope.launch {
+                    try {
+                        val roomCode = _roomCode.value ?: return@launch
+                        val customGame = repository.getCustomMiniGame(roomCode, gameRoom.currentMiniGameId)
+                        if (customGame != null) {
+                            Log.d("GameViewModel", "Loaded custom game from Firebase: ${customGame.title}")
+
+                            // Add to local list for future reference
+                            val updatedGames = _miniGames.value.toMutableList()
+                            updatedGames.add(customGame)
+                            _miniGames.value = updatedGames
+
+                            // Update selected game
+                            _selectedMiniGame.value = customGame
+                        }
+                    } catch (e: Exception) {
+                        Log.e("GameViewModel", "Error loading custom game", e)
+                    }
+                }
             }
         } else if (gameRoom.currentMiniGameId == null && _selectedMiniGame.value != null) {
             // The Mini Game was cleared in the database, clear it locally too
@@ -664,12 +700,44 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
                 val customRules = repository.getCustomJackRules(roomCode)
                 val customGames = repository.getCustomMiniGames(roomCode)
 
+                Log.d("GameViewModel", "Loaded ${customRules.size} custom Jack Rules")
+                Log.d("GameViewModel", "Loaded ${customGames.size} custom Mini Games")
+
                 // Combine default and custom content
                 _jackRules.value = defaultRules + customRules
                 _miniGames.value = defaultGames + customGames
 
-                Log.d("GameViewModel", "Loaded ${_jackRules.value.size} Jack Rules (${customRules.size} custom)")
-                Log.d("GameViewModel", "Loaded ${_miniGames.value.size} Mini Games (${customGames.size} custom)")
+                // Check if there's a currently selected rule or game and make sure we have it locally
+                val gameRoom = _gameRoom.value
+                if (gameRoom != null) {
+                    if (gameRoom.currentJackRuleId != null &&
+                        !_jackRules.value.any { it.id == gameRoom.currentJackRuleId }) {
+                        // We don't have the current rule locally, load it
+                        Log.d("GameViewModel", "Current Jack Rule not found locally, fetching: ${gameRoom.currentJackRuleId}")
+                        val currentRule = repository.getCustomJackRule(roomCode, gameRoom.currentJackRuleId)
+                        if (currentRule != null) {
+                            val updatedRules = _jackRules.value.toMutableList()
+                            updatedRules.add(currentRule)
+                            _jackRules.value = updatedRules
+                            _selectedJackRule.value = currentRule
+                        }
+                    }
+
+                    if (gameRoom.currentMiniGameId != null &&
+                        !_miniGames.value.any { it.id == gameRoom.currentMiniGameId }) {
+                        // We don't have the current game locally, load it
+                        Log.d("GameViewModel", "Current Mini Game not found locally, fetching: ${gameRoom.currentMiniGameId}")
+                        val currentGame = repository.getCustomMiniGame(roomCode, gameRoom.currentMiniGameId)
+                        if (currentGame != null) {
+                            val updatedGames = _miniGames.value.toMutableList()
+                            updatedGames.add(currentGame)
+                            _miniGames.value = updatedGames
+                            _selectedMiniGame.value = currentGame
+                        }
+                    }
+                }
+
+                Log.d("GameViewModel", "Finished loading rules and games: ${_jackRules.value.size} rules, ${_miniGames.value.size} games")
             } catch (e: Exception) {
                 Log.e("GameViewModel", "Error loading rules and games", e)
                 _error.value = "Failed to load rules and games: ${e.message}"
