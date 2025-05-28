@@ -216,28 +216,39 @@ fun LobbyScreen(
             // Player list
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 items(players) { player ->
+                    // Search for the name in the list of easter eggs
+                    val matchedIcon = easterEggIcons.entries.find { (keyword, _) ->
+                        player.name.contains(keyword, ignoreCase = true)
+                    }?.value
+
+                    val displayName = if (matchedIcon != null && !player.name.contains(matchedIcon)) {
+                        "${player.name} $matchedIcon"
+                    } else {
+                        player.name
+                    }
+
                     Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                         Row(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                    player.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.weight(1f)
+                                text = displayName,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.weight(1f)
                             )
                             if (player.isHost) {
                                 Text(
-                                        "Host",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary
+                                    "Host",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             }
                             if (!player.isConnected) {
                                 Text(
-                                        "Offline",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.error
+                                    "Offline",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
@@ -300,3 +311,135 @@ fun LobbyScreen(
         }
     }
 }
+
+val easterEggIcons = mapOf(
+    //La mondá
+    "Benju" to "👓💻👨🏼‍🎓",
+    "Porras" to "👓💻👨🏼‍🎓",
+    "Choles" to "👓💻👨🏼‍🎓",
+
+    // Dragon Ball
+    "goku" to "🟠",
+    "vegeta" to "🌱",
+    "krilin" to "💥",
+    "cell" to "🧪",
+    "freezer" to "❄️",
+    "broly" to "💪",
+
+    // Naruto
+    "naruto" to "🍜",
+    "sasuke" to "⚡",
+    "sakura" to "🌸",
+    "kakashi" to "📘",
+    "itachi" to "🐦",
+    "jiraiya" to "🐸",
+    "madara" to "🌪️",
+
+    // One Piece
+    "luffy" to "🏴‍☠️",
+    "zoro" to "🗡️",
+    "nami" to "🌊",
+    "sanji" to "🔥",
+    "usopp" to "🎯",
+    "robin" to "📚",
+    "chopper" to "🦌",
+    "brook" to "🎸",
+
+    // Pokémon
+    "pikachu" to "⚡",
+    "charizard" to "🔥",
+    "bulbasaur" to "🍃",
+    "squirtle" to "💧",
+    "ash" to "🎒",
+
+    // Harry Potter
+    "harry" to "⚡",
+    "hermione" to "📚",
+    "ron" to "🐀",
+    "dobby" to "🧦",
+    "voldemort" to "🐍",
+
+    // Star Wars
+    "darth" to "🌌",
+    "vader" to "🖤",
+    "kenobi" to "⚔️",
+    "yoda" to "🧓",
+    "grogu" to "👶",
+
+    // LOTR
+    "gandalf" to "🧙",
+    "frodo" to "💍",
+    "sauron" to "👁️",
+
+    // Superhéroes
+    "batman" to "🦇",
+    "joker" to "🎭",
+    "superman" to "🛡️",
+    "spiderman" to "🕷️",
+    "ironman" to "🤖",
+    "thanos" to "🧤",
+    "deadpool" to "🔫",
+    "thor" to "🔨",
+    "peter" to "🕸️",
+
+    // Cultura pop y memes
+    "shrek" to "🧅",
+    "fiona" to "👸",
+    "grinch" to "💚",
+    "doge" to "🐶",
+    "sus" to "🔺",
+    "amogus" to "🧽",
+    "gigachad" to "😎",
+    "toretto" to "🚗",
+    "elver" to "🍆",
+    "pepito" to "🧸",
+    "chimuelo" to "🐉",
+    "trol" to "🧌",
+    "sigma" to "🧠",
+    "cr7" to "👑",
+    "messi" to "🐐",
+
+    // Apodos y nombres comunes
+    "juan" to "🐴",
+    "elpro" to "🧠",
+    "arnold" to "🤖",
+    "walter" to "🎩",
+    "gus" to "🐔",
+    "saul" to "⚖️",
+    "hank" to "🚓",
+    "natasha" to "🕷️",
+    "rick" to "🤠",
+    "daryl" to "🏹",
+    "trinity" to "🕶️",
+    "daenerys" to "🐉",
+    "po" to "🐼",
+    "shifu" to "🐭",
+    "tigresa" to "🐯",
+
+    // Nickelodeon
+    "bob" to "🍍",
+    "patricio" to "🌟",
+    "sandy" to "🐿️",
+    "calamardo" to "🎷",
+
+    // Otros animes y videojuegos
+    "tanjiro" to "🌊",
+    "nezuko" to "🎍",
+    "eren" to "🧱",
+    "levi" to "🧹",
+    "mikasa" to "🧣",
+    "gojo" to "🩵",
+    "saitama" to "👊",
+    "genos" to "🔥",
+    "akira" to "🏍️",
+    "link" to "🗡️",
+    "zelda" to "👑",
+    "samus" to "👩‍🚀",
+    "cloud" to "☁️",
+    "sephiroth" to "🗡️",
+    "mario" to "🍄",
+    "luigi" to "🟢",
+    "bowser" to "🐢",
+    "peach" to "👑",
+    "wario" to "💰"
+)
