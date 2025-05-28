@@ -3,9 +3,11 @@ package com.benchopo.firering.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -35,11 +37,15 @@ fun GameModeSelector(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        LazyRow(
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
         ) {
-            items(GameMode.values()) { mode ->
+            GameMode.entries.forEach { mode ->
                 GameModeCard(
                     mode = mode,
                     isSelected = mode == selectedMode,
@@ -47,6 +53,8 @@ fun GameModeSelector(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Game mode description
         Text(
@@ -66,7 +74,7 @@ fun GameModeCard(
 ) {
     Card(
         modifier = Modifier
-            .width(110.dp)
+            .width(130.dp)
             .height(140.dp)
             .clip(RoundedCornerShape(8.dp))
             .border(
@@ -99,7 +107,7 @@ fun GameModeCard(
 
             Text(
                 getGameModeName(mode),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
         }
