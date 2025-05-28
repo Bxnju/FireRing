@@ -568,6 +568,9 @@ class GameViewModel(private val userViewModel: UserViewModel) : ViewModel() {
 
     // Add this function to synchronize the current card for all players
     private fun updateCurrentCardFromRoom(gameRoom: GameRoom) {
+        // Update active Jack Rules from the game room
+        _activeJackRules.value = gameRoom.activeJackRules
+
         // If there's a current card ID but our local drawnCard doesn't match it,
         // find the card in the game room's drawn cards
         val currentCardId = gameRoom.currentCardId
