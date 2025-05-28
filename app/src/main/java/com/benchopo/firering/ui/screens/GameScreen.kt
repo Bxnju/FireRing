@@ -304,6 +304,7 @@ fun GameScreen(
                         currentTurnPlayer?.name ?: "Unknown",
                         style = MaterialTheme.typography.headlineSmall
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         if (isCurrentPlayerTurn) "It's your turn!" else "Wait for your turn",
                         style = MaterialTheme.typography.bodyMedium,
