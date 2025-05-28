@@ -152,10 +152,10 @@ fun CreateRoomScreen(
                     .height(56.dp),
                 colors =
                     ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent // Hacemos el fondo del botón
-                        // transparente
+                        containerColor = Color.Transparent
+
                     ),
-                contentPadding = PaddingValues() // Quitamos el padding interno del botón
+                contentPadding = PaddingValues()
             ) {
                 Box(
                     modifier =
