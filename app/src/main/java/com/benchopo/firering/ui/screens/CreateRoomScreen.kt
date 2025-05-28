@@ -3,6 +3,8 @@ package com.benchopo.firering.ui.screens
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +35,7 @@ fun CreateRoomScreen(
 
     val roomCode by gameViewModel.roomCode.collectAsState()
     val loading by gameViewModel.loading.collectAsState()
+    var clickCount by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         Log.d("CreateRoomScreen", "Entered CreateRoomScreen, resetting loading state")
@@ -90,9 +93,18 @@ fun CreateRoomScreen(
                 Text("Create Room ", style = MaterialTheme.typography.headlineLarge)
 
                 Image(
-                    painter = painterResource(id = R.drawable.ic_beer_bottle),
-                    contentDescription = "Beer Icon",
+                    painter = painterResource(id = if (clickCount > 5) R.drawable.ic_wine_cup else R.drawable.ic_wine_bottle),
+                    contentDescription = "Wine Icon",
                     modifier = Modifier.size(46.dp)
+                        .clickable (
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        clickCount++
+                        if (clickCount >= 10) {
+                            clickCount = 0
+                        }
+                    }
                 )
             }
 
