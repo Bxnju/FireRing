@@ -58,7 +58,20 @@ which can include drinking, choosing partners, starting games like categories, a
 🚀 Material 3
   </pre>
 
-  <br><br>
+<br><br>
+
+<h2>🎨 Figma Prototype</h2>
+
+<pre>
+Want a sneak peek at the design?  
+Check out our interactive Figma prototype and see how FireRing came to life!
+</pre>
+
+<a href="https://www.figma.com/proto/gMFSs2tpfPOJu2DEiBcWxg/FireRing---Aplicaciones-M%C3%B3viles?node-id=1-31&p=f&t=GM8kYwOhZapfNdYX-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A31">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg" width="100"/>
+</a>
+
+<br><br>
 
   <h2>👨‍💻 Contributors</h2>
 
